@@ -16,8 +16,16 @@ export default function MembersContent({ games }: { games: GameWithRole[] }) {
       fetch(`/api/games/${selectedGameId}/members`).then(r => r.json()),
       fetch(`/api/leaderboard?game_id=${selectedGameId}`).then(r => r.json()),
     ]).then(([mem, lb]) => {
-      setMembers(Array.isArray(mem) ? mem : [])
-      setLeaderboard(Array.isArray(lb) ? lb : [])
+      const lbList = Array.isArray(lb) ? lb : []
+      const memList = Array.isArray(mem) ? mem : []
+      // 按积分从高到低排序
+      memList.sort((a, b) => {
+        const aPoints = lbList.find((e: any) => e.user_id === a.user_id)?.total_points ?? 0
+        const bPoints = lbList.find((e: any) => e.user_id === b.user_id)?.total_points ?? 0
+        return bPoints - aPoints
+      })
+      setMembers(memList)
+      setLeaderboard(lbList)
       setLoading(false)
     })
   }, [selectedGameId])
