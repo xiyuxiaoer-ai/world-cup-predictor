@@ -18,6 +18,8 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [members, setMembers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState<Filter>('upcoming')
+  const [syncing, setSyncing] = useState(false)
+  const [syncMsg, setSyncMsg] = useState('')
 
   useEffect(() => {
     if (!selectedGameId) return
@@ -37,11 +39,42 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
     return true
   })
 
+  async function handleSync() {
+    setSyncing(true)
+    setSyncMsg('')
+    const res = await fetch('/api/sync-matches', { method: 'POST' })
+    if (res.ok) {
+      setSyncMsg('已更新')
+      if (selectedGameId) {
+        fetch(`/api/records?game_id=${selectedGameId}`)
+          .then(r => r.json())
+          .then(data => { setMatches(data.matches || []); setMembers(data.members || []) })
+      }
+    } else {
+      setSyncMsg('更新失败')
+    }
+    setSyncing(false)
+    setTimeout(() => setSyncMsg(''), 3000)
+  }
+
   if (!selectedGameId) return <p className="text-zinc-500">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
-      <h1 className="text-xl font-bold">竞猜记录</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">竞猜记录</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-50 transition-colors"
+          >
+            <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
+            <span>{syncing ? '更新中...' : '手动更新'}</span>
+          </button>
+          {syncMsg && <span className="text-xs text-emerald-400">{syncMsg}</span>}
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-2 items-center">
         <select

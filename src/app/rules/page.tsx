@@ -103,6 +103,22 @@ export default async function RulesPage() {
             比赛开赛前1小时锁定，锁定后无法提交竞猜
           </p>
         </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+          <h2 className="font-bold text-base flex items-center gap-2">
+            <span>🔄</span> 数据更新说明
+          </h2>
+          <div className="space-y-3 text-sm text-zinc-400">
+            <div className="flex gap-3">
+              <span className="text-zinc-500 shrink-0">自动更新</span>
+              <span>系统每30分钟自动同步一次比赛结果和积分，无需手动操作。</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-zinc-500 shrink-0">手动更新</span>
+              <span>想立即获取最新结果？点击主页或竞猜记录页顶部的「手动更新」按钮，比赛结果和积分将实时刷新。</span>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   )
