@@ -7,8 +7,8 @@ import { createClient } from '@/lib/supabase/client'
 const navLinks = [
   { href: '/', label: '主页' },
   { href: '/history', label: '竞猜记录' },
-  { href: '/rules', label: '积分规则' },
   { href: '/members', label: '成员' },
+  { href: '/rules', label: '积分规则' },
 ]
 
 export default function Navbar({ username, avatarUrl }: { username: string; avatarUrl?: string | null }) {
