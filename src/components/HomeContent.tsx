@@ -170,7 +170,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               disabled={deletingGame}
               className="text-xs text-red-400/50 hover:text-red-400 border border-red-400/20 hover:border-red-400/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
             >
-              {deletingGame ? '删除中...' : '删除此 Game'}
+              {deletingGame ? '删除中...' : '删除 Game'}
             </button>
           )}
         </div>
