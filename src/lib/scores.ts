@@ -28,9 +28,16 @@ export function calculatePoints(match: Match, prediction: Prediction): number {
   }
 
   if (predResult === 'draw' && KNOCKOUT_STAGES.includes(match.stage)) {
+    const etEndedInDraw = match.et_winner === null && match.penalty_winner !== null
+
+    // 加时赛得分：猜对加时赛胜者，或双方都预测加时平且实际加时平
     if (match.et_winner && prediction.pred_et_winner === match.et_winner) {
       points += bonusBase * m
+    } else if (etEndedInDraw && prediction.pred_et_winner === 'draw') {
+      points += bonusBase * m
     }
+
+    // 点球得分：猜对点球胜者
     if (match.penalty_winner && prediction.pred_penalty_winner === match.penalty_winner) {
       points += bonusBase * m
     }
