@@ -158,9 +158,9 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="text-xs text-zinc-500 bg-zinc-800/50">
-                          <th className="text-left px-4 py-2 font-medium">成员</th>
-                          <th className="text-center px-3 py-2 font-medium">竞猜</th>
-                          <th className="text-right px-4 py-2 font-medium">积分</th>
+                          <th className="text-left px-4 py-2 font-medium w-1/3">成员</th>
+                          <th className="text-center px-3 py-2 font-medium w-1/3">竞猜</th>
+                          <th className="text-right px-4 py-2 font-medium w-1/3">积分</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-800">
