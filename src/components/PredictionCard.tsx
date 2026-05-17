@@ -6,6 +6,11 @@ import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
 const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
 
+const STAGE_LABELS: Record<string, string> = {
+  group: '小组赛', round_of_32: '32强', round_of_16: '16强',
+  quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
+}
+
 export default function PredictionCard({
   match,
   gameId,
@@ -101,7 +106,9 @@ export default function PredictionCard({
           {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
           {' '}
           {kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-          {match.group_name && ` · ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+          {' · '}
+          {STAGE_LABELS[match.stage]}
+          {match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
         </span>
         {isUrgent && (
           <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full animate-pulse">
