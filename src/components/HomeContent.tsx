@@ -27,6 +27,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [loading, setLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
+  const [syncAllGames, setSyncAllGames] = useState(false)
   const [copied, setCopied] = useState(false)
   const [deletingGame, setDeletingGame] = useState(false)
   const [confirmDeleteGame, setConfirmDeleteGame] = useState(false)
@@ -202,7 +203,20 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           {/* Top: Todo + Leaderboard */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div>
-              <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">待竞猜</h2>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">待竞猜</h2>
+                {games.length > 1 && (
+                  <button
+                    onClick={() => setSyncAllGames(prev => !prev)}
+                    className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                  >
+                    同步所有 Game
+                    <div className={`w-8 h-4 rounded-full transition-colors relative ${syncAllGames ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
+                      <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${syncAllGames ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                    </div>
+                  </button>
+                )}
+              </div>
               {pendingMatches.length === 0 ? (
                 <p className="text-zinc-500 text-sm">暂无待竞猜比赛 🎉</p>
               ) : (
@@ -211,7 +225,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     <PredictionCard
                       key={match.id}
                       match={match}
-                      gameId={selectedGameId}
+                      gameIds={syncAllGames ? games.map(g => g.id) : [selectedGameId]}
                       prediction={predictions[match.id]}
                       onSubmitted={pred => handlePredictionSubmitted(match.id, pred)}
                     />

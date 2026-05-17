@@ -13,12 +13,12 @@ const STAGE_LABELS: Record<string, string> = {
 
 export default function PredictionCard({
   match,
-  gameId,
+  gameIds,
   prediction,
   onSubmitted,
 }: {
   match: Match
-  gameId: string
+  gameIds: string[]
   prediction?: Prediction
   onSubmitted: (pred: Prediction) => void
 }) {
@@ -45,25 +45,35 @@ export default function PredictionCard({
     setError('')
     setLoading(true)
 
-    const res = await fetch('/api/predictions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        game_id: gameId,
-        match_id: match.id,
-        pred_home_score: parseInt(homeScore),
-        pred_away_score: parseInt(awayScore),
-        pred_et_winner: showExtraFields ? etWinner || null : null,
-        pred_penalty_winner: showExtraFields ? penaltyWinner || null : null,
-      }),
-    })
+    const body = {
+      match_id: match.id,
+      pred_home_score: parseInt(homeScore),
+      pred_away_score: parseInt(awayScore),
+      pred_et_winner: showExtraFields ? etWinner || null : null,
+      pred_penalty_winner: showExtraFields ? penaltyWinner || null : null,
+    }
 
-    const data = await res.json()
-    if (!res.ok) {
-      setError(data.error || '提交失败')
-    } else {
-      onSubmitted(data)
+    let lastSuccess = null
+    let successCount = 0
+    for (const gid of gameIds) {
+      const res = await fetch('/api/predictions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...body, game_id: gid }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        lastSuccess = data
+        successCount++
+      }
+    }
+
+    if (lastSuccess) {
+      onSubmitted(lastSuccess)
       setDone(true)
+      if (gameIds.length > 1) setError('')
+    } else {
+      setError('提交失败')
     }
     setLoading(false)
   }
