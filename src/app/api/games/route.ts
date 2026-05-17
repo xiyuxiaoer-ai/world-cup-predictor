@@ -38,6 +38,7 @@ export async function POST(request: Request) {
     .single()
 
   if (gameError) return NextResponse.json({ error: gameError.message }, { status: 500 })
+  if (!game) return NextResponse.json({ error: '创建失败，请重试' }, { status: 500 })
 
   const { error: memberError } = await supabase
     .from('game_members')

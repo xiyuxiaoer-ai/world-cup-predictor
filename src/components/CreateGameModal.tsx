@@ -18,17 +18,22 @@ export default function CreateGameModal({
     e.preventDefault()
     setLoading(true)
     setError('')
-    const res = await fetch('/api/games', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
-    })
-    const data = await res.json()
-    if (!res.ok) {
-      setError(data.error || '创建失败')
+    try {
+      const res = await fetch('/api/games', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || '创建失败')
+      } else {
+        onCreated({ ...data, role: 'admin' })
+      }
+    } catch {
+      setError('网络错误，请重试')
+    } finally {
       setLoading(false)
-    } else {
-      onCreated({ ...data, role: 'admin' })
     }
   }
 
