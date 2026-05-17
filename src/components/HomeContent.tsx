@@ -54,7 +54,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
-    .slice(0, 5)
+    .slice(0, 3)
 
   if (!selectedGameId) {
     return (
