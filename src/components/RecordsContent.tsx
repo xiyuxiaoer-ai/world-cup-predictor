@@ -160,7 +160,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                         <tr className="text-xs text-zinc-500 bg-zinc-800/50">
                           <th className="text-left px-4 py-2 font-medium">成员</th>
                           <th className="text-center px-3 py-2 font-medium">竞猜</th>
-                          {isFinished && <th className="text-center px-3 py-2 font-medium">结果</th>}
+                          <th className="text-center px-3 py-2 font-medium">结果</th>
                           <th className="text-right px-4 py-2 font-medium">积分</th>
                         </tr>
                       </thead>
@@ -201,11 +201,9 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                   <span className="text-zinc-400 text-xs"> · 点球:{pred.pred_penalty_winner}</span>
                                 )}
                               </td>
-                              {isFinished && (
-                                <td className={`px-3 py-2.5 text-center font-bold ${resultIcon === '✓' ? 'text-emerald-400' : 'text-red-400'}`}>
-                                  {resultIcon}
-                                </td>
-                              )}
+                              <td className={`px-3 py-2.5 text-center font-bold ${resultIcon === '✓' ? 'text-emerald-400' : resultIcon === '✗' ? 'text-red-400' : ''}`}>
+                                {resultIcon}
+                              </td>
                               <td className="px-4 py-2.5 text-right font-bold">
                                 {points != null ? (
                                   <span className={points > 0 ? 'text-emerald-400' : points < 0 ? 'text-red-400' : 'text-zinc-500'}>
