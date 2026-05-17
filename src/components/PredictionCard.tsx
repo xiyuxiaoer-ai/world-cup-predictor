@@ -28,6 +28,7 @@ export default function PredictionCard({
   const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
   const isDraw = homeScore !== '' && awayScore !== '' && homeScore === awayScore
   const showExtraFields = isKnockout && isDraw
+  const showPenalty = showExtraFields && etWinner === 'draw'
 
   const now = new Date()
   const lockTime = new Date(match.lock_time)
@@ -146,20 +147,21 @@ export default function PredictionCard({
 
       {showExtraFields && (
         <div className="space-y-2 border-t border-zinc-800 pt-3">
-          <p className="text-xs text-zinc-400">平局时需猜加时赛和点球：</p>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="text-xs text-zinc-500 mb-1 block">加时赛胜者</label>
-              <select
-                value={etWinner}
-                onChange={e => setEtWinner(e.target.value)}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500"
-              >
-                <option value="">选择</option>
-                <option value={match.home_team}>{getTeamDisplay(match.home_tla, match.home_team)}</option>
-                <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
-              </select>
-            </div>
+          <p className="text-xs text-zinc-400">90分钟平局时需猜加时赛：</p>
+          <div>
+            <label className="text-xs text-zinc-500 mb-1 block">加时赛胜者</label>
+            <select
+              value={etWinner}
+              onChange={e => { setEtWinner(e.target.value); if (e.target.value !== 'draw') setPenaltyWinner('') }}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500"
+            >
+              <option value="">选择</option>
+              <option value={match.home_team}>{getTeamDisplay(match.home_tla, match.home_team)}</option>
+              <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
+              <option value="draw">平局（进点球）</option>
+            </select>
+          </div>
+          {showPenalty && (
             <div>
               <label className="text-xs text-zinc-500 mb-1 block">点球胜者</label>
               <select
@@ -172,7 +174,7 @@ export default function PredictionCard({
                 <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
               </select>
             </div>
-          </div>
+          )}
         </div>
       )}
 
