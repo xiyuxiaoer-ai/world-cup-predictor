@@ -88,10 +88,10 @@ export default function ProfilePage() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const path = `${user.id}/avatar.jpg`
+        const path = `${user.id}/avatar_${Date.now()}.jpg`
         const { error: uploadError } = await supabase.storage
           .from('avatars')
-          .upload(path, pendingBlob, { upsert: true, contentType: 'image/jpeg' })
+          .upload(path, pendingBlob, { contentType: 'image/jpeg' })
 
         if (uploadError) {
           setMsg('头像上传失败：' + uploadError.message)
