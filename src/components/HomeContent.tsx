@@ -142,14 +142,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           >
             + 加入
           </button>
-          {isAdmin && (
-            <button
-              onClick={() => setShowInviteModal(true)}
-              className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-1.5 rounded-lg transition-colors"
-            >
-              邀请成员
-            </button>
-          )}
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            邀请成员
+          </button>
           <button
             onClick={copyGameCode}
             title="复制 Game 码邀请朋友"

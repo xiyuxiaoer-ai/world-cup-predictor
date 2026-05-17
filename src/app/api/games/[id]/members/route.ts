@@ -32,8 +32,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     .eq('user_id', user.id)
     .single()
 
-  if (membership?.role !== 'admin') {
-    return NextResponse.json({ error: '只有管理员可以邀请成员' }, { status: 403 })
+  if (!membership) {
+    return NextResponse.json({ error: '你不在此 Game 中' }, { status: 403 })
   }
 
   const { data: profile } = await supabase
