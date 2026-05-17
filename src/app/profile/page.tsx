@@ -2,14 +2,14 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
-export default async function HomePage() {
+export default async function ProfilePage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username')
+    .select('*')
     .eq('id', user.id)
     .single()
 
@@ -17,7 +17,8 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col">
       <Navbar username={profile?.username ?? ''} />
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
-        <p className="text-zinc-400">主页内容开发中...</p>
+        <h1 className="text-xl font-bold mb-6">个人设置</h1>
+        <p className="text-zinc-400">开发中...</p>
       </main>
     </div>
   )
