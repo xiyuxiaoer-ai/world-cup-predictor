@@ -9,7 +9,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const { data, error } = await supabase
     .from('game_members')
-    .select('role, joined_at, profiles(id, username, display_name, avatar_url, bio)')
+    .select('user_id, role, joined_at, profiles(id, username, display_name, avatar_url, bio)')
     .eq('game_id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
