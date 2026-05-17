@@ -318,14 +318,23 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     {/* Row 3: prediction */}
                     <div className="text-xs border-t border-zinc-800 pt-2">
                       {pred ? (
-                        <div className="flex items-center justify-between">
-                          <span className="text-zinc-500">我猜：<span className="text-zinc-300 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span></span>
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-zinc-500 space-y-0.5">
+                            <div>我猜：<span className="text-zinc-300 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span></div>
+                            {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
+                              <div>延时：<span className="text-zinc-300">{pred.pred_et_winner}</span></div>
+                            )}
+                            {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (
+                              <div>点球：<span className="text-zinc-300">{pred.pred_penalty_winner}</span></div>
+                            )}
+                            {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && !pred.pred_penalty_winner && null}
+                          </div>
                           {pred.points_earned != null ? (
-                            <span className={pred.points_earned > 0 ? 'text-emerald-400 font-semibold' : pred.points_earned < 0 ? 'text-red-400' : 'text-zinc-500'}>
+                            <span className={`shrink-0 ${pred.points_earned > 0 ? 'text-emerald-400 font-semibold' : pred.points_earned < 0 ? 'text-red-400' : 'text-zinc-500'}`}>
                               {pred.points_earned > 0 ? `+${pred.points_earned}分` : pred.points_earned < 0 ? `${pred.points_earned}分` : '0分'}
                             </span>
                           ) : (
-                            <span className="text-zinc-600">待结算</span>
+                            <span className="text-zinc-600 shrink-0">待结算</span>
                           )}
                         </div>
                       ) : isLocked ? (

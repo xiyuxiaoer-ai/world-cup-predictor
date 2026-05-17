@@ -192,8 +192,14 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                   <span className="truncate max-w-[80px]">{name}</span>
                                 </div>
                               </td>
-                              <td className="px-3 py-2.5 text-center font-mono text-white">
-                                {predHome}–{predAway}
+                              <td className="px-3 py-2.5 text-center">
+                                <div className="font-mono text-white">{predHome}–{predAway}</div>
+                                {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
+                                  <div className="text-xs text-zinc-400 mt-0.5">延:{pred.pred_et_winner}</div>
+                                )}
+                                {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (
+                                  <div className="text-xs text-zinc-400 mt-0.5">点球:{pred.pred_penalty_winner}</div>
+                                )}
                               </td>
                               {isFinished && (
                                 <td className={`px-3 py-2.5 text-center font-bold ${resultIcon === '✓' ? 'text-emerald-400' : 'text-red-400'}`}>
