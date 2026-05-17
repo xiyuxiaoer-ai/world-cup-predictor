@@ -22,8 +22,8 @@ const STAGE_RULES = [
     rules: [
       { icon: '✓', label: '猜对90分钟内胜负平', points: '+4分' },
       { icon: '⭐', label: '猜对精确比分（含结果）', points: '+2分' },
-      { icon: '⏱', label: '预测平且实际平 → 加时赛胜者', points: '+2分' },
-      { icon: '🥅', label: '预测平且实际平 → 点球胜者', points: '+2分' },
+      { icon: '⏱', label: '预测90分钟平且实际平 → 猜对加时赛胜者', points: '+2分' },
+      { icon: '🥅', label: '预测加时赛平且实际平 → 猜对点球胜者', points: '+2分' },
     ],
     max: '单场最高 10分',
   },
