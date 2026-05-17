@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const [{ data: members }, { data: predictions }] = await Promise.all([
     supabase
       .from('game_members')
-      .select('user_id, profiles(username, display_name)')
+      .select('user_id, profiles(username, display_name, avatar_url)')
       .eq('game_id', gameId),
     supabase
       .from('predictions')
@@ -34,6 +34,7 @@ export async function GET(request: Request) {
       user_id: m.user_id,
       username: (m.profiles as any)?.username || '',
       display_name: (m.profiles as any)?.display_name || '',
+      avatar_url: (m.profiles as any)?.avatar_url || null,
       total_points: pointsMap[m.user_id] || 0,
       prediction_count: countMap[m.user_id] || 0,
     }))

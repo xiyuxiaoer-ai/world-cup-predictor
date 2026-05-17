@@ -41,12 +41,16 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                   ? <span className="text-base">{MEDALS[i]}</span>
                   : <span className="text-zinc-500 text-sm">{i + 1}</span>}
               </span>
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                i === 0 ? 'bg-yellow-500/20 border border-yellow-500/40 text-yellow-400'
-                : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-              }`}>
-                {(entry.display_name || entry.username)?.[0]?.toUpperCase()}
-              </div>
+              {entry.avatar_url ? (
+                <img src={entry.avatar_url} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 border ${i === 0 ? 'border-yellow-500/40' : 'border-zinc-600'}`} />
+              ) : (
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                  i === 0 ? 'bg-yellow-500/20 border border-yellow-500/40 text-yellow-400'
+                  : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+                }`}>
+                  {(entry.display_name || entry.username)?.[0]?.toUpperCase()}
+                </div>
+              )}
               <span className={`flex-1 text-sm font-medium truncate ${i === 0 ? 'text-yellow-100' : ''}`}>
                 {entry.display_name || entry.username}
               </span>
