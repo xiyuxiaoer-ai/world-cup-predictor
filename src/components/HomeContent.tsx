@@ -102,9 +102,20 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     setPredictions(prev => ({ ...prev, [matchId]: pred }))
   }
 
+  const [showAllMatches, setShowAllMatches] = useState(false)
+
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
     .slice(0, 3)
+
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  const oneWeekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+  const displayMatches = showAllMatches
+    ? matches
+    : matches.filter(m => {
+        const t = new Date(m.kickoff_time)
+        return t >= oneWeekAgo && t <= oneWeekLater
+      })
 
   if (!selectedGameId) {
     return (
@@ -211,6 +222,15 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             <div className="flex items-center gap-3 mb-3">
               <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">2026世界杯赛程安排</h2>
               <button
+                onClick={() => setShowAllMatches(prev => !prev)}
+                className="text-xs text-zinc-500 hover:text-zinc-300 border border-zinc-700 hover:border-zinc-500 px-2 py-1 rounded-lg transition-colors"
+              >
+                {showAllMatches ? '只看近期' : '全部比赛'}
+              </button>
+              {!showAllMatches && (
+                <span className="text-xs text-zinc-600">前后一周</span>
+              )}
+              <button
                 onClick={handleSync}
                 disabled={syncing}
                 className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-50 transition-colors"
@@ -221,7 +241,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               {syncMsg && <span className="text-xs text-emerald-400">{syncMsg}</span>}
             </div>
             <div className="space-y-2">
-              {matches.map(match => {
+              {displayMatches.length === 0 && (
+                <p className="text-zinc-500 text-sm">本周暂无比赛，<button onClick={() => setShowAllMatches(true)} className="text-emerald-400 underline">查看全部赛程</button></p>
+              )}
+              {displayMatches.map(match => {
                 const pred = predictions[match.id]
                 const isLocked = new Date(match.lock_time) <= now
                 const kickoff = new Date(match.kickoff_time)
