@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
+import InviteMemberModal from './InviteMemberModal'
 
 export default function MembersContent({ games, currentUserId }: { games: GameWithRole[]; currentUserId: string }) {
   const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
@@ -10,6 +11,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [showInviteModal, setShowInviteModal] = useState(false)
 
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
@@ -69,13 +71,21 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
     <div className="space-y-5">
       <h1 className="text-xl font-bold">成员介绍</h1>
 
-      <select
-        value={selectedGameId}
-        onChange={e => setSelectedGameId(e.target.value)}
-        className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
-      >
-        {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
-      </select>
+      <div className="flex items-center gap-3 flex-wrap">
+        <select
+          value={selectedGameId}
+          onChange={e => setSelectedGameId(e.target.value)}
+          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
+        >
+          {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+        </select>
+        <button
+          onClick={() => setShowInviteModal(true)}
+          className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-2 rounded-lg transition-colors"
+        >
+          + 邀请成员
+        </button>
+      </div>
 
       {loading ? (
         <p className="text-zinc-500 text-sm">加载中...</p>
@@ -133,6 +143,9 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             )
           })}
         </div>
+      )}
+      {showInviteModal && (
+        <InviteMemberModal gameId={selectedGameId} onClose={() => setShowInviteModal(false)} />
       )}
     </div>
   )

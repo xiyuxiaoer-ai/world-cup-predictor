@@ -7,7 +7,6 @@ import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import PredictionCard from './PredictionCard'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
-import InviteMemberModal from './InviteMemberModal'
 import JoinGameModal from './JoinGameModal'
 
 const STAGE_LABELS: Record<string, string> = {
@@ -27,7 +26,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({})
   const [loading, setLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [showInviteModal, setShowInviteModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [copied, setCopied] = useState(false)
   const [deletingGame, setDeletingGame] = useState(false)
@@ -158,12 +156,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
           >
             + 加入
-          </button>
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-1.5 rounded-lg transition-colors"
-          >
-            邀请成员
           </button>
           <button
             onClick={copyGameCode}
@@ -302,9 +294,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
       {showCreateModal && (
         <CreateGameModal onCreated={handleGameCreated} onClose={() => setShowCreateModal(false)} />
-      )}
-      {showInviteModal && (
-        <InviteMemberModal gameId={selectedGameId} onClose={() => setShowInviteModal(false)} />
       )}
       {showJoinModal && (
         <JoinGameModal onJoined={handleGameJoined} onClose={() => setShowJoinModal(false)} />
