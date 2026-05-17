@@ -30,12 +30,14 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm animate-fade-in">
       <div className="text-center mb-8">
-        <img
-          src="https://crests.football-data.org/wm26.png"
-          alt="FIFA World Cup 2026"
-          className="w-24 h-24 object-contain mx-auto mb-4"
-        />
-        <h1 className="text-2xl font-bold tracking-tight">世界杯竞猜</h1>
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <h1 className="text-2xl font-bold tracking-tight">2026年世界杯足球赛</h1>
+          <img
+            src="https://crests.football-data.org/wm26.png"
+            alt="FIFA World Cup 2026"
+            className="w-8 h-8 object-contain"
+          />
+        </div>
         <p className="text-zinc-400 text-sm mt-1">登录你的账号继续</p>
       </div>
 
