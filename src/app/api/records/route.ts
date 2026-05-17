@@ -23,7 +23,13 @@ export async function GET(request: Request) {
   ])
 
   const result = (matches || []).map(match => {
-    const matchPredictions = (allPredictions || []).filter(p => p.match_id === match.id)
+    const matchPredictions = (allPredictions || [])
+      .filter(p => p.match_id === match.id)
+      .sort((a, b) => {
+        const nameA = (a.profiles?.display_name || a.profiles?.username || '').toLowerCase()
+        const nameB = (b.profiles?.display_name || b.profiles?.username || '').toLowerCase()
+        return nameA.localeCompare(nameB)
+      })
     const userPrediction = matchPredictions.find(p => p.user_id === user.id)
 
     return {
