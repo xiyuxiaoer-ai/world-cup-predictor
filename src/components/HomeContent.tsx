@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { GameWithRole, Match, Prediction } from '@/types'
+import { useSelectedGame } from '@/hooks/useSelectedGame'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import PredictionCard from './PredictionCard'
 import Leaderboard from './Leaderboard'
@@ -21,7 +22,7 @@ const STAGE_LABELS: Record<string, string> = {
 
 export default function HomeContent({ initialGames }: { initialGames: GameWithRole[] }) {
   const [games, setGames] = useState(initialGames)
-  const [selectedGameId, setSelectedGameId] = useState(initialGames[0]?.id ?? '')
+  const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [matches, setMatches] = useState<Match[]>([])
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({})
   const [loading, setLoading] = useState(false)

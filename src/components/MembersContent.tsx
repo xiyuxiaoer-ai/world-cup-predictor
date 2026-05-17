@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
+import { useSelectedGame } from '@/hooks/useSelectedGame'
 
 export default function MembersContent({ games }: { games: GameWithRole[] }) {
-  const [selectedGameId, setSelectedGameId] = useState(games[0]?.id ?? '')
+  const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [members, setMembers] = useState<any[]>([])
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [loading, setLoading] = useState(false)

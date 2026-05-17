@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
+import { useSelectedGame } from '@/hooks/useSelectedGame'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
 const STAGE_LABELS: Record<string, string> = {
@@ -12,7 +13,7 @@ const STAGE_LABELS: Record<string, string> = {
 type Filter = 'all' | 'finished' | 'upcoming'
 
 export default function RecordsContent({ games }: { games: GameWithRole[] }) {
-  const [selectedGameId, setSelectedGameId] = useState(games[0]?.id ?? '')
+  const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [matches, setMatches] = useState<any[]>([])
   const [members, setMembers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
