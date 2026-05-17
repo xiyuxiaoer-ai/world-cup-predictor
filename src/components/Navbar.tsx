@@ -11,7 +11,7 @@ const navLinks = [
   { href: '/members', label: '成员' },
 ]
 
-export default function Navbar({ username }: { username: string }) {
+export default function Navbar({ username, avatarUrl }: { username: string; avatarUrl?: string | null }) {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -51,9 +51,13 @@ export default function Navbar({ username }: { username: string }) {
             href="/profile"
             className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs font-bold">
-              {username?.[0]?.toUpperCase() ?? '?'}
-            </div>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover border border-zinc-600" />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs font-bold">
+                {username?.[0]?.toUpperCase() ?? '?'}
+              </div>
+            )}
             <span className="hidden sm:block">{username}</span>
           </Link>
           <button
