@@ -1,30 +1,32 @@
-const FLAG_MAP: Record<string, string> = {
+const TLA_TO_ISO2: Record<string, string> = {
   // Americas
-  MEX: '🇲🇽', USA: '🇺🇸', CAN: '🇨🇦', BRA: '🇧🇷', ARG: '🇦🇷',
-  COL: '🇨🇴', URU: '🇺🇾', ECU: '🇪🇨', PAR: '🇵🇾', BOL: '🇧🇴',
-  VEN: '🇻🇪', CHI: '🇨🇱', PER: '🇵🇪', CRC: '🇨🇷', PAN: '🇵🇦',
-  JAM: '🇯🇲', HON: '🇭🇳', SLV: '🇸🇻',
+  MEX: 'mx', USA: 'us', CAN: 'ca', BRA: 'br', ARG: 'ar',
+  COL: 'co', URU: 'uy', ECU: 'ec', PAR: 'py', BOL: 'bo',
+  VEN: 've', CHI: 'cl', PER: 'pe', CRC: 'cr', PAN: 'pa',
+  JAM: 'jm', HON: 'hn', SLV: 'sv',
   // Europe
-  FRA: '🇫🇷', GER: '🇩🇪', ESP: '🇪🇸', ENG: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', POR: '🇵🇹',
-  NED: '🇳🇱', BEL: '🇧🇪', ITA: '🇮🇹', CRO: '🇭🇷', SRB: '🇷🇸',
-  SUI: '🇨🇭', DEN: '🇩🇰', AUT: '🇦🇹', SVK: '🇸🇰', SCO: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
-  TUR: '🇹🇷', POL: '🇵🇱', ROU: '🇷🇴', UKR: '🇺🇦', HUN: '🇭🇺',
-  SVN: '🇸🇮', GRE: '🇬🇷', GEO: '🇬🇪', WAL: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', NIR: '🇬🇧',
+  FRA: 'fr', GER: 'de', ESP: 'es', ENG: 'gb-eng', POR: 'pt',
+  NED: 'nl', BEL: 'be', ITA: 'it', CRO: 'hr', SRB: 'rs',
+  SUI: 'ch', DEN: 'dk', AUT: 'at', SVK: 'sk', SCO: 'gb-sct',
+  TUR: 'tr', POL: 'pl', ROU: 'ro', UKR: 'ua', HUN: 'hu',
+  SVN: 'si', GRE: 'gr', GEO: 'ge', WAL: 'gb-wls', NIR: 'gb',
+  CZE: 'cz',
   // Africa
-  MAR: '🇲🇦', SEN: '🇸🇳', EGY: '🇪🇬', CMR: '🇨🇲', NGA: '🇳🇬',
-  CIV: '🇨🇮', ALG: '🇩🇿', TUN: '🇹🇳', MLI: '🇲🇱', RSA: '🇿🇦',
-  GHA: '🇬🇭', ZIM: '🇿🇼', MOZ: '🇲🇿', UGA: '🇺🇬', TAN: '🇹🇿',
+  MAR: 'ma', SEN: 'sn', EGY: 'eg', CMR: 'cm', NGA: 'ng',
+  CIV: 'ci', ALG: 'dz', TUN: 'tn', MLI: 'ml', RSA: 'za',
+  GHA: 'gh', ZIM: 'zw', MOZ: 'mz', UGA: 'ug', TAN: 'tz',
   // Asia
-  JPN: '🇯🇵', KOR: '🇰🇷', AUS: '🇦🇺', QAT: '🇶🇦', UZB: '🇺🇿',
-  IRN: '🇮🇷', KSA: '🇸🇦', CHN: '🇨🇳', IND: '🇮🇳', THA: '🇹🇭',
+  JPN: 'jp', KOR: 'kr', AUS: 'au', QAT: 'qa', UZB: 'uz',
+  IRN: 'ir', KSA: 'sa', CHN: 'cn', IND: 'in', THA: 'th',
   // Oceania
-  NZL: '🇳🇿',
-  CZE: '🇨🇿',
+  NZL: 'nz',
 }
 
-export function getFlag(tla: string | null | undefined): string {
-  if (!tla) return '🏳️'
-  return FLAG_MAP[tla.toUpperCase()] ?? '🏳️'
+export function getFlagUrl(tla: string | null | undefined): string | null {
+  if (!tla) return null
+  const iso2 = TLA_TO_ISO2[tla.toUpperCase()]
+  if (!iso2) return null
+  return `https://flagcdn.com/w40/${iso2}.png`
 }
 
 export function getTeamDisplay(tla: string | null | undefined, fullName: string): string {

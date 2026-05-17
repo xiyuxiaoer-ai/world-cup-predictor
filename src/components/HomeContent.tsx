@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { GameWithRole, Match, Prediction } from '@/types'
-import { getFlag, getTeamDisplay } from '@/lib/flags'
+import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import PredictionCard from './PredictionCard'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
@@ -144,8 +144,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 const kickoff = new Date(match.kickoff_time)
                 const homeTla = getTeamDisplay((match as any).home_tla, match.home_team)
                 const awayTla = getTeamDisplay((match as any).away_tla, match.away_team)
-                const homeFlag = getFlag((match as any).home_tla)
-                const awayFlag = getFlag((match as any).away_tla)
+                const homeFlagUrl = getFlagUrl((match as any).home_tla)
+                const awayFlagUrl = getFlagUrl((match as any).away_tla)
                 const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
 
                 return (
@@ -164,7 +164,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     {/* Row 2: teams + score */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-1">
-                        <span className="text-xl leading-none">{homeFlag}</span>
+                        {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
                         <span className="text-sm font-bold tracking-wide">{homeTla}</span>
                       </div>
                       <div className="text-center shrink-0 px-2">
@@ -178,7 +178,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                       </div>
                       <div className="flex items-center gap-1.5 flex-1 justify-end">
                         <span className="text-sm font-bold tracking-wide">{awayTla}</span>
-                        <span className="text-xl leading-none">{awayFlag}</span>
+                        {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
                       </div>
                     </div>
 
