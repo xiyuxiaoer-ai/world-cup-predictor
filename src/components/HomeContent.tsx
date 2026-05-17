@@ -81,21 +81,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     setDeletingGame(false)
   }
 
-  async function handleCalcOnly() {
-    setSyncing(true)
-    setSyncMsg('')
-    const res = await fetch('/api/scores/calculate', { method: 'POST' })
-    const data = await res.json()
-    setSyncMsg(res.ok ? `积分已计算 (${data.updated}条)` : '计算失败')
-    setSyncing(false)
-    if (selectedGameId) {
-      fetch(`/api/matches?game_id=${selectedGameId}`)
-        .then(r => r.json())
-        .then(d => { setMatches(d.matches || []); setPredictions(d.predictions || {}) })
-    }
-    setTimeout(() => setSyncMsg(''), 3000)
-  }
-
   async function handleSync() {
     setSyncing(true)
     setSyncMsg('')
@@ -249,13 +234,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               >
                 <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
                 <span>{syncing ? '更新中...' : '手动更新'}</span>
-              </button>
-              <button
-                onClick={handleCalcOnly}
-                disabled={syncing}
-                className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-50 transition-colors"
-              >
-                ★ 计算积分
               </button>
               {syncMsg && <span className="text-xs text-emerald-400">{syncMsg}</span>}
             </div>
