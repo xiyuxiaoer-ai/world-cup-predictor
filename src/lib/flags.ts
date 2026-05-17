@@ -19,7 +19,21 @@ const TLA_TO_ISO2: Record<string, string> = {
   JPN: 'jp', KOR: 'kr', AUS: 'au', QAT: 'qa', UZB: 'uz',
   IRN: 'ir', KSA: 'sa', CHN: 'cn', IND: 'in', THA: 'th',
   // Oceania
-  NZL: 'nz',
+  NZL: 'nz', FIJ: 'fj', PNG: 'pg', SOL: 'sb', VAN: 'vu', NCL: 'nc',
+  // Europe (extra)
+  NOR: 'no', BIH: 'ba', MKD: 'mk', ALB: 'al', MNE: 'me', ISL: 'is',
+  FIN: 'fi', LUX: 'lu', KVX: 'xk', ARM: 'am', IRL: 'ie', CYP: 'cy',
+  // Asia (extra)
+  JOR: 'jo', IRQ: 'iq', SYR: 'sy', LBN: 'lb', BHR: 'bh', OMA: 'om',
+  KUW: 'kw', YEM: 'ye', PAL: 'ps', IDN: 'id', VIE: 'vn', PHI: 'ph',
+  MYA: 'mm', PRK: 'kp', TJK: 'tj', KGZ: 'kg', TKM: 'tm', AFG: 'af',
+  // Africa (extra)
+  COD: 'cd', ZAM: 'zm', CPV: 'cv', GUI: 'gn', KEN: 'ke', ANG: 'ao',
+  COM: 'km', BEN: 'bj', BFA: 'bf', GAB: 'ga', EQG: 'gq', LBR: 'lr',
+  SLE: 'sl', GNB: 'gw', NIG: 'ne', CHA: 'td', ETH: 'et', SOM: 'so',
+  // Americas (extra)
+  CUB: 'cu', TRI: 'tt', HAI: 'ht', SUR: 'sr', GUY: 'gy', CUW: 'cw',
+  GUA: 'gt', NCA: 'ni', DOM: 'do', PUR: 'pr', MTQ: 'mq',
 }
 
 const TLA_TO_ZH: Record<string, string> = {
@@ -43,7 +57,22 @@ const TLA_TO_ZH: Record<string, string> = {
   JPN: '日本', KOR: '韩国', AUS: '澳大利亚', QAT: '卡塔尔', UZB: '乌兹别克',
   IRN: '伊朗', KSA: '沙特', CHN: '中国', IND: '印度', THA: '泰国',
   // 大洋洲
-  NZL: '新西兰',
+  NZL: '新西兰', FIJ: '斐济', PNG: '巴布亚新几内亚', SOL: '所罗门群岛', VAN: '瓦努阿图',
+  // 欧洲（补充）
+  NOR: '挪威', BIH: '波黑', MKD: '北马其顿', ALB: '阿尔巴尼亚', MNE: '黑山',
+  ISL: '冰岛', FIN: '芬兰', LUX: '卢森堡', KVX: '科索沃', ARM: '亚美尼亚',
+  IRL: '爱尔兰', CYP: '塞浦路斯',
+  // 亚洲（补充）
+  JOR: '约旦', IRQ: '伊拉克', SYR: '叙利亚', LBN: '黎巴嫩', BHR: '巴林',
+  OMA: '阿曼', KUW: '科威特', IDN: '印度尼西亚', VIE: '越南', PHI: '菲律宾',
+  MYA: '缅甸', PRK: '朝鲜', TJK: '塔吉克', KGZ: '吉尔吉斯', TKM: '土库曼',
+  // 非洲（补充）
+  COD: '刚果金', ZAM: '赞比亚', CPV: '佛得角', GUI: '几内亚', KEN: '肯尼亚',
+  ANG: '安哥拉', COM: '科摩罗', BEN: '贝宁', BFA: '布基纳法索', GAB: '加蓬',
+  EQG: '赤道几内亚', NIG: '尼日尔', ETH: '埃塞俄比亚',
+  // 美洲（补充）
+  CUB: '古巴', TRI: '特多', HAI: '海地', SUR: '苏里南', GUY: '圭亚那',
+  GUA: '危地马拉', NCA: '尼加拉瓜', DOM: '多米尼加',
 }
 
 export function getFlagUrl(tla: string | null | undefined): string | null {
