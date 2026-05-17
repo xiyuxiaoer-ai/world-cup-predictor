@@ -30,7 +30,7 @@ export default function LoginPage() {
   return (
     <div className="w-full max-w-sm animate-fade-in">
       <div className="text-center mb-8">
-        <div className="text-6xl mb-4 animate-football">⚽</div>
+        <div className="text-6xl mb-4">⚽</div>
         <h1 className="text-2xl font-bold tracking-tight">世界杯竞猜</h1>
         <p className="text-zinc-400 text-sm mt-1">登录你的账号继续</p>
       </div>
