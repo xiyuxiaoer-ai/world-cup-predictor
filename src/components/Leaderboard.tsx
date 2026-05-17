@@ -7,7 +7,7 @@ const MEDALS = ['🥇', '🥈', '🥉']
 const RANK_STYLES = [
   'bg-yellow-500/10 border-yellow-500/30 animate-gold-pulse',
   'bg-zinc-500/15 border-zinc-400/25',
-  'bg-amber-900/10 border-amber-800/15',
+  'bg-amber-900/5 border-amber-800/10',
 ]
 
 export default function Leaderboard({ gameId }: { gameId: string }) {
