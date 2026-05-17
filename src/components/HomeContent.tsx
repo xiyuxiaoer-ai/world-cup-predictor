@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { GameWithRole, Match, Prediction } from '@/types'
+import { getFlag, getTeamDisplay } from '@/lib/flags'
 import PredictionCard from './PredictionCard'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
@@ -135,44 +136,65 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
           {/* Full Schedule */}
           <div>
-            <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">完整赛程</h2>
+            <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">2026世界杯赛程安排</h2>
             <div className="space-y-2">
               {matches.map(match => {
                 const pred = predictions[match.id]
                 const isLocked = new Date(match.lock_time) <= now
                 const kickoff = new Date(match.kickoff_time)
+                const homeTla = getTeamDisplay((match as any).home_tla, match.home_team)
+                const awayTla = getTeamDisplay((match as any).away_tla, match.away_team)
+                const homeFlag = getFlag((match as any).home_tla)
+                const awayFlag = getFlag((match as any).away_tla)
+                const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
 
                 return (
-                  <div key={match.id} className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-center gap-4">
-                    <div className="text-xs text-zinc-500 w-16 shrink-0">
-                      <div>{STAGE_LABELS[match.stage]}</div>
-                      {match.group_name && (
-                        <div>{match.group_name.replace('GROUP_', '').replace('_', ' ')}组</div>
-                      )}
+                  <div key={match.id} className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-3 space-y-2">
+                    {/* Row 1: meta */}
+                    <div className="flex justify-between items-center text-xs text-zinc-500">
+                      <span>{STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}</span>
+                      <span>
+                        {match.status === 'finished'
+                          ? '已结束'
+                          : `${kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })} ${kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
+                        }
+                      </span>
                     </div>
-                    <div className="flex-1 flex items-center justify-center gap-3 min-w-0">
-                      <span className="text-sm font-medium text-right flex-1 truncate">{match.home_team}</span>
-                      <div className="text-center shrink-0 w-24">
+
+                    {/* Row 2: teams + score */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <span className="text-xl leading-none">{homeFlag}</span>
+                        <span className="text-sm font-bold tracking-wide">{homeTla}</span>
+                      </div>
+                      <div className="text-center shrink-0 px-2">
                         {match.status === 'finished' ? (
-                          <span className="font-bold text-emerald-400 text-sm">
-                            {match.home_score_90} - {match.away_score_90}
+                          <span className="text-base font-bold text-white">
+                            {match.home_score_90} – {match.away_score_90}
                           </span>
                         ) : (
-                          <span className="text-zinc-500 text-xs">
-                            {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
-                            {' '}
-                            {kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
+                          <span className="text-zinc-600 text-sm font-bold">vs</span>
                         )}
                       </div>
-                      <span className="text-sm font-medium text-left flex-1 truncate">{match.away_team}</span>
+                      <div className="flex items-center gap-1.5 flex-1 justify-end">
+                        <span className="text-sm font-bold tracking-wide">{awayTla}</span>
+                        <span className="text-xl leading-none">{awayFlag}</span>
+                      </div>
                     </div>
-                    <div className="text-xs text-right w-20 shrink-0">
+
+                    {/* Row 3: prediction */}
+                    <div className="text-xs border-t border-zinc-800 pt-2">
                       {pred ? (
-                        <span className={`font-mono ${pred.points_earned != null ? (pred.points_earned > 0 ? 'text-emerald-400' : 'text-red-400') : 'text-zinc-400'}`}>
-                          {pred.pred_home_score}-{pred.pred_away_score}
-                          {pred.points_earned != null && ` (${pred.points_earned > 0 ? '+' : ''}${pred.points_earned})`}
-                        </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-zinc-500">我猜：<span className="text-zinc-300 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span></span>
+                          {pred.points_earned != null ? (
+                            <span className={pred.points_earned > 0 ? 'text-emerald-400 font-semibold' : pred.points_earned < 0 ? 'text-red-400' : 'text-zinc-500'}>
+                              {pred.points_earned > 0 ? `+${pred.points_earned}分` : pred.points_earned < 0 ? `${pred.points_earned}分` : '0分'}
+                            </span>
+                          ) : (
+                            <span className="text-zinc-600">待结算</span>
+                          )}
+                        </div>
                       ) : isLocked ? (
                         <span className="text-zinc-600">未猜</span>
                       ) : (
