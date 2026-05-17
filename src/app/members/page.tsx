@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import MembersContent from '@/components/MembersContent'
+import PageBackground from '@/components/PageBackground'
 import type { GameWithRole } from '@/types'
 
 export default async function MembersPage() {
@@ -22,7 +23,8 @@ export default async function MembersPage() {
   }))
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      <PageBackground variant="members" />
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
         <MembersContent games={games} />
