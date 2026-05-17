@@ -29,6 +29,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [copied, setCopied] = useState(false)
   const [deletingGame, setDeletingGame] = useState(false)
+  const [confirmDeleteGame, setConfirmDeleteGame] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
 
@@ -67,7 +68,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   }
 
   async function handleDeleteGame() {
-    if (!confirm(`确定要删除「${selectedGame?.name}」吗？所有成员和竞猜记录将一并删除，此操作不可恢复。`)) return
+    setConfirmDeleteGame(false)
     setDeletingGame(true)
     const res = await fetch(`/api/games/${selectedGameId}`, { method: 'DELETE' })
     if (res.ok) {
@@ -175,14 +176,21 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           >
             {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
           </button>
-          {isAdmin && (
+          {isAdmin && !confirmDeleteGame && (
             <button
-              onClick={handleDeleteGame}
+              onClick={() => setConfirmDeleteGame(true)}
               disabled={deletingGame}
               className="text-xs text-red-400/50 hover:text-red-400 border border-red-400/20 hover:border-red-400/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
             >
               {deletingGame ? '删除中...' : '删除 Game'}
             </button>
+          )}
+          {isAdmin && confirmDeleteGame && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-red-400">确定删除「{selectedGame?.name}」？</span>
+              <button onClick={handleDeleteGame} className="text-xs text-red-400 border border-red-400/50 px-2 py-1 rounded-lg">确定</button>
+              <button onClick={() => setConfirmDeleteGame(false)} className="text-xs text-zinc-400 border border-zinc-700 px-2 py-1 rounded-lg">取消</button>
+            </div>
           )}
         </div>
       </div>
