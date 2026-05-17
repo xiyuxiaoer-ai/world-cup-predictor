@@ -119,43 +119,45 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   return (
     <div className="space-y-8">
       {/* Game Selector */}
-      <div className="flex items-center gap-3 flex-wrap">
+      <div className="space-y-2">
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+          className="w-full sm:w-auto bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors"
         >
           {games.map(g => (
             <option key={g.id} value={g.id}>{g.name}</option>
           ))}
         </select>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-2 rounded-lg transition-colors"
-        >
-          + 创建
-        </button>
-        <button
-          onClick={() => setShowJoinModal(true)}
-          className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-2 rounded-lg transition-colors"
-        >
-          + 加入
-        </button>
-        {isAdmin && (
+        <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setShowInviteModal(true)}
-            className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-2 rounded-lg transition-colors"
+            onClick={() => setShowCreateModal(true)}
+            className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
           >
-            邀请成员
+            + 创建
           </button>
-        )}
-        <button
-          onClick={copyGameCode}
-          title="复制 Game 码邀请朋友"
-          className="text-sm text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 px-3 py-2 rounded-lg transition-colors font-mono"
-        >
-          {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
-        </button>
+          <button
+            onClick={() => setShowJoinModal(true)}
+            className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors"
+          >
+            + 加入
+          </button>
+          {isAdmin && (
+            <button
+              onClick={() => setShowInviteModal(true)}
+              className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-1.5 rounded-lg transition-colors"
+            >
+              邀请成员
+            </button>
+          )}
+          <button
+            onClick={copyGameCode}
+            title="复制 Game 码邀请朋友"
+            className="text-sm text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 px-3 py-1.5 rounded-lg transition-colors font-mono"
+          >
+            {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
+          </button>
+        </div>
       </div>
 
       {loading ? (
