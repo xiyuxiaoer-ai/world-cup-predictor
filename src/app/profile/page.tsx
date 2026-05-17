@@ -58,7 +58,6 @@ export default function ProfilePage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) { setMsg('图片不能超过 5MB'); return }
     const reader = new FileReader()
     reader.onload = () => setCropSrc(reader.result as string)
     reader.readAsDataURL(file)
