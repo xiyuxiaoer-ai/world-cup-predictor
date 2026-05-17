@@ -109,6 +109,9 @@ export default function PredictionCard({
           {' · '}
           {STAGE_LABELS[match.stage]}
           {match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+          {['quarter_final', 'semi_final', 'third_place', 'final'].includes(match.stage) && (
+            <span className="ml-2 text-amber-400 bg-amber-400/10 px-1.5 py-0.5 rounded text-xs font-semibold">🔥 双倍积分，把握机会！</span>
+          )}
         </span>
         {isUrgent && (
           <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full animate-pulse">
