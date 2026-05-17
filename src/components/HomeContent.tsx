@@ -26,6 +26,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [loading, setLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+  const [syncMsg, setSyncMsg] = useState('')
 
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
@@ -47,6 +49,23 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     setGames(prev => [...prev, game])
     setSelectedGameId(game.id)
     setShowCreateModal(false)
+  }
+
+  async function handleSync() {
+    setSyncing(true)
+    setSyncMsg('')
+    const res = await fetch('/api/sync-matches', { method: 'POST' })
+    const data = await res.json()
+    if (res.ok) {
+      setSyncMsg('已更新')
+      await fetch(`/api/matches?game_id=${selectedGameId}`)
+        .then(r => r.json())
+        .then(d => { setMatches(d.matches || []); setPredictions(d.predictions || {}) })
+    } else {
+      setSyncMsg('更新失败')
+    }
+    setSyncing(false)
+    setTimeout(() => setSyncMsg(''), 3000)
   }
 
   function handlePredictionSubmitted(matchId: string, pred: Prediction) {
@@ -136,7 +155,18 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
           {/* Full Schedule */}
           <div>
-            <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">2026世界杯赛程安排</h2>
+            <div className="flex items-center gap-3 mb-3">
+              <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">2026世界杯赛程安排</h2>
+              <button
+                onClick={handleSync}
+                disabled={syncing}
+                className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-50 transition-colors"
+              >
+                <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
+                <span>{syncing ? '更新中...' : '手动更新'}</span>
+              </button>
+              {syncMsg && <span className="text-xs text-emerald-400">{syncMsg}</span>}
+            </div>
             <div className="space-y-2">
               {matches.map(match => {
                 const pred = predictions[match.id]
