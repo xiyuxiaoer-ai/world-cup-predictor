@@ -39,6 +39,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const now = new Date()
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
     if (!selectedGameId) return
     setLoading(true)
     fetch(`/api/matches?game_id=${selectedGameId}`)
