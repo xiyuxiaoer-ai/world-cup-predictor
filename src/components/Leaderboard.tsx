@@ -6,8 +6,8 @@ import type { LeaderboardEntry } from '@/types'
 const MEDALS = ['🥇', '🥈', '🥉']
 const RANK_STYLES = [
   'bg-yellow-500/10 border-yellow-500/30 animate-gold-pulse',
-  'bg-zinc-700/30 border-zinc-600/30',
-  'bg-amber-700/10 border-amber-700/30',
+  'bg-zinc-500/15 border-zinc-400/25',
+  'bg-amber-900/10 border-amber-800/15',
 ]
 
 export default function Leaderboard({ gameId }: { gameId: string }) {
