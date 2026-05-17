@@ -7,6 +7,7 @@ import PredictionCard from './PredictionCard'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
 import InviteMemberModal from './InviteMemberModal'
+import JoinGameModal from './JoinGameModal'
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛',
@@ -26,6 +27,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [loading, setLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [showJoinModal, setShowJoinModal] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
 
@@ -49,6 +52,18 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     setGames(prev => [...prev, game])
     setSelectedGameId(game.id)
     setShowCreateModal(false)
+  }
+
+  function handleGameJoined(game: GameWithRole) {
+    setGames(prev => [...prev, game])
+    setSelectedGameId(game.id)
+    setShowJoinModal(false)
+  }
+
+  function copyGameCode() {
+    navigator.clipboard.writeText(selectedGameId.slice(0, 8))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   async function handleSync() {
@@ -81,15 +96,22 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       <div className="text-center py-20">
         <div className="text-5xl mb-4">⚽</div>
         <p className="text-zinc-400 mb-6">你还没有加入任何 Game</p>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors"
-        >
-          创建第一个 Game
-        </button>
-        {showCreateModal && (
-          <CreateGameModal onCreated={handleGameCreated} onClose={() => setShowCreateModal(false)} />
-        )}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors"
+          >
+            创建 Game
+          </button>
+          <button
+            onClick={() => setShowJoinModal(true)}
+            className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-6 py-2.5 rounded-lg font-semibold transition-colors"
+          >
+            加入已有 Game
+          </button>
+        </div>
+        {showCreateModal && <CreateGameModal onCreated={handleGameCreated} onClose={() => setShowCreateModal(false)} />}
+        {showJoinModal && <JoinGameModal onJoined={handleGameJoined} onClose={() => setShowJoinModal(false)} />}
       </div>
     )
   }
@@ -111,16 +133,29 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           onClick={() => setShowCreateModal(true)}
           className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-2 rounded-lg transition-colors"
         >
-          + 创建 Game
+          + 创建
+        </button>
+        <button
+          onClick={() => setShowJoinModal(true)}
+          className="text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-2 rounded-lg transition-colors"
+        >
+          + 加入
         </button>
         {isAdmin && (
           <button
             onClick={() => setShowInviteModal(true)}
             className="text-sm text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500 px-3 py-2 rounded-lg transition-colors"
           >
-            + 邀请成员
+            邀请成员
           </button>
         )}
+        <button
+          onClick={copyGameCode}
+          title="复制 Game 码邀请朋友"
+          className="text-sm text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-600 px-3 py-2 rounded-lg transition-colors font-mono"
+        >
+          {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
+        </button>
       </div>
 
       {loading ? (
@@ -244,6 +279,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       )}
       {showInviteModal && (
         <InviteMemberModal gameId={selectedGameId} onClose={() => setShowInviteModal(false)} />
+      )}
+      {showJoinModal && (
+        <JoinGameModal onJoined={handleGameJoined} onClose={() => setShowJoinModal(false)} />
       )}
     </div>
   )
