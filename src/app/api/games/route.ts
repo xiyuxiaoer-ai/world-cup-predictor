@@ -31,6 +31,14 @@ export async function POST(request: Request) {
   const { name } = await request.json()
   if (!name?.trim()) return NextResponse.json({ error: 'Game 名称不能为空' }, { status: 400 })
 
+  const { data: existing } = await supabase
+    .from('games')
+    .select('id')
+    .eq('name', name.trim())
+    .single()
+
+  if (existing) return NextResponse.json({ error: '此名称已被使用，请换一个' }, { status: 400 })
+
   const { data: game, error: gameError } = await supabase
     .from('games')
     .insert({ name: name.trim(), created_by: user.id, status: 'active' })
