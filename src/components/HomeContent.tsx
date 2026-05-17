@@ -211,9 +211,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
                   >
                     同步所有 Game
-                    <div className={`w-8 h-4 rounded-full transition-colors relative ${syncAllGames ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
-                      <span className={`absolute top-0.5 w-3 h-3 rounded-full bg-white transition-transform ${syncAllGames ? 'translate-x-4' : 'translate-x-0.5'}`} />
-                    </div>
+                    <div className={`w-8 h-4 rounded-full transition-colors ${syncAllGames ? 'bg-emerald-500' : 'bg-zinc-700'}`} />
                   </button>
                 )}
               </div>
