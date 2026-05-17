@@ -4,13 +4,17 @@ import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 
-export default function MembersContent({ games }: { games: GameWithRole[] }) {
+export default function MembersContent({ games, currentUserId }: { games: GameWithRole[]; currentUserId: string }) {
   const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [members, setMembers] = useState<any[]>([])
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  useEffect(() => {
+  const selectedGame = games.find(g => g.id === selectedGameId)
+  const isAdmin = selectedGame?.role === 'admin'
+
+  function loadMembers() {
     if (!selectedGameId) return
     setLoading(true)
     Promise.all([
@@ -19,7 +23,6 @@ export default function MembersContent({ games }: { games: GameWithRole[] }) {
     ]).then(([mem, lb]) => {
       const lbList = Array.isArray(lb) ? lb : []
       const memList = Array.isArray(mem) ? mem : []
-      // 按积分从高到低排序
       memList.sort((a, b) => {
         const aPoints = lbList.find((e: any) => e.user_id === a.user_id)?.total_points ?? 0
         const bPoints = lbList.find((e: any) => e.user_id === b.user_id)?.total_points ?? 0
@@ -29,7 +32,22 @@ export default function MembersContent({ games }: { games: GameWithRole[] }) {
       setLeaderboard(lbList)
       setLoading(false)
     })
-  }, [selectedGameId])
+  }
+
+  useEffect(() => { loadMembers() }, [selectedGameId])
+
+  async function handleDeleteMember(userId: string, name: string) {
+    if (!confirm(`确定要将「${name}」移出此 Game 吗？`)) return
+    setDeletingId(userId)
+    const res = await fetch(`/api/games/${selectedGameId}/members/${userId}`, { method: 'DELETE' })
+    if (res.ok) {
+      setMembers(prev => prev.filter(m => m.user_id !== userId))
+    } else {
+      const d = await res.json()
+      alert(d.error || '删除失败')
+    }
+    setDeletingId(null)
+  }
 
   const getPoints = (userId: string) =>
     leaderboard.find(e => e.user_id === userId)?.total_points ?? 0
@@ -67,6 +85,7 @@ export default function MembersContent({ games }: { games: GameWithRole[] }) {
             const rank = getRank(userId)
             const points = getPoints(userId)
             const initial = (profile?.display_name || profile?.username || '?')[0].toUpperCase()
+            const isSelf = userId === currentUserId
 
             return (
               <div key={userId} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 flex gap-4 items-start">
@@ -93,7 +112,18 @@ export default function MembersContent({ games }: { games: GameWithRole[] }) {
                   {profile?.bio && (
                     <p className="text-sm text-zinc-400 mt-2 line-clamp-2">{profile.bio}</p>
                   )}
-                  <p className="text-xs text-zinc-600 mt-2">{m.role === 'admin' ? '管理员' : '成员'}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xs text-zinc-600">{m.role === 'admin' ? '管理员' : '成员'}</p>
+                    {isAdmin && !isSelf && (
+                      <button
+                        onClick={() => handleDeleteMember(userId, profile?.display_name || profile?.username)}
+                        disabled={deletingId === userId}
+                        className="text-xs text-red-400/60 hover:text-red-400 transition-colors disabled:opacity-50"
+                      >
+                        {deletingId === userId ? '移除中...' : '移除'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )

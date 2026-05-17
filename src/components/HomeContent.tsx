@@ -30,6 +30,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [deletingGame, setDeletingGame] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
 
@@ -65,6 +66,21 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     navigator.clipboard.writeText(selectedGameId.slice(0, 8))
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function handleDeleteGame() {
+    if (!confirm(`确定要删除「${selectedGame?.name}」吗？所有成员和竞猜记录将一并删除，此操作不可恢复。`)) return
+    setDeletingGame(true)
+    const res = await fetch(`/api/games/${selectedGameId}`, { method: 'DELETE' })
+    if (res.ok) {
+      const remaining = games.filter(g => g.id !== selectedGameId)
+      setGames(remaining)
+      setSelectedGameId(remaining[0]?.id ?? '')
+    } else {
+      const d = await res.json()
+      alert(d.error || '删除失败')
+    }
+    setDeletingGame(false)
   }
 
   async function handleSync() {
@@ -156,6 +172,15 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           >
             {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
           </button>
+          {isAdmin && (
+            <button
+              onClick={handleDeleteGame}
+              disabled={deletingGame}
+              className="text-xs text-red-400/50 hover:text-red-400 border border-red-400/20 hover:border-red-400/50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+            >
+              {deletingGame ? '删除中...' : '删除此 Game'}
+            </button>
+          )}
         </div>
       </div>
 

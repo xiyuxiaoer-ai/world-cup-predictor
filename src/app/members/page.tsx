@@ -27,7 +27,7 @@ export default async function MembersPage() {
       <PageBackground variant="members" />
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
-        <MembersContent games={games} />
+        <MembersContent games={games} currentUserId={user.id} />
       </main>
     </div>
   )
