@@ -54,7 +54,6 @@ export default function PredictionCard({
     }
 
     let lastSuccess = null
-    let successCount = 0
     for (const gid of gameIds) {
       const res = await fetch('/api/predictions', {
         method: 'POST',
@@ -63,15 +62,16 @@ export default function PredictionCard({
       })
       if (res.ok) {
         const data = await res.json()
-        lastSuccess = data
-        successCount++
+        if (!data.skipped) lastSuccess = data  // 跳过已提交的
       }
     }
 
     if (lastSuccess) {
       onSubmitted(lastSuccess)
       setDone(true)
-      if (gameIds.length > 1) setError('')
+    } else if (gameIds.length > 0) {
+      // 所有 game 都已提交过（skipped）也视为成功
+      setDone(true)
     } else {
       setError('提交失败')
     }

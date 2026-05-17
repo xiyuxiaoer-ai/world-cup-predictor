@@ -40,9 +40,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '该比赛已锁定，无法提交预测' }, { status: 400 })
   }
 
+  // 已提交过就跳过，不覆盖
+  const { data: existing } = await supabase
+    .from('predictions')
+    .select('id')
+    .eq('game_id', game_id)
+    .eq('user_id', user.id)
+    .eq('match_id', match_id)
+    .single()
+
+  if (existing) return NextResponse.json({ skipped: true }, { status: 200 })
+
   const { data, error } = await supabase
     .from('predictions')
-    .upsert({
+    .insert({
       game_id,
       user_id: user.id,
       match_id,
@@ -51,7 +62,7 @@ export async function POST(request: Request) {
       pred_et_winner: pred_et_winner || null,
       pred_penalty_winner: pred_penalty_winner || null,
       submitted_at: new Date().toISOString(),
-    }, { onConflict: 'game_id,user_id,match_id' })
+    })
     .select()
     .single()
 
