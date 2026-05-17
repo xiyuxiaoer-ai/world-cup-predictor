@@ -57,16 +57,16 @@ export default async function RulesPage() {
 
         {STAGE_RULES.map(stage => (
           <div key={stage.title} className={`bg-zinc-900 border ${stage.color} rounded-2xl p-5 space-y-4`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-bold text-base">{stage.title}</h2>
-                <p className="text-xs text-zinc-500 mt-0.5">{stage.subtitle}</p>
+            <div>
+              <h2 className="font-bold text-base">{stage.title}</h2>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <p className="text-xs text-zinc-500">{stage.subtitle}</p>
+                {stage.badge && (
+                  <span className="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                    {stage.badge}
+                  </span>
+                )}
               </div>
-              {stage.badge && (
-                <span className="text-sm bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-                  {stage.badge}
-                </span>
-              )}
             </div>
             <div className="space-y-2">
               {stage.rules.map(rule => (
