@@ -42,6 +42,10 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
     const res = await fetch(`/api/games/${selectedGameId}/members/${userId}`, { method: 'DELETE' })
     if (res.ok) {
       setMembers(prev => prev.filter(m => m.user_id !== userId))
+      // 重新加载积分榜
+      fetch(`/api/leaderboard?game_id=${selectedGameId}`)
+        .then(r => r.json())
+        .then(lb => setLeaderboard(Array.isArray(lb) ? lb : []))
     } else {
       const d = await res.json()
       alert(d.error || '删除失败')

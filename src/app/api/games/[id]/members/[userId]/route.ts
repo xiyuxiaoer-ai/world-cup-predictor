@@ -20,6 +20,14 @@ export async function DELETE(
   if (game.created_by !== user.id) return NextResponse.json({ error: '只有管理员可以删除成员' }, { status: 403 })
   if (userId === user.id) return NextResponse.json({ error: '不能删除自己' }, { status: 400 })
 
+  // 删除该成员在此 Game 的所有竞猜记录
+  await supabase
+    .from('predictions')
+    .delete()
+    .eq('game_id', id)
+    .eq('user_id', userId)
+
+  // 从 Game 中移除该成员
   const { error } = await supabase
     .from('game_members')
     .delete()
