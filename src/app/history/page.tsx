@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
-import HistoryContent from '@/components/HistoryContent'
+import RecordsContent from '@/components/RecordsContent'
 import type { GameWithRole } from '@/types'
 
 export default async function HistoryPage() {
@@ -25,7 +25,7 @@ export default async function HistoryPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar username={profile?.username ?? ''} />
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
-        <HistoryContent games={games} />
+        <RecordsContent games={games} />
       </main>
     </div>
   )

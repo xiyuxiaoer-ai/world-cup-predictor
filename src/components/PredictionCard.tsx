@@ -23,7 +23,7 @@ export default function PredictionCard({
   const [penaltyWinner, setPenaltyWinner] = useState(prediction?.pred_penalty_winner ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [done, setDone] = useState(false)
+  const [done, setDone] = useState(!!prediction)
 
   const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
   const isDraw = homeScore !== '' && awayScore !== '' && homeScore === awayScore
@@ -63,6 +63,35 @@ export default function PredictionCard({
   }
 
   const kickoff = new Date(match.kickoff_time)
+
+  if (done && prediction) {
+    return (
+      <div className="bg-zinc-900 border border-emerald-500/20 rounded-xl p-4 space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-zinc-500">
+            {new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+            {' '}{new Date(match.kickoff_time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+            {match.group_name && ` · ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+          </span>
+          <span className="text-xs text-emerald-400">✓ 已提交</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-1 justify-end">
+            <span className="text-sm font-medium">{getTeamDisplay(match.home_tla, match.home_team)}</span>
+            {getFlagUrl(match.home_tla) && <img src={getFlagUrl(match.home_tla)!} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+          </div>
+          <div className="shrink-0 px-3 text-white font-bold text-base">
+            {prediction.pred_home_score} – {prediction.pred_away_score}
+          </div>
+          <div className="flex items-center gap-1.5 flex-1 justify-start">
+            {getFlagUrl(match.away_tla) && <img src={getFlagUrl(match.away_tla)!} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+            <span className="text-sm font-medium">{getTeamDisplay(match.away_tla, match.away_team)}</span>
+          </div>
+        </div>
+        <p className="text-xs text-zinc-600 text-center">竞猜已锁定，不可修改</p>
+      </div>
+    )
+  }
 
   return (
     <form onSubmit={handleSubmit} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
