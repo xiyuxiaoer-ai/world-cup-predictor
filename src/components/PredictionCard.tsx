@@ -64,6 +64,8 @@ export default function PredictionCard({
     } else {
       onSubmitted(data)
       setDone(true)
+      // 庆祝音效（触觉反馈）
+      if (navigator.vibrate) navigator.vibrate([50, 30, 50])
     }
     setLoading(false)
   }
@@ -72,7 +74,7 @@ export default function PredictionCard({
 
   if (done && prediction) {
     return (
-      <div className="bg-zinc-900 border border-emerald-500/20 rounded-xl p-4 space-y-2">
+      <div className="bg-zinc-900 border border-emerald-500/20 rounded-xl p-4 space-y-2 animate-slide-up">
         <div className="flex justify-between items-center">
           <span className="text-xs text-zinc-500">
             {new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}

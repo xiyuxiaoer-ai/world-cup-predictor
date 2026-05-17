@@ -215,7 +215,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
 
                 return (
-                  <div key={match.id} className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-3 space-y-2">
+                  <div key={match.id} className="bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-3 space-y-2 hover:border-zinc-700 transition-colors">
                     {/* Row 1: meta */}
                     <div className="flex justify-between items-center text-xs text-zinc-500">
                       <span>{STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}</span>

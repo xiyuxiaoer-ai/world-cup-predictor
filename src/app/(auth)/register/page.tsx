@@ -55,14 +55,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-sm">
+    <div className="w-full max-w-sm animate-fade-in">
       <div className="text-center mb-8">
-        <div className="text-5xl mb-3">⚽</div>
-        <h1 className="text-2xl font-bold">世界杯竞猜</h1>
+        <div className="text-6xl mb-4 animate-football">⚽</div>
+        <h1 className="text-2xl font-bold tracking-tight">世界杯竞猜</h1>
         <p className="text-zinc-400 text-sm mt-1">创建你的账号加入竞猜</p>
       </div>
 
-      <form onSubmit={handleRegister} className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+      <form onSubmit={handleRegister} className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4 animate-slide-up">
         {error && (
           <p className="text-red-400 text-sm bg-red-400/10 rounded-lg p-3">{error}</p>
         )}

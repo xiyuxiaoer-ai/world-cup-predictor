@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react'
 import type { LeaderboardEntry } from '@/types'
 
 const MEDALS = ['🥇', '🥈', '🥉']
+const RANK_STYLES = [
+  'bg-yellow-500/10 border-yellow-500/30 animate-gold-pulse',
+  'bg-zinc-700/30 border-zinc-600/30',
+  'bg-amber-700/10 border-amber-700/30',
+]
 
 export default function Leaderboard({ gameId }: { gameId: string }) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
@@ -26,16 +31,29 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
       ) : (
         <div className="divide-y divide-zinc-800">
           {entries.map((entry, i) => (
-            <div key={entry.user_id} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-6 text-center text-sm">
-                {i < 3 ? MEDALS[i] : <span className="text-zinc-500">{i + 1}</span>}
+            <div
+              key={entry.user_id}
+              className={`flex items-center gap-3 px-4 py-3 border-l-2 transition-colors ${i < 3 ? RANK_STYLES[i] : 'border-transparent'}`}
+              style={{ animationDelay: `${i * 0.1}s` }}
+            >
+              <span className="w-6 text-center">
+                {i < 3
+                  ? <span className="text-base">{MEDALS[i]}</span>
+                  : <span className="text-zinc-500 text-sm">{i + 1}</span>}
               </span>
-              <div className="w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs font-bold shrink-0">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                i === 0 ? 'bg-yellow-500/20 border border-yellow-500/40 text-yellow-400'
+                : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+              }`}>
                 {(entry.display_name || entry.username)?.[0]?.toUpperCase()}
               </div>
-              <span className="flex-1 text-sm font-medium truncate">{entry.display_name || entry.username}</span>
+              <span className={`flex-1 text-sm font-medium truncate ${i === 0 ? 'text-yellow-100' : ''}`}>
+                {entry.display_name || entry.username}
+              </span>
               <div className="text-right">
-                <div className={`font-bold text-sm ${entry.total_points > 0 ? 'text-emerald-400' : 'text-zinc-400'}`}>
+                <div className={`font-bold text-sm ${
+                  i === 0 ? 'text-yellow-400' : entry.total_points > 0 ? 'text-emerald-400' : 'text-zinc-400'
+                }`}>
                   {entry.total_points}分
                 </div>
                 <div className="text-xs text-zinc-500">{entry.prediction_count}猜</div>

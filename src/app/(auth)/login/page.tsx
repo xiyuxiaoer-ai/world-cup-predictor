@@ -28,16 +28,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="w-full max-w-sm">
+    <div className="w-full max-w-sm animate-fade-in">
       <div className="text-center mb-8">
-        <div className="text-5xl mb-3">⚽</div>
-        <h1 className="text-2xl font-bold">世界杯竞猜</h1>
+        <div className="text-6xl mb-4 animate-football">⚽</div>
+        <h1 className="text-2xl font-bold tracking-tight">世界杯竞猜</h1>
         <p className="text-zinc-400 text-sm mt-1">登录你的账号继续</p>
       </div>
 
-      <form onSubmit={handleLogin} className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4">
+      <form onSubmit={handleLogin} className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 space-y-4 animate-slide-up">
         {error && (
-          <p className="text-red-400 text-sm bg-red-400/10 rounded-lg p-3">{error}</p>
+          <p className="text-red-400 text-sm bg-red-400/10 rounded-lg p-3 animate-pop">{error}</p>
         )}
         <div>
           <label className="text-zinc-400 text-sm mb-1.5 block">邮箱</label>
@@ -64,9 +64,9 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-colors"
+          className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
         >
-          {loading ? '登录中...' : '登录'}
+          {loading ? '登录中...' : '登录 ⚽'}
         </button>
         <p className="text-center text-zinc-400 text-sm">
           没有账号？{' '}
