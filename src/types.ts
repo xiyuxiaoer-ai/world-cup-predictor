@@ -12,6 +12,10 @@ export interface Match {
   result_90: 'home_win' | 'away_win' | 'draw' | null
   et_winner: string | null
   penalty_winner: string | null
+  home_score_et: number | null
+  away_score_et: number | null
+  home_score_pen: number | null
+  away_score_pen: number | null
   group_name: string | null
   home_tla: string | null
   away_tla: string | null

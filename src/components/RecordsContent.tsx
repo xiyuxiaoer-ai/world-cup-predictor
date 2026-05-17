@@ -131,9 +131,19 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
                     </div>
                     <div className="text-center shrink-0 px-2">
-                      {isFinished
-                        ? <span className="text-base font-bold text-white">{match.home_score_90} – {match.away_score_90}</span>
-                        : <span className="text-zinc-600 text-sm">vs</span>}
+                      {isFinished ? (
+                        <div>
+                          <div className="text-base font-bold text-white leading-tight">{match.home_score_90} – {match.away_score_90}</div>
+                          {match.home_score_et != null && match.home_score_pen == null && (
+                            <div className="text-xs text-zinc-400 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
+                          )}
+                          {match.home_score_pen != null && (
+                            <div className="text-xs text-zinc-400 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-zinc-600 text-sm">vs</span>
+                      )}
                     </div>
                     <div className="flex items-center gap-1.5 flex-1 justify-start">
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
