@@ -1,7 +1,7 @@
 const TLA_TO_ISO2: Record<string, string> = {
   // Americas
   MEX: 'mx', USA: 'us', CAN: 'ca', BRA: 'br', ARG: 'ar',
-  COL: 'co', URU: 'uy', ECU: 'ec', PAR: 'py', BOL: 'bo',
+  COL: 'co', URU: 'uy', URY: 'uy', ECU: 'ec', PAR: 'py', BOL: 'bo',
   VEN: 've', CHI: 'cl', PER: 'pe', CRC: 'cr', PAN: 'pa',
   JAM: 'jm', HON: 'hn', SLV: 'sv',
   // Europe
@@ -33,13 +33,13 @@ const TLA_TO_ISO2: Record<string, string> = {
   SLE: 'sl', GNB: 'gw', NIG: 'ne', CHA: 'td', ETH: 'et', SOM: 'so',
   // Americas (extra)
   CUB: 'cu', TRI: 'tt', HAI: 'ht', SUR: 'sr', GUY: 'gy', CUW: 'cw',
-  GUA: 'gt', NCA: 'ni', DOM: 'do', PUR: 'pr', MTQ: 'mq',
+  GUA: 'gt', NCA: 'ni', DOM: 'do', PUR: 'pr', MTQ: 'mq', CUR: 'cw', SWE: 'se',
 }
 
 const TLA_TO_ZH: Record<string, string> = {
   // 美洲
   MEX: '墨西哥', USA: '美国', CAN: '加拿大', BRA: '巴西', ARG: '阿根廷',
-  COL: '哥伦比亚', URU: '乌拉圭', ECU: '厄瓜多尔', PAR: '巴拉圭', BOL: '玻利维亚',
+  COL: '哥伦比亚', URU: '乌拉圭', URY: '乌拉圭', ECU: '厄瓜多尔', PAR: '巴拉圭', BOL: '玻利维亚',
   VEN: '委内瑞拉', CHI: '智利', PER: '秘鲁', CRC: '哥斯达黎加', PAN: '巴拿马',
   JAM: '牙买加', HON: '洪都拉斯', SLV: '萨尔瓦多',
   // 欧洲
@@ -72,7 +72,7 @@ const TLA_TO_ZH: Record<string, string> = {
   EQG: '赤道几内亚', NIG: '尼日尔', ETH: '埃塞俄比亚',
   // 美洲（补充）
   CUB: '古巴', TRI: '特多', HAI: '海地', SUR: '苏里南', GUY: '圭亚那',
-  GUA: '危地马拉', NCA: '尼加拉瓜', DOM: '多米尼加',
+  GUA: '危地马拉', NCA: '尼加拉瓜', DOM: '多米尼加', CUR: '库拉索', SWE: '瑞典',
 }
 
 export function getFlagUrl(tla: string | null | undefined): string | null {
