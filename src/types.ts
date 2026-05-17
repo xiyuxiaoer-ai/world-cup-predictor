@@ -13,6 +13,8 @@ export interface Match {
   et_winner: string | null
   penalty_winner: string | null
   group_name: string | null
+  home_tla: string | null
+  away_tla: string | null
 }
 
 export interface Prediction {

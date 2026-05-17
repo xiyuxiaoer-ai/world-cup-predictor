@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { Match, Prediction } from '@/types'
+import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
 const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
 
@@ -82,15 +83,20 @@ export default function PredictionCard({
         )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="flex-1 text-right text-sm font-medium truncate">{match.home_team}</span>
-        <div className="flex items-center gap-1.5 shrink-0">
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-1 justify-end">
+          <span className="text-sm font-medium text-right">{getTeamDisplay(match.home_tla, match.home_team)}</span>
+          {getFlagUrl(match.home_tla) && (
+            <img src={getFlagUrl(match.home_tla)!} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />
+          )}
+        </div>
+        <div className="flex items-center gap-1 shrink-0">
           <input
             type="number" min="0" max="20"
             value={homeScore}
             onChange={e => setHomeScore(e.target.value)}
             required
-            className="w-12 text-center bg-zinc-800 border border-zinc-700 rounded-lg py-1.5 text-white font-bold focus:outline-none focus:border-emerald-500 transition-colors"
+            className="w-11 text-center bg-zinc-800 border border-zinc-700 rounded-lg py-1.5 text-white font-bold focus:outline-none focus:border-emerald-500 transition-colors"
           />
           <span className="text-zinc-500 font-bold">:</span>
           <input
@@ -98,10 +104,15 @@ export default function PredictionCard({
             value={awayScore}
             onChange={e => setAwayScore(e.target.value)}
             required
-            className="w-12 text-center bg-zinc-800 border border-zinc-700 rounded-lg py-1.5 text-white font-bold focus:outline-none focus:border-emerald-500 transition-colors"
+            className="w-11 text-center bg-zinc-800 border border-zinc-700 rounded-lg py-1.5 text-white font-bold focus:outline-none focus:border-emerald-500 transition-colors"
           />
         </div>
-        <span className="flex-1 text-left text-sm font-medium truncate">{match.away_team}</span>
+        <div className="flex items-center gap-1.5 flex-1 justify-start">
+          {getFlagUrl(match.away_tla) && (
+            <img src={getFlagUrl(match.away_tla)!} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />
+          )}
+          <span className="text-sm font-medium text-left">{getTeamDisplay(match.away_tla, match.away_team)}</span>
+        </div>
       </div>
 
       {showExtraFields && (
@@ -116,8 +127,8 @@ export default function PredictionCard({
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500"
               >
                 <option value="">选择</option>
-                <option value={match.home_team}>{match.home_team}</option>
-                <option value={match.away_team}>{match.away_team}</option>
+                <option value={match.home_team}>{getTeamDisplay(match.home_tla, match.home_team)}</option>
+                <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
               </select>
             </div>
             <div>
@@ -128,8 +139,8 @@ export default function PredictionCard({
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-sm text-white focus:outline-none focus:border-emerald-500"
               >
                 <option value="">选择</option>
-                <option value={match.home_team}>{match.home_team}</option>
-                <option value={match.away_team}>{match.away_team}</option>
+                <option value={match.home_team}>{getTeamDisplay(match.home_tla, match.home_team)}</option>
+                <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
               </select>
             </div>
           </div>
