@@ -227,9 +227,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               >
                 {showAllMatches ? '只看近期' : '全部比赛'}
               </button>
-              {!showAllMatches && (
-                <span className="text-xs text-zinc-600">前后一周</span>
-              )}
               <button
                 onClick={handleSync}
                 disabled={syncing}
