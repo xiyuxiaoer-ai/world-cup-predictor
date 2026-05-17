@@ -111,12 +111,10 @@ export default function ProfilePage() {
 
     setSaving(false)
     if (res.ok) {
-      setSavedAvatarUrl(avatarUrl)
-      setPendingBlob(null)
-      setMsg('保存成功 ✓')
-      router.refresh()
+      router.push('/members')
     } else {
       setMsg('保存失败')
+      setSaving(false)
     }
   }
 
