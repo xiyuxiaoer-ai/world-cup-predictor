@@ -24,8 +24,8 @@ export default function Navbar({ username }: { username: string }) {
 
   return (
     <nav className="sticky top-0 z-50 bg-zinc-900/80 backdrop-blur border-b border-zinc-800">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-6">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2 overflow-hidden">
+        <div className="flex items-center gap-3 overflow-x-auto scrollbar-none min-w-0">
           <Link href="/" className="flex items-center gap-2 font-bold text-white">
             <span className="text-xl">⚽</span>
             <span className="hidden sm:block text-sm">世界杯竞猜</span>
@@ -35,7 +35,7 @@ export default function Navbar({ username }: { username: string }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${
                   pathname === link.href
                     ? 'bg-zinc-800 text-white'
                     : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
@@ -46,7 +46,7 @@ export default function Navbar({ username }: { username: string }) {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <Link
             href="/profile"
             className="flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
