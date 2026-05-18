@@ -39,10 +39,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const now = new Date()
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
-  useEffect(() => {
     if (!selectedGameId) return
     setLoading(true)
     fetch(`/api/matches?game_id=${selectedGameId}`)
@@ -91,7 +87,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     setSyncing(true)
     setSyncMsg('')
     const res = await fetch('/api/sync-matches', { method: 'POST' })
-    const data = await res.json()
     if (res.ok) {
       setSyncMsg('已更新')
       await fetch(`/api/matches?game_id=${selectedGameId}`)
