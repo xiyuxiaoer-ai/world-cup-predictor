@@ -48,7 +48,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
             const rank = getRank(i)
             const isTop3 = rank <= 3
             const hasPoints = entry.total_points > 0
-            const rankStyle = isTop3 ? RANK_STYLES[rank - 1] : 'border-transparent'
+            const rankStyle = isTop3 && hasPoints ? RANK_STYLES[rank - 1] : 'border-transparent'
 
             return (
               <div
