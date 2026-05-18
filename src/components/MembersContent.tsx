@@ -25,11 +25,9 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
     ]).then(([mem, lb]) => {
       const lbList = Array.isArray(lb) ? lb : []
       const memList = Array.isArray(mem) ? mem : []
-      memList.sort((a, b) => {
-        const aPoints = lbList.find((e: any) => e.user_id === a.user_id)?.total_points ?? 0
-        const bPoints = lbList.find((e: any) => e.user_id === b.user_id)?.total_points ?? 0
-        return bPoints - aPoints
-      })
+      memList.sort((a, b) =>
+        new Date(a.joined_at).getTime() - new Date(b.joined_at).getTime()
+      )
       setMembers(memList)
       setLeaderboard(lbList)
       setLoading(false)
@@ -111,7 +109,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                       {initial}
                     </div>
                   )}
-                  {rank && rank <= 3 && (
+                  {rank && rank <= 3 && points > 0 && (
                     <span className="absolute -top-1 -right-1 text-base">{MEDALS[rank - 1]}</span>
                   )}
                 </div>
