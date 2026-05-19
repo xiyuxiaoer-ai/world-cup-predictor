@@ -79,6 +79,19 @@ body {
   animation: hold-shake 0.45s ease-in-out infinite;
 }
 
+/* 足球旋转 + 左右漂浮（两层 transform 分开写不冲突） */
+@keyframes ball-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes ball-float {
+  0%, 100% { transform: translateX(0px) translateY(0px); }
+  30%       { transform: translateX(7px)  translateY(-3px); }
+  70%       { transform: translateX(-5px) translateY(2px); }
+}
+.animate-ball-spin  { animation: ball-spin  1.4s linear      infinite; }
+.animate-ball-float { animation: ball-float 2.4s ease-in-out infinite; }
+
 /* scrollbar-none */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }

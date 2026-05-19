@@ -90,10 +90,15 @@ export default async function RulesPage() {
             ))}
           </div>
           <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
-          {/* tq.png 作为背景水印，z-index:-1 在文字后面，opacity 保证文字可读 */}
-          <div className="absolute -bottom-10 -right-6 pointer-events-none"
-               style={{ zIndex: -1, opacity: 0.55, width: 200 }}>
-            <img src="/tq1.png" alt="" style={{ width: 200, height: 'auto' }} />
+          {/* 踢球效果：腿（静止）+ 足球（旋转+漂浮），z:-1 在文字后面 */}
+          <div className="absolute -bottom-10 -right-4 pointer-events-none"
+               style={{ zIndex: -1, opacity: 0.72, width: 250, position: 'absolute' }}>
+            {/* 腿 */}
+            <img src="/tq3.png" alt="" style={{ width: 250, height: 'auto', display: 'block' }} />
+            {/* 足球：外层漂浮 + 内层旋转 */}
+            <div className="animate-ball-float" style={{ position: 'absolute', top: -28, right: 2 }}>
+              <img src="/tq2.png" alt="" className="animate-ball-spin" style={{ width: 74, height: 'auto' }} />
+            </div>
           </div>
         </div>
 
