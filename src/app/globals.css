@@ -92,6 +92,18 @@ body {
 .animate-ball-spin  { animation: ball-spin  1.4s linear      infinite; }
 .animate-ball-float { animation: ball-float 2.4s ease-in-out infinite; }
 
+/* 偷看人物 peekaboo 探头 */
+@keyframes peekaboo {
+  0%        { transform: translateY(0); }
+  25%       { transform: translateY(-9px); }
+  45%, 55%  { transform: translateY(-8px); }   /* 探头后停顿，像在张望 */
+  75%       { transform: translateY(4px); }    /* 微微缩回 */
+  100%      { transform: translateY(0); }
+}
+.animate-peekaboo {
+  animation: peekaboo 3.6s ease-in-out infinite;
+}
+
 /* scrollbar-none */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
