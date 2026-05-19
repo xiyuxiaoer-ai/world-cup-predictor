@@ -147,15 +147,9 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             )
           })}
         </div>
-        {/* tj.png 托举人物 — 角色 x≈550-1150 y≈80-870，scale≈0.247 */}
+        {/* tj1.png 透明背景托举人物，微微抖动 */}
         <div className="flex justify-center pt-2 pointer-events-none">
-          <div style={{
-            width: 175, height: 215,
-            backgroundImage: 'url(/tj.png)',
-            backgroundSize: '420px auto',
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: '-116px -20px',
-          }} />
+          <img src="/tj1.png" alt="" className="animate-hold-shake" style={{ width: 190, height: 'auto' }} />
         </div>
         </>
       )}

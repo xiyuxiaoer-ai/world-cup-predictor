@@ -67,6 +67,18 @@ body {
 }
 .animate-marquee:hover { animation-play-state: paused; }
 
+/* 托举人物抖动 */
+@keyframes hold-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20%       { transform: translateX(-2px) rotate(-0.4deg); }
+  40%       { transform: translateX(2px)  rotate(0.4deg); }
+  60%       { transform: translateX(-1px) rotate(-0.2deg); }
+  80%       { transform: translateX(1px)  rotate(0.2deg); }
+}
+.animate-hold-shake {
+  animation: hold-shake 0.45s ease-in-out infinite;
+}
+
 /* scrollbar-none */
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
