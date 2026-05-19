@@ -76,7 +76,7 @@ export default function LoginPage() {
       setError('邮箱或密码错误')
       setLoading(false)
     } else {
-      router.push('/')
+      router.replace('/')
       router.refresh()
     }
   }
