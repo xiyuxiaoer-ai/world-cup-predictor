@@ -75,7 +75,7 @@ export default async function RulesPage() {
           </div>
         ))}
 
-        <div className="bg-white border border-red-100 rounded-2xl p-5 space-y-3 shadow-sm relative">
+        <div className="bg-white border border-red-100 rounded-2xl p-5 space-y-3 shadow-sm relative isolate overflow-visible">
           <h2 className="font-bold text-base text-gray-900 flex items-center gap-2"><span>⚠️</span> 漏猜惩罚</h2>
           <div className="space-y-2">
             {[
@@ -90,10 +90,10 @@ export default async function RulesPage() {
             ))}
           </div>
           <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
-          {/* tq.png — 放在卡片右侧页边距，lg 以上才显示，不遮挡任何内容 */}
-          <div className="absolute bottom-0 pointer-events-none z-10 hidden lg:block"
-               style={{ left: 'calc(100% + 12px)', width: 120 }}>
-            <img src="/tq.png" alt="" style={{ width: 120, height: 'auto' }} />
+          {/* tq.png 作为背景水印，z-index:-1 在文字后面，opacity 保证文字可读 */}
+          <div className="absolute -bottom-6 -right-4 pointer-events-none"
+               style={{ zIndex: -1, opacity: 0.2, width: 140 }}>
+            <img src="/tq.png" alt="" style={{ width: 140, height: 'auto' }} />
           </div>
         </div>
 
