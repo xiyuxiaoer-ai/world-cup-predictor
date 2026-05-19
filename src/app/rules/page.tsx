@@ -3,6 +3,32 @@ import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import PageBackground from '@/components/PageBackground'
 
+function KickingLeg() {
+  return (
+    <svg width="92" height="100" viewBox="0 0 92 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* 小腿 / shin 斜向右上方延伸出画框 */}
+      <path d="M30 52 L40 50 L92 8 L84 2 Z" fill="#374151" stroke="#111827" strokeWidth="1.5" strokeLinejoin="round"/>
+      {/* 球鞋主体 — 鞋尖朝左 */}
+      <path d="M2 50 L30 44 L44 46 L58 52 L62 60 L54 74 L6 76 L0 62 Z" fill="#FBBF24" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* 鞋尖护盖 */}
+      <path d="M0 62 L2 50 L12 46 L14 64 L6 76 Z" fill="#F59E0B" stroke="#111827" strokeWidth="2" strokeLinejoin="round"/>
+      {/* 鞋带线条 */}
+      <line x1="22" y1="44" x2="20" y2="74" stroke="#111827" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="32" y1="43" x2="30" y2="74" stroke="#111827" strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="42" y1="44" x2="40" y2="72" stroke="#111827" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* 鞋底钉 */}
+      <rect x="10" y="76" width="5" height="5" rx="1.5" fill="#111827"/>
+      <rect x="22" y="77" width="5" height="5" rx="1.5" fill="#111827"/>
+      <rect x="34" y="77" width="5" height="5" rx="1.5" fill="#111827"/>
+      <rect x="46" y="76" width="5" height="5" rx="1.5" fill="#111827"/>
+      {/* 速度线 — 踢出方向反向 */}
+      <line x1="66" y1="38" x2="84" y2="32" stroke="#111827" strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="68" y1="54" x2="90" y2="51" stroke="#111827" strokeWidth="2.5" strokeLinecap="round"/>
+      <line x1="64" y1="68" x2="82" y2="68" stroke="#111827" strokeWidth="2.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 const STAGE_RULES = [
   {
     title: '小组赛', subtitle: '共 72 场', color: 'border-gray-200', badge: null,
@@ -74,7 +100,7 @@ export default async function RulesPage() {
           </div>
         ))}
 
-        <div className="bg-white border border-red-100 rounded-2xl p-5 space-y-3 shadow-sm">
+        <div className="bg-white border border-red-100 rounded-2xl p-5 space-y-3 shadow-sm relative overflow-visible">
           <h2 className="font-bold text-base text-gray-900 flex items-center gap-2"><span>⚠️</span> 漏猜惩罚</h2>
           <div className="space-y-2">
             {[
@@ -89,6 +115,10 @@ export default async function RulesPage() {
             ))}
           </div>
           <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
+          {/* 踢穿卡片角落的球鞋 */}
+          <div className="absolute -bottom-8 -right-3 pointer-events-none z-10 hidden md:block">
+            <KickingLeg />
+          </div>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-3 shadow-sm">
