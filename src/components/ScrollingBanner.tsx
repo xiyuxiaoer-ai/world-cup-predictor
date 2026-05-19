@@ -23,8 +23,8 @@ export default function ScrollingBanner({ items, peek = true }: { items: string[
       {/* 偷看人物：用 background-image 精确裁剪，只露出手和头顶 */}
       {peek && (
         <div
-          className="absolute top-full right-4 md:right-10 pointer-events-none z-10 animate-peekaboo"
-          style={{ width: 160, height: 100, marginTop: -38, ...CHAR_STYLE }}
+          className="absolute top-full right-4 md:right-10 pointer-events-none z-10"
+          style={{ width: 160, height: 100, marginTop: -18, ...CHAR_STYLE }}
         />
       )}
     </div>
