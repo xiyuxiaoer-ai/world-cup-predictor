@@ -91,9 +91,9 @@ export default async function RulesPage() {
           </div>
           <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
           {/* tq.png 作为背景水印，z-index:-1 在文字后面，opacity 保证文字可读 */}
-          <div className="absolute -bottom-6 -right-4 pointer-events-none"
-               style={{ zIndex: -1, opacity: 0.2, width: 140 }}>
-            <img src="/tq1.png" alt="" style={{ width: 140, height: 'auto' }} />
+          <div className="absolute -bottom-10 -right-6 pointer-events-none"
+               style={{ zIndex: -1, opacity: 0.55, width: 200 }}>
+            <img src="/tq1.png" alt="" style={{ width: 200, height: 'auto' }} />
           </div>
         </div>
 
