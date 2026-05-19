@@ -23,8 +23,7 @@ export default async function MembersPage() {
   }))
 
   return (
-    <div className="min-h-screen flex flex-col relative">
-      <PageBackground variant="members" />
+    <div className="min-h-screen flex flex-col">
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
         <MembersContent games={games} currentUserId={user.id} />

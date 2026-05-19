@@ -41,8 +41,7 @@ export default async function RulesPage() {
   const { data: profile } = await supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single()
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 relative">
-      <PageBackground variant="rules" />
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8 space-y-4">
         <h1 className="text-xl font-bold text-gray-900">积分规则</h1>
