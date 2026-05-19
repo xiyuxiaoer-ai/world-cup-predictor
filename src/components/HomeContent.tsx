@@ -215,7 +215,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       ) : (
         <>
           {/* Top: Todo + Leaderboard */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">待竞猜</h2>

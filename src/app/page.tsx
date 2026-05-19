@@ -25,7 +25,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
-      <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
+      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
         <HomeContent initialGames={games} />
       </main>
     </div>
