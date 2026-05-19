@@ -149,7 +149,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
         </div>
         {/* tj1.png 透明背景托举人物，微微抖动 */}
         <div className="flex justify-center -mt-4 pointer-events-none">
-          <img src="/tj1.png" alt="" className="animate-hold-shake" style={{ width: 300, height: 'auto' }} />
+          <img src="/tj1.png" alt="" className="animate-hold-shake" style={{ width: 400, height: 'auto' }} />
         </div>
         </>
       )}
