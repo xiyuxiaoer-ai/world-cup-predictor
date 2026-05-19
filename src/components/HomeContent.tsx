@@ -8,6 +8,7 @@ import PredictionCard from './PredictionCard'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
 import JoinGameModal from './JoinGameModal'
+import ScrollingBanner from './ScrollingBanner'
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛',
@@ -105,6 +106,19 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   const [showAllMatches, setShowAllMatches] = useState(false)
 
+  const recentResults = matches
+    .filter(m => m.status === 'finished' && m.result_90)
+    .slice(-12)
+    .map(m => {
+      const home = getTeamDisplay((m as any).home_tla, m.home_team)
+      const away = getTeamDisplay((m as any).away_tla, m.away_team)
+      return `✓ ${home} ${m.home_score_90}–${m.away_score_90} ${away}`
+    })
+
+  const homeBannerItems = recentResults.length > 0
+    ? recentResults
+    : ['⚽ 等待比赛开始', '📅 世界杯 6月11日开幕', '🏆 2026 FIFA World Cup', '🎯 提前提交你的竞猜']
+
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
     .slice(0, 3)
@@ -145,6 +159,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   return (
     <div className="space-y-8">
+      <ScrollingBanner items={homeBannerItems} />
       {/* Game Selector */}
       <div className="space-y-2">
         <select

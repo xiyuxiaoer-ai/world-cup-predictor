@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
+import ScrollingBanner from './ScrollingBanner'
 
 export default function MembersContent({ games, currentUserId }: { games: GameWithRole[]; currentUserId: string }) {
   const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
@@ -63,10 +64,15 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
 
   const MEDALS = ['🥇', '🥈', '🥉']
 
+  const memberBannerItems = members.length > 0
+    ? members.map(m => `👤 ${m.profiles?.display_name || m.profiles?.username || '成员'}`)
+    : ['👋 邀请朋友加入', '🎮 一起竞猜', '⚽ World Cup 2026', '🏆 看谁猜得最准']
+
   if (!selectedGameId) return <p className="text-gray-500">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
+      <ScrollingBanner items={memberBannerItems} />
       <h1 className="text-xl font-bold">成员介绍</h1>
 
       <div className="flex items-center gap-3 flex-wrap">

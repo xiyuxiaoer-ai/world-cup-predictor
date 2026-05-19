@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
+import ScrollingBanner from './ScrollingBanner'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
 const STAGE_LABELS: Record<string, string> = {
@@ -20,6 +21,14 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [filter, setFilter] = useState<Filter>('upcoming')
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
+  const [leaderboard, setLeaderboard] = useState<any[]>([])
+
+  useEffect(() => {
+    if (!selectedGameId) return
+    fetch(`/api/leaderboard?game_id=${selectedGameId}`)
+      .then(r => r.json())
+      .then(data => setLeaderboard(Array.isArray(data) ? data : []))
+  }, [selectedGameId])
 
   useEffect(() => {
     if (!selectedGameId) return
@@ -57,10 +66,20 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
     setTimeout(() => setSyncMsg(''), 3000)
   }
 
+  const COMMENTS = ['遥遥领先 👑', '紧追不舍 🔥', '不甘落后 💪', '奋起直追 ⚡', '加油别放弃 💫']
+  const recordsBannerItems = leaderboard.length > 0
+    ? leaderboard.map((e, i) => {
+        const name = e.display_name || e.username
+        const comment = COMMENTS[Math.min(i, COMMENTS.length - 1)]
+        return `${['🥇','🥈','🥉'][i] || '·'} ${name} ${e.total_points}分 ${e.total_points > 0 ? comment : '加油！💫'}`
+      })
+    : ['🎯 提交你的竞猜预测', '⏰ 等待比赛结果', '🏆 看谁猜得最准', '⚽ World Cup 2026']
+
   if (!selectedGameId) return <p className="text-gray-500">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
+      <ScrollingBanner items={recordsBannerItems} />
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">竞猜记录</h1>
         <div className="flex items-center gap-2">
