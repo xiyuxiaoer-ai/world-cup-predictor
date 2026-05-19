@@ -113,7 +113,7 @@ function ProfileBg() {
 
 export default function PageBackground({ variant }: { variant: Variant }) {
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 opacity-30">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.06]">
       {variant === 'auth'    && <AuthBg />}
       {variant === 'home'    && <HomeBg />}
       {variant === 'records' && <RecordsBg />}
