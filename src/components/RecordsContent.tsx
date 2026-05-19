@@ -80,7 +80,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   return (
     <div className="space-y-5">
       <ScrollingBanner items={recordsBannerItems} />
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between relative z-20">
         <h1 className="text-xl font-bold">竞猜记录</h1>
         <div className="flex items-center gap-2">
           <button
