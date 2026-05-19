@@ -36,13 +36,6 @@ export default function LoginPage() {
 
       {/* 右侧登录表单 */}
       <div className="w-full md:w-1/2 max-w-sm animate-float-up" style={{ animationDelay: '0.1s' }}>
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">2026年世界杯足球赛</h1>
-            <img src="https://crests.football-data.org/wm26.png" alt="" className="w-7 h-7 object-contain" />
-          </div>
-          <p className="text-gray-500 text-sm">登录你的账号继续</p>
-        </div>
 
         <form onSubmit={handleLogin} className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 space-y-4">
           {error && (
