@@ -96,7 +96,7 @@ export default async function RulesPage() {
             {/* 腿（静止，高透明度） */}
             <img src="/tq3.png" alt="" style={{ width: 290, height: 'auto', display: 'block', opacity: 0.88 }} />
             {/* 足球：外层漂浮 + 内层旋转，单独控制透明度 */}
-            <div className="animate-ball-float" style={{ position: 'absolute', top: -28, right: 2, opacity: 0.65 }}>
+            <div className="animate-ball-float" style={{ position: 'absolute', top: -28, right: 2, opacity: 0.88 }}>
               <img src="/tq2.png" alt="" className="animate-ball-spin" style={{ width: 74, height: 'auto' }} />
             </div>
           </div>
