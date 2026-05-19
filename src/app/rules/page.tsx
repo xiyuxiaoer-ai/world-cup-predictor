@@ -85,7 +85,7 @@ export default async function RulesPage() {
             ].map(r => (
               <div key={r.stage} className="flex justify-between items-center">
                 <span className="text-sm text-gray-700">{r.stage}</span>
-                <span className="text-sm font-bold text-red-700">{r.pts}</span>
+                <span className="text-sm font-bold text-red-700 bg-white/90 px-1.5 py-0.5 rounded">{r.pts}</span>
               </div>
             ))}
           </div>
