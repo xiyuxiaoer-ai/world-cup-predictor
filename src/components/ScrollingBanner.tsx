@@ -24,7 +24,7 @@ export default function ScrollingBanner({ items, peek = true }: { items: string[
       {peek && (
         <div
           className="absolute top-full right-4 md:right-10 pointer-events-none z-10 animate-peekaboo"
-          style={{ width: 160, height: 70, marginTop: -1, ...CHAR_STYLE }}
+          style={{ width: 160, height: 100, marginTop: -1, ...CHAR_STYLE }}
         />
       )}
     </div>
