@@ -9,7 +9,7 @@ const CHAR_STYLE: React.CSSProperties = {
   backgroundPosition: '-115px -125px', // x: 从左手开始；y: 从横线下方开始
 }
 
-export default function ScrollingBanner({ items }: { items: string[] }) {
+export default function ScrollingBanner({ items, peek = true }: { items: string[]; peek?: boolean }) {
   const text = items.join('   ·   ') + '   ·   '
 
   return (
@@ -21,10 +21,12 @@ export default function ScrollingBanner({ items }: { items: string[] }) {
         </div>
       </div>
       {/* 偷看人物：用 background-image 精确裁剪，只露出手和头顶 */}
-      <div
-        className="absolute top-full right-4 md:right-10 pointer-events-none z-10"
-        style={{ width: 160, height: 70, marginTop: -1, ...CHAR_STYLE }}
-      />
+      {peek && (
+        <div
+          className="absolute top-full right-4 md:right-10 pointer-events-none z-10"
+          style={{ width: 160, height: 70, marginTop: -1, ...CHAR_STYLE }}
+        />
+      )}
     </div>
   )
 }

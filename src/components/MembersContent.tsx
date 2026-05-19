@@ -71,7 +71,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
 
   return (
     <div className="space-y-5">
-      <ScrollingBanner items={memberBannerItems} />
+      <ScrollingBanner items={memberBannerItems} peek={false} />
       <h1 className="text-xl font-bold">成员介绍</h1>
 
       <div className="flex items-center gap-3 flex-wrap">
@@ -95,6 +95,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       ) : members.length === 0 ? (
         <p className="text-gray-500 text-sm">暂无成员</p>
       ) : (
+        <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {members.map(m => {
             const profile = m.profiles
@@ -146,6 +147,17 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             )
           })}
         </div>
+        {/* tj.png 托举人物 — 角色 x≈550-1150 y≈80-870，scale≈0.247 */}
+        <div className="flex justify-center pt-2 pointer-events-none">
+          <div style={{
+            width: 175, height: 215,
+            backgroundImage: 'url(/tj.png)',
+            backgroundSize: '420px auto',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: '-116px -20px',
+          }} />
+        </div>
+        </>
       )}
       {showInviteModal && (
         <InviteMemberModal gameId={selectedGameId} onClose={() => setShowInviteModal(false)} />
