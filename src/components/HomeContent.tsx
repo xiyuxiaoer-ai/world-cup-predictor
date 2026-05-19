@@ -165,7 +165,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="w-full sm:w-auto bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-sm"
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-sm"
         >
           {games.map(g => (
             <option key={g.id} value={g.id}>{g.name}</option>
