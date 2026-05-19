@@ -80,7 +80,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-emerald-500"
+          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-amber-500 shadow-sm"
         >
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
