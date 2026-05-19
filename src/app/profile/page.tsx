@@ -124,7 +124,7 @@ export default function ProfilePage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-zinc-500">加载中...</p>
+      <p className="text-gray-400">加载中...</p>
     </div>
   )
 
@@ -138,14 +138,14 @@ export default function ProfilePage() {
         <div className="flex flex-col items-center gap-3">
           <div className="relative cursor-pointer group" onClick={() => fileRef.current?.click()}>
             {displayAvatarUrl ? (
-              <img src={displayAvatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-zinc-700 group-hover:border-emerald-500 transition-colors" />
+              <img src={displayAvatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 group-hover:border-emerald-500 transition-colors" />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-zinc-700 group-hover:border-emerald-500 flex items-center justify-center text-emerald-400 text-2xl font-bold transition-colors">
+              <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-gray-200 group-hover:border-emerald-500 flex items-center justify-center text-amber-500 text-2xl font-bold transition-colors">
                 {initial}
               </div>
             )}
             <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <span className="text-white text-xs">更换头像</span>
+              <span className="text-gray-900 text-xs">更换头像</span>
             </div>
           </div>
           {pendingBlob && <p className="text-xs text-amber-400">头像待保存</p>}
@@ -154,32 +154,32 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label className="text-zinc-400 text-sm mb-1.5 block">用户名（不可修改）</label>
+            <label className="text-gray-500 text-sm mb-1.5 block">用户名（不可修改）</label>
             <input value={username} disabled
-              className="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-4 py-2.5 text-zinc-500 cursor-not-allowed" />
+              className="w-full bg-gray-50/50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-400 cursor-not-allowed shadow-sm" />
           </div>
           <div>
-            <label className="text-zinc-400 text-sm mb-1.5 block">显示名称</label>
+            <label className="text-gray-500 text-sm mb-1.5 block">显示名称</label>
             <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)}
               maxLength={20}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 focus:outline-none focus:border-amber-500 transition-colors"
               placeholder="你的显示名称" />
           </div>
           <div>
-            <label className="text-zinc-400 text-sm mb-1.5 block">个人签名</label>
+            <label className="text-gray-500 text-sm mb-1.5 block">个人签名</label>
             <textarea value={bio} onChange={e => setBio(e.target.value)}
               maxLength={60} rows={2}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 transition-colors resize-none"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 focus:outline-none focus:border-amber-500 transition-colors resize-none"
               placeholder="一句话介绍自己" />
             <p className="text-xs text-zinc-600 mt-1 text-right">{bio.length}/60</p>
           </div>
           {msg && (
-            <p className={`text-sm ${msg.includes('✓') ? 'text-emerald-400' : msg.includes('待保存') || msg.includes('已选择') ? 'text-amber-400' : 'text-red-400'}`}>
+            <p className={`text-sm ${msg.includes('✓') ? 'text-amber-500' : msg.includes('待保存') || msg.includes('已选择') ? 'text-amber-400' : 'text-red-400'}`}>
               {msg}
             </p>
           )}
           <button type="submit" disabled={saving}
-            className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors">
+            className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-gray-900 font-semibold py-2.5 rounded-lg transition-colors">
             {saving ? '保存中...' : '保存'}
           </button>
         </form>
@@ -190,7 +190,7 @@ export default function ProfilePage() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
             <span className="font-semibold">裁剪头像</span>
-            <button onClick={() => setCropSrc(null)} className="text-zinc-400 hover:text-white">✕</button>
+            <button onClick={() => setCropSrc(null)} className="text-gray-500 hover:text-gray-900">✕</button>
           </div>
           <div className="relative flex-1">
             <Cropper
@@ -205,20 +205,20 @@ export default function ProfilePage() {
               onCropComplete={onCropComplete}
             />
           </div>
-          <div className="px-4 py-4 space-y-3 border-t border-zinc-800 bg-zinc-900">
+          <div className="px-4 py-4 space-y-3 border-t border-zinc-800 bg-white">
             <div className="flex items-center gap-3">
-              <span className="text-xs text-zinc-500 shrink-0">缩放</span>
+              <span className="text-xs text-gray-400 shrink-0">缩放</span>
               <input type="range" min={1} max={3} step={0.05} value={zoom}
                 onChange={e => setZoom(Number(e.target.value))}
                 className="flex-1 accent-emerald-500" />
             </div>
             <div className="flex gap-3">
               <button onClick={() => setCropSrc(null)}
-                className="flex-1 border border-zinc-700 text-zinc-400 py-2.5 rounded-lg hover:border-zinc-500 transition-colors">
+                className="flex-1 border border-gray-200 text-gray-500 py-2.5 rounded-lg hover:border-zinc-500 transition-colors">
                 取消
               </button>
               <button onClick={handleCropConfirm}
-                className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-2.5 rounded-lg transition-colors">
+                className="flex-1 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold py-2.5 rounded-lg transition-colors">
                 确认裁剪
               </button>
             </div>

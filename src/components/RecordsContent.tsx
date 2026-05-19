@@ -57,7 +57,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
     setTimeout(() => setSyncMsg(''), 3000)
   }
 
-  if (!selectedGameId) return <p className="text-zinc-500">你还没有加入任何 Game</p>
+  if (!selectedGameId) return <p className="text-gray-500">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
@@ -67,12 +67,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-zinc-300 disabled:opacity-50 transition-colors"
           >
             <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
             <span>{syncing ? '更新中...' : '手动更新'}</span>
           </button>
-          {syncMsg && <span className="text-xs text-emerald-400">{syncMsg}</span>}
+          {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
         </div>
       </div>
 
@@ -80,14 +80,14 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
+          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-emerald-500"
         >
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
         <div className="flex gap-1">
           {(['upcoming', 'all'] as Filter[]).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-amber-500 text-white text-gray-900' : 'text-gray-400 hover:text-gray-900'}`}>
               {f === 'all' ? '全部' : '待开赛'}
             </button>
           ))}
@@ -95,9 +95,9 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
       </div>
 
       {loading ? (
-        <p className="text-zinc-500 text-sm">加载中...</p>
+        <p className="text-gray-500 text-sm">加载中...</p>
       ) : filtered.length === 0 ? (
-        <p className="text-zinc-500 text-sm">暂无比赛</p>
+        <p className="text-gray-500 text-sm">暂无比赛</p>
       ) : (
         <div className="space-y-4">
           {filtered.map(match => {
@@ -114,10 +114,10 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             const predictions: any[] = match.predictions || []
 
             return (
-              <div key={match.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+              <div key={match.id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
                 {/* Match Header */}
                 <div className="px-4 py-3 space-y-2">
-                  <div className="flex justify-between text-xs text-zinc-500">
+                  <div className="flex justify-between text-xs text-gray-500">
                     <span>{STAGE_LABELS[match.stage]} {group}</span>
                     <span>
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
@@ -133,12 +133,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                     <div className="text-center shrink-0 px-2">
                       {isFinished ? (
                         <div>
-                          <div className="text-base font-bold text-white leading-tight">{match.home_score_90} – {match.away_score_90}</div>
+                          <div className="text-base font-bold text-gray-900 leading-tight">{match.home_score_90} – {match.away_score_90}</div>
                           {match.home_score_et != null && match.home_score_pen == null && (
-                            <div className="text-xs text-zinc-400 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
+                            <div className="text-xs text-gray-400 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
                           )}
                           {match.home_score_pen != null && (
-                            <div className="text-xs text-zinc-400 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
+                            <div className="text-xs text-gray-400 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
                           )}
                         </div>
                       ) : (
@@ -154,16 +154,16 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
 
                 {/* Predictions Table */}
                 {hasPredicted ? (
-                  <div className="border-t border-zinc-800">
+                  <div className="border-t border-gray-200">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-xs text-zinc-500 bg-zinc-800/50">
+                        <tr className="text-xs text-gray-500 bg-gray-50">
                           <th className="text-left px-4 py-2 font-medium w-1/3">成员</th>
                           <th className="text-center px-3 py-2 font-medium w-1/3">竞猜</th>
                           <th className="text-right px-4 py-2 font-medium w-1/3">积分</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-zinc-800">
+                      <tbody className="divide-y divide-gray-100">
                         {predictions.map(pred => {
                           const profile = pred.profiles
                           const name = profile?.display_name || profile?.username || '未知'
@@ -178,31 +178,31 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                           }
 
                           return (
-                            <tr key={pred.id} className="hover:bg-zinc-800/30 transition-colors">
+                            <tr key={pred.id} className="hover:bg-gray-50 transition-colors">
                               <td className="px-4 py-2.5">
                                 <div className="flex items-center gap-2">
                                   {profile?.avatar_url ? (
                                     <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover shrink-0" />
                                   ) : (
-                                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-xs font-bold shrink-0">
+                                    <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-500 text-xs font-bold shrink-0">
                                       {initial}
                                     </div>
                                   )}
                                   <span className="truncate max-w-[80px]">{name}</span>
                                 </div>
                               </td>
-                              <td className="px-3 py-2.5 text-center text-white">
+                              <td className="px-3 py-2.5 text-center text-gray-900">
                                 <span className="font-mono">{predHome}–{predAway}</span>
                                 {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
-                                  <span className="text-zinc-400 text-xs"> · 延:{pred.pred_et_winner}</span>
+                                  <span className="text-gray-400 text-xs"> · 延:{pred.pred_et_winner}</span>
                                 )}
                                 {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (
-                                  <span className="text-zinc-400 text-xs"> · 点球:{pred.pred_penalty_winner}</span>
+                                  <span className="text-gray-400 text-xs"> · 点球:{pred.pred_penalty_winner}</span>
                                 )}
                               </td>
                               <td className="px-4 py-2.5 text-right font-bold">
                                 {points != null ? (
-                                  <span className={points > 0 ? 'text-emerald-400' : points < 0 ? 'text-red-400' : 'text-zinc-500'}>
+                                  <span className={points > 0 ? 'text-amber-500' : points < 0 ? 'text-red-500' : 'text-gray-500'}>
                                     {points > 0 ? `+${points}` : points}
                                   </span>
                                 ) : (
@@ -216,7 +216,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                     </table>
                   </div>
                 ) : (
-                  <div className="border-t border-zinc-800 px-4 py-3 flex items-center gap-2 text-xs text-zinc-500">
+                  <div className="border-t border-gray-200 px-4 py-3 flex items-center gap-2 text-xs text-gray-500">
                     <span>🔒</span>
                     <span>请先提交竞猜，才能查看其他成员的预测</span>
                   </div>

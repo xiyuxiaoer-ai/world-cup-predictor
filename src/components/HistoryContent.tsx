@@ -33,7 +33,7 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
     })
     .sort((a, b) => new Date(b.matches?.kickoff_time).getTime() - new Date(a.matches?.kickoff_time).getTime())
 
-  if (!selectedGameId) return <p className="text-zinc-500">你还没有加入任何 Game</p>
+  if (!selectedGameId) return <p className="text-gray-500">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
@@ -43,14 +43,14 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500"
+          className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-emerald-500"
         >
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
         <div className="flex gap-1">
           {(['all', 'finished', 'upcoming'] as Filter[]).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-amber-500 text-gray-900' : 'text-gray-400 hover:text-gray-900'}`}>
               {f === 'all' ? '全部' : f === 'finished' ? '已结束' : '待开赛'}
             </button>
           ))}
@@ -58,9 +58,9 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
       </div>
 
       {loading ? (
-        <p className="text-zinc-500 text-sm">加载中...</p>
+        <p className="text-gray-500 text-sm">加载中...</p>
       ) : filtered.length === 0 ? (
-        <p className="text-zinc-500 text-sm">暂无记录</p>
+        <p className="text-gray-500 text-sm">暂无记录</p>
       ) : (
         <div className="space-y-3">
           {filtered.map(pred => {
@@ -70,8 +70,8 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
             const group = match?.group_name ? `· ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组` : ''
 
             return (
-              <div key={pred.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-3">
-                <div className="flex justify-between text-xs text-zinc-500">
+              <div key={pred.id} className="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+                <div className="flex justify-between text-xs text-gray-500">
                   <span>{STAGE_LABELS[match?.stage]} {group}</span>
                   <span>{kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })} {kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
                 </div>
@@ -83,7 +83,7 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
                   </div>
                   <div className="text-center w-16 shrink-0">
                     {isFinished
-                      ? <span className="text-white font-bold text-sm">{match.home_score_90}–{match.away_score_90}</span>
+                      ? <span className="text-gray-900 font-bold text-sm">{match.home_score_90}–{match.away_score_90}</span>
                       : <span className="text-zinc-600 text-xs">vs</span>}
                   </div>
                   <div className="flex items-center gap-1.5 flex-1 justify-start">
@@ -92,14 +92,14 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center text-sm border-t border-zinc-800 pt-2">
-                  <span className="text-zinc-400">我猜：<span className="text-white font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span></span>
+                <div className="flex justify-between items-center text-sm border-t border-gray-200 pt-2">
+                  <span className="text-gray-400">我猜：<span className="text-gray-900 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span></span>
                   {pred.points_earned != null ? (
-                    <span className={`font-bold ${pred.points_earned > 0 ? 'text-emerald-400' : pred.points_earned < 0 ? 'text-red-400' : 'text-zinc-500'}`}>
+                    <span className={`font-bold ${pred.points_earned > 0 ? 'text-amber-500' : pred.points_earned < 0 ? 'text-red-500' : 'text-gray-500'}`}>
                       {pred.points_earned > 0 ? `+${pred.points_earned}` : pred.points_earned}分
                     </span>
                   ) : isFinished ? (
-                    <span className="text-zinc-500 text-xs">待结算</span>
+                    <span className="text-gray-500 text-xs">待结算</span>
                   ) : (
                     <span className="text-zinc-600 text-xs">未开赛</span>
                   )}
