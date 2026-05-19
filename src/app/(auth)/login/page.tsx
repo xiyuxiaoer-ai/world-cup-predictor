@@ -7,55 +7,54 @@ import Link from 'next/link'
 
 function ComicIllustration() {
   return (
-    <svg viewBox="0 0 280 260" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* 地面 */}
-      <ellipse cx="140" cy="248" rx="80" ry="10" fill="#E5E7EB"/>
-      {/* 速度线 */}
-      <line x1="195" y1="130" x2="255" y2="108" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
-      <line x1="198" y1="148" x2="262" y2="145" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
-      <line x1="192" y1="115" x2="248" y2="92" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" opacity="0.4"/>
-      {/* 足球 */}
-      <circle cx="210" cy="140" r="32" fill="#F59E0B" stroke="#111827" strokeWidth="3"/>
-      <circle cx="210" cy="140" r="32" fill="none" stroke="#111827" strokeWidth="3"/>
-      <path d="M210 112 L222 126 L218 142 L202 142 L198 126 Z" fill="#111827" opacity="0.25"/>
-      <path d="M210 168 L222 154 L218 142 L202 142 L198 154 Z" fill="#111827" opacity="0.2"/>
-      <path d="M183 131 L198 126 L202 142 L190 152 L178 144 Z" fill="#111827" opacity="0.2"/>
-      {/* 腿（踢球姿势）*/}
-      <path d="M95 200 L82 248 L96 248 L108 218 L118 248 L134 248 L122 198 Z" fill="#1D4ED8" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
-      {/* 踢球腿延伸 */}
-      <path d="M122 200 L168 162 L178 174 L136 214 Z" fill="#1D4ED8" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
-      {/* 球鞋 */}
-      <path d="M78 248 L62 258 L100 260 L96 248 Z" fill="#111827" stroke="#111827" strokeWidth="1.5" strokeLinejoin="round"/>
-      <path d="M118 248 L114 258 L148 258 L148 248 Z" fill="#111827" stroke="#111827" strokeWidth="1.5" strokeLinejoin="round"/>
-      {/* 球衣身体 */}
-      <path d="M72 142 L80 200 L136 200 L145 142 L120 132 L108 148 L96 132 Z" fill="#DC2626" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
-      {/* 号码 */}
-      <text x="108" y="182" textAnchor="middle" fill="white" fontSize="22" fontWeight="bold" fontFamily="Arial">10</text>
-      {/* 手臂 */}
-      <path d="M72 148 L44 172 L50 182 L82 162 Z" fill="#FBBF24" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
-      <path d="M145 148 L162 158 L158 168 L142 160 Z" fill="#FBBF24" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
-      {/* 脖子 */}
-      <rect x="100" y="104" width="16" height="30" rx="4" fill="#FBBF24" stroke="#111827" strokeWidth="2"/>
-      {/* 头 */}
-      <circle cx="108" cy="88" r="28" fill="#FBBF24" stroke="#111827" strokeWidth="2.5"/>
-      {/* 头发 */}
-      <path d="M82 80 Q88 60 108 57 Q128 60 134 80 L130 82 Q120 64 108 63 Q96 64 86 82 Z" fill="#111827"/>
-      {/* 眼睛 */}
-      <ellipse cx="100" cy="86" rx="5" ry="6" fill="white" stroke="#111827" strokeWidth="1.5"/>
-      <ellipse cx="116" cy="86" rx="5" ry="6" fill="white" stroke="#111827" strokeWidth="1.5"/>
-      <circle cx="101" cy="87" r="2.5" fill="#111827"/>
-      <circle cx="117" cy="87" r="2.5" fill="#111827"/>
-      {/* 眉毛 */}
-      <path d="M94 79 L106 76" stroke="#111827" strokeWidth="2" strokeLinecap="round"/>
-      <path d="M110 76 L122 79" stroke="#111827" strokeWidth="2" strokeLinecap="round"/>
-      {/* 嘴巴 */}
-      <path d="M101 98 Q108 103 115 98" stroke="#111827" strokeWidth="2" fill="none" strokeLinecap="round"/>
-      {/* 星星装饰 */}
-      <text x="30" y="110" fontSize="18" opacity="0.8">⭐</text>
-      <text x="220" y="60" fontSize="14" opacity="0.7">✨</text>
-      <text x="15" y="185" fontSize="12" opacity="0.6">💫</text>
-      {/* 2026 文字 */}
+    <svg viewBox="0 0 280 280" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* 2026 */}
       <text x="140" y="28" textAnchor="middle" fill="#F59E0B" fontSize="16" fontWeight="bold" fontFamily="Arial" letterSpacing="3">2026</text>
+      {/* 地面阴影 */}
+      <ellipse cx="118" cy="268" rx="75" ry="9" fill="#E5E7EB"/>
+      {/* 速度线 */}
+      <line x1="210" y1="155" x2="268" y2="135" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+      <line x1="214" y1="172" x2="272" y2="168" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" opacity="0.5"/>
+      <line x1="206" y1="140" x2="260" y2="118" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" opacity="0.4"/>
+      {/* 足球 */}
+      <circle cx="228" cy="160" r="30" fill="#F59E0B" stroke="#111827" strokeWidth="3"/>
+      <path d="M228 133 L239 146 L235 160 L221 160 L217 146 Z" fill="#111827" opacity="0.25"/>
+      <path d="M228 187 L239 174 L235 160 L221 160 L217 174 Z" fill="#111827" opacity="0.2"/>
+      {/* 左腿 */}
+      <path d="M100 205 L88 262 L106 262 L112 205 Z" fill="#1D4ED8" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* 右腿 */}
+      <path d="M124 205 L138 262 L156 262 L140 205 Z" fill="#1D4ED8" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* 左脚 */}
+      <path d="M83 262 L65 270 L108 272 L106 262 Z" fill="#111827" strokeLinejoin="round"/>
+      {/* 右脚 */}
+      <path d="M138 262 L156 262 L172 270 L148 272 Z" fill="#111827" strokeLinejoin="round"/>
+      {/* 球衣身体 */}
+      <path d="M76 148 L88 210 L150 210 L158 148 L134 138 L120 154 L106 138 Z" fill="#DC2626" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* 号码 */}
+      <text x="117" y="190" textAnchor="middle" fill="white" fontSize="22" fontWeight="bold" fontFamily="Arial">10</text>
+      {/* 左手臂 */}
+      <path d="M78 155 L50 178 L58 188 L90 168 Z" fill="#FBBF24" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* 右手臂（向右举起）*/}
+      <path d="M155 152 L195 140 L192 152 L156 166 Z" fill="#FBBF24" stroke="#111827" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* 脖子 */}
+      <rect x="108" y="110" width="18" height="30" rx="4" fill="#FBBF24" stroke="#111827" strokeWidth="2"/>
+      {/* 头 */}
+      <circle cx="117" cy="92" r="30" fill="#FBBF24" stroke="#111827" strokeWidth="2.5"/>
+      {/* 头发 */}
+      <path d="M89 83 Q95 61 117 58 Q139 61 145 83 L141 85 Q132 65 117 64 Q102 65 93 85 Z" fill="#111827"/>
+      {/* 眼睛 */}
+      <ellipse cx="108" cy="90" rx="5.5" ry="6.5" fill="white" stroke="#111827" strokeWidth="1.5"/>
+      <ellipse cx="126" cy="90" rx="5.5" ry="6.5" fill="white" stroke="#111827" strokeWidth="1.5"/>
+      <circle cx="109" cy="91" r="3" fill="#111827"/>
+      <circle cx="127" cy="91" r="3" fill="#111827"/>
+      {/* 眉毛 */}
+      <path d="M102 82 L114 79" stroke="#111827" strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M120 79 L132 82" stroke="#111827" strokeWidth="2.5" strokeLinecap="round"/>
+      {/* 微笑 */}
+      <path d="M108 104 Q117 110 126 104" stroke="#111827" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      {/* 装饰 */}
+      <text x="35" y="120" fontSize="18" opacity="0.8">⭐</text>
+      <text x="22" y="195" fontSize="13" opacity="0.6">💫</text>
     </svg>
   )
 }
