@@ -41,7 +41,7 @@ export default function ScrollingBanner({ items }: { items: string[] }) {
         </div>
       </div>
       {/* 偷看的球员 */}
-      <div className="absolute top-full right-16 pointer-events-none z-10 hidden md:block">
+      <div className="absolute top-full right-12 md:right-16 pointer-events-none z-0 block">
         <PeekingCharacter />
       </div>
     </div>

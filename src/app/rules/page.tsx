@@ -116,7 +116,7 @@ export default async function RulesPage() {
           </div>
           <p className="text-xs text-gray-400 border-t border-gray-100 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
           {/* 踢穿卡片角落的球鞋 */}
-          <div className="absolute -bottom-8 -right-3 pointer-events-none z-10 hidden md:block">
+          <div className="absolute -bottom-8 -right-3 pointer-events-none z-10 block">
             <KickingLeg />
           </div>
         </div>

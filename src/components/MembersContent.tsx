@@ -180,7 +180,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
           })}
         </div>
         {/* 从网格底部撑起来的人物 */}
-        <div className="hidden md:flex justify-center pt-1 pointer-events-none">
+        <div className="flex justify-center pt-1 pointer-events-none">
           <PushingUpCharacter />
         </div>
         </>
