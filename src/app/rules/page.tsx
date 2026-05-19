@@ -93,7 +93,7 @@ export default async function RulesPage() {
           {/* tq.png 作为背景水印，z-index:-1 在文字后面，opacity 保证文字可读 */}
           <div className="absolute -bottom-6 -right-4 pointer-events-none"
                style={{ zIndex: -1, opacity: 0.2, width: 140 }}>
-            <img src="/tq.png" alt="" style={{ width: 140, height: 'auto' }} />
+            <img src="/tq1.png" alt="" style={{ width: 140, height: 'auto' }} />
           </div>
         </div>
 
