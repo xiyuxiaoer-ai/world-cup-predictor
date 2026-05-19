@@ -63,7 +63,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
   const MEDALS = ['🥇', '🥈', '🥉']
 
 
-  if (!selectedGameId) return <p className="text-gray-500">你还没有加入任何 Game</p>
+  if (!selectedGameId) return <p className="text-gray-500 dark:text-gray-400">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
@@ -73,7 +73,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-amber-500 shadow-sm"
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-amber-500 shadow-sm"
         >
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
@@ -86,9 +86,9 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       </div>
 
       {loading ? (
-        <p className="text-gray-500 text-sm">加载中...</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">加载中...</p>
       ) : members.length === 0 ? (
-        <p className="text-gray-500 text-sm">暂无成员</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">暂无成员</p>
       ) : (
         <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -101,12 +101,12 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             const isSelf = userId === currentUserId
 
             return (
-              <div key={userId} className="bg-white border border-gray-200 rounded-2xl p-5 flex gap-4 items-start">
+              <div key={userId} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 flex gap-4 items-start">
                 <div className="relative shrink-0">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover" />
                   ) : (
-                    <div className="w-14 h-14 rounded-full bg-amber-100 border-2 border-amber-200 flex items-center justify-center text-amber-600 text-xl font-bold">
+                    <div className="w-14 h-14 rounded-full bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-800/30 flex items-center justify-center text-amber-600 text-xl font-bold">
                       {initial}
                     </div>
                   )}
@@ -117,16 +117,16 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-semibold truncate">{profile?.display_name || profile?.username}</span>
-                    <span className={`text-sm font-bold shrink-0 ${points > 0 ? 'text-amber-500' : 'text-gray-500'}`}>
+                    <span className={`text-sm font-bold shrink-0 ${points > 0 ? 'text-amber-500' : 'text-gray-500 dark:text-gray-400'}`}>
                       {points}分
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">@{profile?.username}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">@{profile?.username}</p>
                   {profile?.bio && (
-                    <p className="text-sm text-gray-400 mt-2 line-clamp-2">{profile.bio}</p>
+                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-2 line-clamp-2">{profile.bio}</p>
                   )}
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs text-gray-400">{m.role === 'admin' ? '管理员' : '成员'}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500">{m.role === 'admin' ? '管理员' : '成员'}</p>
                     {isAdmin && !isSelf && (
                       <button
                         onClick={() => handleDeleteMember(userId, profile?.display_name || profile?.username)}

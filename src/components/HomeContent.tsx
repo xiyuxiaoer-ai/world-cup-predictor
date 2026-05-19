@@ -146,7 +146,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </button>
           <button
             onClick={() => setShowJoinModal(true)}
-            className="border border-gray-300 hover:border-gray-400 text-gray-600 px-6 py-2.5 rounded-lg font-semibold transition-colors"
+            className="border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 px-6 py-2.5 rounded-lg font-semibold transition-colors"
           >
             加入已有 Game
           </button>
@@ -165,7 +165,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-gray-900 text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-sm"
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-sm"
         >
           {games.map(g => (
             <option key={g.id} value={g.id}>{g.name}</option>
@@ -174,20 +174,20 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 px-3 py-1.5 rounded-lg transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 px-3 py-1.5 rounded-lg transition-colors"
           >
             + 创建
           </button>
           <button
             onClick={() => setShowJoinModal(true)}
-            className="text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 px-3 py-1.5 rounded-lg transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 px-3 py-1.5 rounded-lg transition-colors"
           >
             + 加入
           </button>
           <button
             onClick={copyGameCode}
             title="复制 Game 码邀请朋友"
-            className="text-sm text-gray-400 hover:text-gray-600 border border-gray-100 hover:border-gray-200 px-3 py-1.5 rounded-lg transition-colors font-mono bg-gray-50"
+            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 px-3 py-1.5 rounded-lg transition-colors font-mono bg-gray-50 dark:bg-gray-900"
           >
             {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
           </button>
@@ -211,26 +211,26 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       </div>
 
       {loading ? (
-        <div className="text-gray-400 text-sm">加载中...</div>
+        <div className="text-gray-400 dark:text-gray-500 text-sm">加载中...</div>
       ) : (
         <>
           {/* Top: Todo + Leaderboard */}
           <div className="grid grid-cols-1 gap-6">
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">待竞猜</h2>
+                <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">待竞猜</h2>
                 {games.length > 1 && (
                   <button
                     onClick={() => setSyncAllGames(prev => !prev)}
-                    className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                   >
                     同步所有 Game
-                    <div className={`w-8 h-4 rounded-full transition-colors ${syncAllGames ? 'bg-amber-500' : 'bg-gray-300'}`} />
+                    <div className={`w-8 h-4 rounded-full transition-colors ${syncAllGames ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
                   </button>
                 )}
               </div>
               {pendingMatches.length === 0 ? (
-                <p className="text-gray-400 text-sm">暂无待竞猜比赛 🎉</p>
+                <p className="text-gray-400 dark:text-gray-500 text-sm">暂无待竞猜比赛 🎉</p>
               ) : (
                 <div className="space-y-3">
                   {pendingMatches.map(match => (
@@ -254,17 +254,17 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           {/* Full Schedule */}
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">2026世界杯赛程安排</h2>
+              <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">2026世界杯赛程安排</h2>
               <button
                 onClick={() => setShowAllMatches(prev => !prev)}
-                className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 px-2 py-1 rounded-lg transition-colors"
+                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 px-2 py-1 rounded-lg transition-colors"
               >
                 {showAllMatches ? '只看近期' : '全部比赛'}
               </button>
               <button
                 onClick={handleSync}
                 disabled={syncing}
-                className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 disabled:opacity-50 transition-colors"
+                className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 transition-colors"
               >
                 <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
                 <span>{syncing ? '更新中...' : '手动更新'}</span>
@@ -286,9 +286,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
 
                 return (
-                  <div key={match.id} className="bg-white border border-gray-200 rounded-xl px-3 py-3 space-y-2 hover:shadow-md hover:border-gray-300 transition-all">
+                  <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-3 space-y-2 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
                     {/* Row 1: meta */}
-                    <div className="flex justify-between items-center text-xs text-gray-400">
+                    <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
                       <span>{STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}</span>
                       <span>
                         {match.status === 'finished'
@@ -307,18 +307,18 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                       <div className="text-center shrink-0 px-2">
                         {match.status === 'finished' ? (
                           <div>
-                            <div className="text-base font-bold text-gray-900 leading-tight">
+                            <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                               {match.home_score_90} – {match.away_score_90}
                             </div>
                             {match.home_score_et != null && match.home_score_pen == null && (
-                              <div className="text-xs text-gray-400 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
                             )}
                             {match.home_score_pen != null && (
-                              <div className="text-xs text-gray-400 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
                             )}
                           </div>
                         ) : (
-                          <span className="text-gray-300 text-sm font-bold">vs</span>
+                          <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 flex-1 justify-end">
@@ -328,11 +328,11 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     </div>
 
                     {/* Row 3: prediction */}
-                    <div className="text-xs border-t border-gray-100 pt-2">
+                    <div className="text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
                       {pred ? (
                         <div className="flex items-center justify-between gap-2">
-                          <span className="text-gray-500">
-                            我猜：<span className="text-gray-700 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            我猜：<span className="text-gray-700 dark:text-gray-200 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
                             {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
                               <> · 延:<span className="text-zinc-300">{pred.pred_et_winner}</span></>
                             )}
@@ -345,13 +345,13 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                               {pred.points_earned > 0 ? `+${pred.points_earned}分` : pred.points_earned < 0 ? `${pred.points_earned}分` : '0分'}
                             </span>
                           ) : (
-                            <span className="text-gray-400 shrink-0">待结算</span>
+                            <span className="text-gray-400 dark:text-gray-500 shrink-0">待结算</span>
                           )}
                         </div>
                       ) : isLocked ? (
-                        <span className="text-gray-400">未猜</span>
+                        <span className="text-gray-400 dark:text-gray-500">未猜</span>
                       ) : (
-                        <span className="text-gray-500">待猜</span>
+                        <span className="text-gray-500 dark:text-gray-400">待猜</span>
                       )}
                     </div>
                   </div>

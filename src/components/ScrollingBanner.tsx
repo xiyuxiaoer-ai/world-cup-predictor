@@ -14,7 +14,7 @@ export default function ScrollingBanner({ items, peek = true }: { items: string[
 
   return (
     <div className="relative">
-      <div className="overflow-hidden bg-amber-50 border-b border-amber-100 h-8 flex items-center select-none">
+      <div className="overflow-hidden bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-800/30 h-8 flex items-center select-none">
         <div className="animate-marquee whitespace-nowrap text-xs text-amber-700/50 font-medium tracking-wide">
           <span>{text}</span>
           <span>{text}</span>

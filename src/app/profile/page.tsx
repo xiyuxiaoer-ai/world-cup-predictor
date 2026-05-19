@@ -124,7 +124,7 @@ export default function ProfilePage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-400">加载中...</p>
+      <p className="text-gray-400 dark:text-gray-500">加载中...</p>
     </div>
   )
 
@@ -138,9 +138,9 @@ export default function ProfilePage() {
         <div className="flex flex-col items-center gap-3">
           <div className="relative cursor-pointer group" onClick={() => fileRef.current?.click()}>
             {displayAvatarUrl ? (
-              <img src={displayAvatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 group-hover:border-emerald-500 transition-colors" />
+              <img src={displayAvatarUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 group-hover:border-emerald-500 transition-colors" />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-gray-200 group-hover:border-emerald-500 flex items-center justify-center text-amber-500 text-2xl font-bold transition-colors">
+              <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-gray-200 dark:border-gray-700 group-hover:border-emerald-500 flex items-center justify-center text-amber-500 text-2xl font-bold transition-colors">
                 {initial}
               </div>
             )}
@@ -154,22 +154,22 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label className="text-gray-500 text-sm mb-1.5 block">用户名（不可修改）</label>
+            <label className="text-gray-500 dark:text-gray-400 text-sm mb-1.5 block">用户名（不可修改）</label>
             <input value={username} disabled
-              className="w-full bg-gray-50/50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-400 cursor-not-allowed shadow-sm" />
+              className="w-full bg-gray-50/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-400 dark:text-gray-500 cursor-not-allowed shadow-sm" />
           </div>
           <div>
-            <label className="text-gray-500 text-sm mb-1.5 block">显示名称</label>
+            <label className="text-gray-500 dark:text-gray-400 text-sm mb-1.5 block">显示名称</label>
             <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)}
               maxLength={20}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 focus:outline-none focus:border-amber-500 transition-colors"
+              className="w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 focus:outline-none focus:border-amber-500 dark:focus:bg-gray-700 transition-colors"
               placeholder="你的显示名称" />
           </div>
           <div>
-            <label className="text-gray-500 text-sm mb-1.5 block">个人签名</label>
+            <label className="text-gray-500 dark:text-gray-400 text-sm mb-1.5 block">个人签名</label>
             <textarea value={bio} onChange={e => setBio(e.target.value)}
               maxLength={60} rows={2}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+              className="w-full bg-gray-50 dark:bg-gray-700 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2.5 text-gray-900 focus:outline-none focus:border-amber-500 dark:focus:bg-gray-700 transition-colors resize-none"
               placeholder="一句话介绍自己" />
             <p className="text-xs text-zinc-600 mt-1 text-right">{bio.length}/60</p>
           </div>
@@ -188,9 +188,9 @@ export default function ProfilePage() {
       {/* Crop Modal */}
       {cropSrc && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-            <span className="font-semibold">裁剪头像</span>
-            <button onClick={() => setCropSrc(null)} className="text-gray-500 hover:text-gray-900">✕</button>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 dark:border-zinc-700">
+            <span className="font-semibold dark:text-gray-100">裁剪头像</span>
+            <button onClick={() => setCropSrc(null)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">✕</button>
           </div>
           <div className="relative flex-1">
             <Cropper
@@ -205,16 +205,16 @@ export default function ProfilePage() {
               onCropComplete={onCropComplete}
             />
           </div>
-          <div className="px-4 py-4 space-y-3 border-t border-zinc-800 bg-white">
+          <div className="px-4 py-4 space-y-3 border-t border-zinc-800 dark:border-zinc-700 bg-white dark:bg-gray-800">
             <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 shrink-0">缩放</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">缩放</span>
               <input type="range" min={1} max={3} step={0.05} value={zoom}
                 onChange={e => setZoom(Number(e.target.value))}
                 className="flex-1 accent-emerald-500" />
             </div>
             <div className="flex gap-3">
               <button onClick={() => setCropSrc(null)}
-                className="flex-1 border border-gray-200 text-gray-500 py-2.5 rounded-lg hover:border-zinc-500 transition-colors">
+                className="flex-1 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 py-2.5 rounded-lg hover:border-zinc-500 transition-colors">
                 取消
               </button>
               <button onClick={handleCropConfirm}

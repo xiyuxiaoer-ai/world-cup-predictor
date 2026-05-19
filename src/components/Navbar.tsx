@@ -23,10 +23,10 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2 overflow-hidden">
         <div className="flex items-center gap-3 overflow-x-auto scrollbar-none min-w-0">
-          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 shrink-0">
+          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 shrink-0">
             <span className="text-xl">⚽</span>
             <span className="hidden sm:block text-sm">世界杯竞猜</span>
           </Link>
@@ -37,8 +37,8 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
                 href={link.href}
                 className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors font-medium ${
                   pathname === link.href
-                    ? 'bg-amber-50 text-amber-600'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
                 {link.label}
@@ -47,17 +47,17 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+          <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover border border-gray-200" />
+              <img src={avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700" />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-600 text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/30 flex items-center justify-center text-amber-600 text-xs font-bold">
                 {username?.[0]?.toUpperCase() ?? '?'}
               </div>
             )}
             <span className="hidden sm:block">{username}</span>
           </Link>
-          <button onClick={handleLogout} className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          <button onClick={handleLogout} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
             退出
           </button>
         </div>
