@@ -174,7 +174,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   </div>
                 </div>
               </div>
-              <div className="card-face card-face-back bg-amber-50 dark:bg-gray-700 border border-amber-200 dark:border-gray-600 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
+              <div className="card-face card-face-back bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
                 {cardImages[userId] && (
                   <img src={cardImages[userId]} alt="" className="w-full h-full object-contain" />
                 )}
