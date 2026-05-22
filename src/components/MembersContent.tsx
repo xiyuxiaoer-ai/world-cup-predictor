@@ -6,7 +6,9 @@ import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
 
 const CARD_IMAGES = [
-  '/cards/1.png',
+  '/cards/1.png', '/cards/2.png', '/cards/3.png', '/cards/4.png',
+  '/cards/5.png', '/cards/6.png', '/cards/7.png', '/cards/8.png',
+  '/cards/9.png', '/cards/10.png', '/cards/11.png', '/cards/12.png',
 ]
 
 export default function MembersContent({ games, currentUserId }: { games: GameWithRole[]; currentUserId: string }) {
