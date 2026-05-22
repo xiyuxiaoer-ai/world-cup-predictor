@@ -5,6 +5,10 @@ import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
 
+const CARD_IMAGES = [
+  '/cards/1.png',
+]
+
 export default function MembersContent({ games, currentUserId }: { games: GameWithRole[]; currentUserId: string }) {
   const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [members, setMembers] = useState<any[]>([])
@@ -12,6 +16,24 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
   const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set())
+  const [cardImages, setCardImages] = useState<Record<string, string>>({})
+
+  function handleCardFlip(userId: string) {
+    setFlippedCards(prev => {
+      const next = new Set(prev)
+      if (next.has(userId)) {
+        next.delete(userId)
+      } else {
+        next.add(userId)
+        setCardImages(p => ({
+          ...p,
+          [userId]: CARD_IMAGES[Math.floor(Math.random() * CARD_IMAGES.length)],
+        }))
+      }
+      return next
+    })
+  }
 
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
@@ -100,8 +122,15 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             const initial = (profile?.display_name || profile?.username || '?')[0].toUpperCase()
             const isSelf = userId === currentUserId
 
+            const isFlipped = flippedCards.has(userId)
+
             return (
-              <div key={userId} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 flex gap-4 items-start">
+              <div key={userId} className="card-flip-container rounded-2xl" style={{ height: 140 }}
+                   onClick={() => handleCardFlip(userId)}>
+              <div className={`card-flip-inner ${isFlipped ? 'flipped' : ''}`}>
+
+              {/* 正面：成员信息 */}
+              <div className="card-face bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 flex gap-4 items-start cursor-pointer">
                 <div className="relative shrink-0">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-14 h-14 rounded-full object-cover" />
@@ -129,7 +158,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                     <p className="text-xs text-gray-400 dark:text-gray-500">{m.role === 'admin' ? '管理员' : '成员'}</p>
                     {isAdmin && !isSelf && (
                       <button
-                        onClick={() => handleDeleteMember(userId, profile?.display_name || profile?.username)}
+                        onClick={e => { e.stopPropagation(); handleDeleteMember(userId, profile?.display_name || profile?.username) }}
                         disabled={deletingId === userId}
                         className="text-xs text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
                       >
@@ -139,6 +168,13 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   </div>
                 </div>
               </div>
+              <div className="card-face card-face-back bg-amber-50 dark:bg-gray-700 border border-amber-200 dark:border-gray-600 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
+                {cardImages[userId] && (
+                  <img src={cardImages[userId]} alt="" className="h-full w-auto object-contain" />
+                )}
+              </div>
+            </div>
+            </div>
             )
           })}
         </div>
