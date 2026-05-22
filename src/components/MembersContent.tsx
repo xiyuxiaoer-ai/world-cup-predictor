@@ -139,8 +139,13 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                       {initial}
                     </div>
                   )}
+                  {/* 奖牌：右上角 */}
                   {rank && rank <= 3 && points > 0 && (
-                    <span className="absolute -top-1 -right-1 text-base">{MEDALS[rank - 1]}</span>
+                    <span className="absolute -top-1 -right-1 text-base leading-none">{MEDALS[rank - 1]}</span>
+                  )}
+                  {/* 管理员王冠：左上角 */}
+                  {m.role === 'admin' && (
+                    <span className="absolute -top-1 -left-1 text-base leading-none">👑</span>
                   )}
                 </div>
                 <div className="text-center w-full">
@@ -154,8 +159,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   {profile?.bio && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 line-clamp-2">{profile.bio}</p>
                   )}
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{m.role === 'admin' ? '管理员' : '成员'}</p>
+                  <div className="flex items-center justify-end mt-2">
                     {isAdmin && !isSelf && (
                       <button
                         onClick={e => { e.stopPropagation(); handleDeleteMember(userId, profile?.display_name || profile?.username) }}
