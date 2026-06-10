@@ -67,14 +67,16 @@ export default function PredictionCard({
   if (done && prediction) {
     return (
       <div className="bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700/40 rounded-2xl p-4 space-y-2 shadow-sm">
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-400 dark:text-gray-500">
-            {new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
-            {' '}{new Date(match.kickoff_time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-            {' · '}{STAGE_LABELS[match.stage]}
-            {venue && <span className="ml-3">📍 {venue.city} · {venue.stadium}</span>}
-          </span>
-          <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-medium shrink-0">✓ 已提交</span>
+        <div className="flex justify-between items-start">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
+            <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
+              {new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+              {' '}{new Date(match.kickoff_time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+              {' · '}{STAGE_LABELS[match.stage]}
+            </span>
+            {venue && <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">📍 {venue.city} · {venue.stadium}</span>}
+          </div>
+          <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-medium shrink-0 ml-2">✓ 已提交</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 flex-1 justify-end">
@@ -94,15 +96,17 @@ export default function PredictionCard({
 
   return (
     <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-center flex-wrap gap-1">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
-          {' '}{kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-          {' · '}{STAGE_LABELS[match.stage]}
-          {match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
-          {venue && <span className="ml-3">📍 {venue.city} · {venue.stadium}</span>}
-        </span>
-        <div className="flex items-center gap-1.5">
+      <div className="flex justify-between items-start gap-1">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
+          <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+            {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+            {' '}{kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+            {' · '}{STAGE_LABELS[match.stage]}
+            {match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+          </span>
+          {venue && <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">📍 {venue.city} · {venue.stadium}</span>}
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
           {isDouble && <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded font-semibold">🔥 双倍积分</span>}
           {isUrgent && <span className="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded-full animate-pulse font-medium">{minutesLeft < 60 ? `${minutesLeft}分钟后锁定` : '即将锁定'}</span>}
         </div>

@@ -138,11 +138,11 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
               <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
                 {/* Match Header */}
                 <div className="px-4 py-3 space-y-2">
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                    <span>
-                      {STAGE_LABELS[match.stage]} {group}
-                      {venue && <span className="ml-3 text-gray-400 dark:text-gray-500">📍 {venue.city} · {venue.stadium}</span>}
-                    </span>
+                  <div className="flex justify-between items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
+                      <span className="shrink-0">{STAGE_LABELS[match.stage]} {group}</span>
+                      {venue && <span className="shrink-0 text-gray-400 dark:text-gray-500">📍 {venue.city} · {venue.stadium}</span>}
+                    </div>
                     <span className="shrink-0 text-right">
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
                       {' '}
