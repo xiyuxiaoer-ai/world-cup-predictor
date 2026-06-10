@@ -5,6 +5,7 @@ import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import ScrollingBanner from './ScrollingBanner'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
+import { MATCH_VENUES } from '@/lib/venues'
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛', round_of_32: '32强', round_of_16: '16强',
@@ -131,14 +132,18 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             const awayName = getTeamDisplay(match.away_tla, match.away_team)
             const hasPredicted = !!match.user_prediction
             const predictions: any[] = match.predictions || []
+            const venue = MATCH_VENUES[match.api_match_id]
 
             return (
               <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
                 {/* Match Header */}
                 <div className="px-4 py-3 space-y-2">
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                    <span>{STAGE_LABELS[match.stage]} {group}</span>
-                    <span>
+                    <div className="space-y-0.5">
+                      <span className="block">{STAGE_LABELS[match.stage]} {group}</span>
+                      {venue && <span className="block text-gray-400 dark:text-gray-500">📍 {venue.city} · {venue.stadium}</span>}
+                    </div>
+                    <span className="shrink-0 text-right">
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
                       {' '}
                       {kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
