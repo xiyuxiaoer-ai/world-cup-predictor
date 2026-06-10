@@ -1,10 +1,10 @@
 export const MATCH_VENUES: Record<number, { stadium: string; city: string }> = {
   // GROUP A
-  537327: { stadium: '阿兹特克球场', city: '墨西哥城' },
+  537327: { stadium: '阿兹特克球场', city: '墨西哥' },
   537328: { stadium: '阿克隆球场', city: '瓜达拉哈拉' },
   537329: { stadium: '梅赛德斯-奔驰球场', city: '亚特兰大' },
   537330: { stadium: '阿克隆球场', city: '瓜达拉哈拉' },
-  537331: { stadium: '阿兹特克球场', city: '墨西哥城' },
+  537331: { stadium: '阿兹特克球场', city: '墨西哥' },
   537332: { stadium: 'BBVA球场', city: '蒙特雷' },
 
   // GROUP B
@@ -81,7 +81,7 @@ export const MATCH_VENUES: Record<number, { stadium: string; city: string }> = {
 
   // GROUP K
   537403: { stadium: 'NRG球场', city: '休斯顿' },
-  537404: { stadium: '阿兹特克球场', city: '墨西哥城' },
+  537404: { stadium: '阿兹特克球场', city: '墨西哥' },
   537405: { stadium: 'NRG球场', city: '休斯顿' },
   537406: { stadium: '阿克隆球场', city: '瓜达拉哈拉' },
   537407: { stadium: '硬石球场', city: '迈阿密' },
@@ -102,7 +102,7 @@ export const MATCH_VENUES: Record<number, { stadium: string; city: string }> = {
   537418: { stadium: 'BBVA球场', city: '蒙特雷' },
   537419: { stadium: 'AT&T球场', city: '达拉斯' },
   537420: { stadium: '大都会人寿球场', city: '纽约/新泽西' },
-  537421: { stadium: '阿兹特克球场', city: '墨西哥城' },
+  537421: { stadium: '阿兹特克球场', city: '墨西哥' },
   537422: { stadium: '梅赛德斯-奔驰球场', city: '亚特兰大' },
   537423: { stadium: '流明球场', city: '西雅图' },
   537424: { stadium: '李维斯球场', city: '旧金山湾区' },
@@ -117,7 +117,7 @@ export const MATCH_VENUES: Record<number, { stadium: string; city: string }> = {
   537375: { stadium: 'NRG球场', city: '休斯顿' },
   537376: { stadium: '林肯金融球场', city: '费城' },
   537377: { stadium: '大都会人寿球场', city: '纽约/新泽西' },
-  537378: { stadium: '阿兹特克球场', city: '墨西哥城' },
+  537378: { stadium: '阿兹特克球场', city: '墨西哥' },
   537379: { stadium: 'AT&T球场', city: '达拉斯' },
   537380: { stadium: '流明球场', city: '西雅图' },
   537381: { stadium: '梅赛德斯-奔驰球场', city: '亚特兰大' },
