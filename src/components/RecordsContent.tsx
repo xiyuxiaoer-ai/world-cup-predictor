@@ -43,11 +43,16 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
       })
   }, [selectedGameId])
 
-  const filtered = matches.filter(m => {
-    if (filter === 'finished') return m.status === 'finished'
-    if (filter === 'upcoming') return m.status !== 'finished'
-    return true
-  })
+  const filtered = (() => {
+    if (filter === 'finished') {
+      return matches
+        .filter(m => m.status === 'finished')
+        .sort((a, b) => new Date(b.kickoff_time).getTime() - new Date(a.kickoff_time).getTime())
+        .slice(0, 5)
+    }
+    if (filter === 'upcoming') return matches.filter(m => m.status !== 'finished')
+    return matches
+  })()
 
   async function handleSync() {
     setSyncing(true)
@@ -105,10 +110,10 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
         <div className="flex gap-1">
-          {(['upcoming', 'all'] as Filter[]).map(f => (
+          {(['finished', 'upcoming', 'all'] as Filter[]).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-amber-500 text-white text-gray-900' : 'text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'}`}>
-              {f === 'all' ? '全部' : '待开赛'}
+              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-amber-500 text-white' : 'text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'}`}>
+              {f === 'finished' ? '已结束' : f === 'upcoming' ? '待开赛' : '全部'}
             </button>
           ))}
         </div>
