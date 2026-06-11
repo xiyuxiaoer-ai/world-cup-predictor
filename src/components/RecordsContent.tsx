@@ -19,7 +19,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [matches, setMatches] = useState<any[]>([])
   const [members, setMembers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [filter, setFilter] = useState<Filter>('upcoming')
+  const [filter, setFilter] = useState<Filter>('finished')
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
   const [leaderboard, setLeaderboard] = useState<any[]>([])
