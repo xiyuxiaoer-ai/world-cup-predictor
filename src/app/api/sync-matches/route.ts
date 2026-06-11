@@ -28,10 +28,17 @@ export async function POST() {
 
   const { matches } = await res.json()
 
+  // 先拿已经是 finished 的比赛 ID，防止 API 抖动时把它们覆盖回 scheduled
+  const { data: alreadyFinished } = await supabaseAdmin
+    .from('matches')
+    .select('api_match_id')
+    .eq('status', 'finished')
+  const finishedIds = new Set((alreadyFinished || []).map((m: any) => m.api_match_id))
+
   const transformed = matches.map((match: any) => {
     const kickoffTime = new Date(match.utcDate)
     const lockTime = new Date(kickoffTime.getTime() - 60 * 60 * 1000)
-    const isFinished = match.status === 'FINISHED'
+    const isFinished = match.status === 'FINISHED' || finishedIds.has(match.id)
 
     let result90 = null, etWinner = null, penaltyWinner = null
 

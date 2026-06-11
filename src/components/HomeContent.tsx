@@ -108,7 +108,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   const recentResults = matches
     .filter(m => m.status === 'finished' && m.result_90)
-    .slice(-12)
+    .slice(-8)
     .map(m => {
       const home = getTeamDisplay((m as any).home_tla, m.home_team)
       const away = getTeamDisplay((m as any).away_tla, m.away_team)
@@ -123,14 +123,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       const away = getTeamDisplay((m as any).away_tla, m.away_team)
       const d = new Date(m.kickoff_time)
       const time = d.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }) + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      return `🗓 ${time}  ${home} vs ${away}`
+      return `🗓 ${time} ${home} vs ${away}`
     })
 
-  const homeBannerItems = recentResults.length > 0
-    ? recentResults
-    : upcomingBannerItems.length > 0
-      ? upcomingBannerItems
-      : ['🏆 2026 FIFA World Cup']
+  const homeBannerItems = [...recentResults, ...upcomingBannerItems].length > 0
+    ? [...recentResults, ...upcomingBannerItems]
+    : ['🏆 2026 FIFA World Cup']
 
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
