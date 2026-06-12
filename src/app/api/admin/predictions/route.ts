@@ -23,8 +23,7 @@ export async function GET() {
 
   const { data: predictions, error } = await admin
     .from('predictions')
-    .select('id, match_id, user_id, pred_home_score, pred_away_score, game_id, created_at, match:matches(id, home_team, away_team, home_tla, away_tla, kickoff_time, stage, group_name, status), profile:profiles(username, display_name)')
-    .order('created_at', { ascending: false })
+    .select('id, match_id, user_id, pred_home_score, pred_away_score, game_id, match:matches(id, home_team, away_team, home_tla, away_tla, kickoff_time, stage, group_name, status), profile:profiles(username, display_name)')
 
   console.log('[preds-api] query:', predictions?.length ?? 'null', 'error:', error?.message ?? 'none')
 
