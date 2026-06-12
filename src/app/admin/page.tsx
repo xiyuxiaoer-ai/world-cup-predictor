@@ -3,13 +3,20 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getTeamDisplay } from '@/lib/flags'
 
-type Tab = 'users' | 'games'
+const STAGE_LABELS: Record<string, string> = {
+  group: '小组赛', round_of_32: '32强', round_of_16: '16强',
+  quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
+}
+
+type Tab = 'users' | 'games' | 'predictions'
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('users')
   const [users, setUsers] = useState<any[]>([])
   const [games, setGames] = useState<any[]>([])
+  const [predGroups, setPredGroups] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [editUser, setEditUser] = useState<any>(null)
   const [newEmail, setNewEmail] = useState('')
@@ -30,12 +37,14 @@ export default function AdminPage() {
 
   async function loadData() {
     setLoading(true)
-    const [usersRes, gamesRes] = await Promise.all([
+    const [usersRes, gamesRes, predsRes] = await Promise.all([
       fetch('/api/admin/users').then(r => r.json()),
       fetch('/api/admin/games').then(r => r.json()),
+      fetch('/api/admin/predictions').then(r => r.json()),
     ])
     setUsers(Array.isArray(usersRes) ? usersRes : [])
     setGames(Array.isArray(gamesRes) ? gamesRes : [])
+    setPredGroups(Array.isArray(predsRes) ? predsRes : [])
     setLoading(false)
   }
 
@@ -68,6 +77,16 @@ export default function AdminPage() {
     setConfirmDelete(null)
   }
 
+  async function handleDeletePrediction(id: string) {
+    const res = await fetch(`/api/admin/predictions/${id}`, { method: 'DELETE' })
+    const data = await res.json()
+    if (res.ok) { setMsg('预测已删除'); loadData() }
+    else setMsg(data.error || '删除失败')
+    setConfirmDelete(null)
+  }
+
+  const totalPreds = predGroups.reduce((sum, g) => sum + g.predictions.length, 0)
+
   if (loading) return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
       <p className="text-zinc-400">加载中...</p>
@@ -91,10 +110,10 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          {(['users', 'games'] as Tab[]).map(t => (
+          {(['users', 'games', 'predictions'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
-              {t === 'users' ? `用户管理 (${users.length})` : `Game管理 (${games.length})`}
+              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : `猜球管理 (${totalPreds})`}
             </button>
           ))}
         </div>
@@ -169,6 +188,63 @@ export default function AdminPage() {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Predictions Tab */}
+        {tab === 'predictions' && (
+          <div className="space-y-4">
+            {predGroups.length === 0 ? (
+              <p className="text-zinc-500 text-sm">暂无待开赛的预测记录</p>
+            ) : predGroups.map((group: any) => {
+              const m = group.match
+              const kickoff = new Date(m.kickoff_time)
+              const group_label = m.group_name ? ` · ${m.group_name.replace('GROUP_', '').replace('_', ' ')}组` : ''
+              const homeName = getTeamDisplay(m.home_tla, m.home_team)
+              const awayName = getTeamDisplay(m.away_tla, m.away_team)
+              return (
+                <div key={m.id} className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+                  <div className="px-4 py-3 bg-zinc-800/50 flex items-center justify-between gap-2">
+                    <div>
+                      <span className="font-semibold text-sm">{homeName} vs {awayName}</span>
+                      <span className="text-xs text-zinc-500 ml-2">{STAGE_LABELS[m.stage]}{group_label}</span>
+                    </div>
+                    <span className="text-xs text-zinc-500 shrink-0">
+                      {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
+                      {' '}
+                      {kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div className="divide-y divide-zinc-800">
+                    {group.predictions.map((p: any) => {
+                      const name = p.user?.display_name || p.user?.username || '未知'
+                      return (
+                        <div key={p.id} className="px-4 py-2.5 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-sm font-medium truncate">{name}</span>
+                            <span className="text-xs text-zinc-500 truncate">{p.game_name}</span>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="font-mono text-sm text-amber-400">{p.pred_home_score} – {p.pred_away_score}</span>
+                            {confirmDelete === p.id ? (
+                              <div className="flex gap-1">
+                                <button onClick={() => handleDeletePrediction(p.id)} className="text-xs text-red-400 border border-red-400/50 px-2 py-1 rounded-lg">确定</button>
+                                <button onClick={() => setConfirmDelete(null)} className="text-xs text-zinc-400 border border-zinc-700 px-2 py-1 rounded-lg">取消</button>
+                              </div>
+                            ) : (
+                              <button onClick={() => setConfirmDelete(p.id)}
+                                className="text-xs text-red-400/60 hover:text-red-400 border border-red-400/20 hover:border-red-400/50 px-2 py-1 rounded-lg transition-colors">
+                                删除
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
 
