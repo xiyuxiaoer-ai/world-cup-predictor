@@ -17,6 +17,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([])
   const [games, setGames] = useState<any[]>([])
   const [predGroups, setPredGroups] = useState<any[]>([])
+  const [predError, setPredError] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [editUser, setEditUser] = useState<any>(null)
   const [newEmail, setNewEmail] = useState('')
@@ -37,14 +38,20 @@ export default function AdminPage() {
 
   async function loadData() {
     setLoading(true)
-    const [usersRes, gamesRes, predsRes] = await Promise.all([
+    const [usersRes, gamesRes, predsRaw] = await Promise.all([
       fetch('/api/admin/users').then(r => r.json()),
       fetch('/api/admin/games').then(r => r.json()),
-      fetch('/api/admin/predictions').then(r => r.json()),
+      fetch('/api/admin/predictions').then(async r => ({ status: r.status, body: await r.json() })),
     ])
     setUsers(Array.isArray(usersRes) ? usersRes : [])
     setGames(Array.isArray(gamesRes) ? gamesRes : [])
-    setPredGroups(Array.isArray(predsRes) ? predsRes : [])
+    if (Array.isArray(predsRaw.body)) {
+      setPredGroups(predsRaw.body)
+      setPredError('')
+    } else {
+      setPredGroups([])
+      setPredError(`API ${predsRaw.status}: ${JSON.stringify(predsRaw.body)}`)
+    }
     setLoading(false)
   }
 
@@ -194,7 +201,9 @@ export default function AdminPage() {
         {/* Predictions Tab */}
         {tab === 'predictions' && (
           <div className="space-y-4">
-            {predGroups.length === 0 ? (
+            {predError ? (
+              <p className="text-red-400 text-xs font-mono bg-zinc-900 p-3 rounded-lg break-all">{predError}</p>
+            ) : predGroups.length === 0 ? (
               <p className="text-zinc-500 text-sm">暂无待开赛的预测记录</p>
             ) : predGroups.map((group: any) => {
               const m = group.match
