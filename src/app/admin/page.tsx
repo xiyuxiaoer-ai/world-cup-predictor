@@ -18,6 +18,8 @@ export default function AdminPage() {
   const [games, setGames] = useState<any[]>([])
   const [predGroups, setPredGroups] = useState<any[]>([])
   const [predError, setPredError] = useState<string>('')
+  const [predFilterGame, setPredFilterGame] = useState('')
+  const [predFilterUser, setPredFilterUser] = useState('')
   const [loading, setLoading] = useState(true)
   const [editUser, setEditUser] = useState<any>(null)
   const [newEmail, setNewEmail] = useState('')
@@ -93,6 +95,23 @@ export default function AdminPage() {
   }
 
   const totalPreds = predGroups.reduce((sum, g) => sum + g.predictions.length, 0)
+
+  // Derived filter options
+  const predGameOptions = [...new Set(predGroups.flatMap((g: any) => g.predictions.map((p: any) => p.game_name)))].sort()
+  const predUserOptions = [...new Set(predGroups.flatMap((g: any) => g.predictions.map((p: any) => p.user?.display_name || p.user?.username || '未知')))].sort()
+
+  // Apply filters — hide groups where all predictions are filtered out
+  const filteredPredGroups = predGroups
+    .map((g: any) => ({
+      ...g,
+      predictions: g.predictions.filter((p: any) => {
+        const userName = p.user?.display_name || p.user?.username || '未知'
+        const gameMatch = !predFilterGame || p.game_name === predFilterGame
+        const userMatch = !predFilterUser || userName === predFilterUser
+        return gameMatch && userMatch
+      }),
+    }))
+    .filter((g: any) => g.predictions.length > 0)
 
   if (loading) return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -201,14 +220,43 @@ export default function AdminPage() {
         {/* Predictions Tab */}
         {tab === 'predictions' && (
           <div className="space-y-4">
+            {/* Filters */}
+            {!predError && predGroups.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={predFilterGame}
+                  onChange={e => setPredFilterGame(e.target.value)}
+                  className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500"
+                >
+                  <option value="">全部 Game</option>
+                  {predGameOptions.map(g => <option key={g} value={g}>{g}</option>)}
+                </select>
+                <select
+                  value={predFilterUser}
+                  onChange={e => setPredFilterUser(e.target.value)}
+                  className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-zinc-500"
+                >
+                  <option value="">全部用户</option>
+                  {predUserOptions.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+                {(predFilterGame || predFilterUser) && (
+                  <button
+                    onClick={() => { setPredFilterGame(''); setPredFilterUser('') }}
+                    className="text-xs text-zinc-400 hover:text-white border border-zinc-700 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    清除筛选
+                  </button>
+                )}
+              </div>
+            )}
             {predError ? (
               <p className="text-red-400 text-xs font-mono bg-zinc-900 p-3 rounded-lg break-all">{predError}</p>
-            ) : predGroups.length === 0 ? (
-              <p className="text-zinc-500 text-sm">暂无待开赛的预测记录</p>
-            ) : predGroups.map((group: any) => {
+            ) : filteredPredGroups.length === 0 ? (
+              <p className="text-zinc-500 text-sm">{predGroups.length === 0 ? '暂无待开赛的预测记录' : '没有符合条件的记录'}</p>
+            ) : filteredPredGroups.map((group: any) => {
               const m = group.match
               const kickoff = new Date(m.kickoff_time)
-              const group_label = m.group_name ? ` · ${m.group_name.replace('GROUP_', '').replace('_', ' ')}组` : ''
+              const groupLabel = m.group_name ? ` · ${m.group_name.replace('GROUP_', '').replace('_', ' ')}组` : ''
               const homeName = getTeamDisplay(m.home_tla, m.home_team)
               const awayName = getTeamDisplay(m.away_tla, m.away_team)
               return (
@@ -216,7 +264,7 @@ export default function AdminPage() {
                   <div className="px-4 py-3 bg-zinc-800/50 flex items-center justify-between gap-2">
                     <div>
                       <span className="font-semibold text-sm">{homeName} vs {awayName}</span>
-                      <span className="text-xs text-zinc-500 ml-2">{STAGE_LABELS[m.stage]}{group_label}</span>
+                      <span className="text-xs text-zinc-500 ml-2">{STAGE_LABELS[m.stage]}{groupLabel}</span>
                     </div>
                     <span className="text-xs text-zinc-500 shrink-0">
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
