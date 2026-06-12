@@ -11,7 +11,9 @@ async function checkAdmin() {
 }
 
 export async function GET() {
-  if (!await checkAdmin()) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const adminUser = await checkAdmin()
+  console.log('[preds-api] checkAdmin:', adminUser ? 'ok' : 'null')
+  if (!adminUser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,30 +21,26 @@ export async function GET() {
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 
-  // Join predictions → matches in one query, filter finished matches in code
   const { data: predictions, error } = await admin
     .from('predictions')
-    .select(`
-      id, match_id, user_id, pred_home_score, pred_away_score, game_id, created_at,
-      match:matches(id, home_team, away_team, home_tla, away_tla, kickoff_time, stage, group_name, status),
-      profile:profiles(username, display_name)
-    `)
+    .select('id, match_id, user_id, pred_home_score, pred_away_score, game_id, created_at, match:matches(id, home_team, away_team, home_tla, away_tla, kickoff_time, stage, group_name, status), profile:profiles(username, display_name)')
     .order('created_at', { ascending: false })
+
+  console.log('[preds-api] query:', predictions?.length ?? 'null', 'error:', error?.message ?? 'none')
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!predictions?.length) return NextResponse.json([])
 
-  // Only keep predictions for non-finished matches (match may be object or array)
   const scheduled = predictions.filter((p: any) => {
     const m = Array.isArray(p.match) ? p.match[0] : p.match
     return m?.status !== 'finished'
   })
+  console.log('[preds-api] scheduled:', scheduled.length)
   if (!scheduled.length) return NextResponse.json([])
 
   const { data: games } = await admin.from('games').select('id, name')
   const gameMap = Object.fromEntries((games || []).map((g: any) => [g.id, g.name]))
 
-  // Group by match
   const matchMap = new Map<string, { match: any; predictions: any[] }>()
   for (const p of scheduled) {
     const m = p.match as any
@@ -50,9 +48,7 @@ export async function GET() {
     const matchId = Array.isArray(m) ? m[0]?.id : m.id
     const matchData = Array.isArray(m) ? m[0] : m
     if (!matchId) continue
-    if (!matchMap.has(matchId)) {
-      matchMap.set(matchId, { match: matchData, predictions: [] })
-    }
+    if (!matchMap.has(matchId)) matchMap.set(matchId, { match: matchData, predictions: [] })
     matchMap.get(matchId)!.predictions.push({
       id: p.id,
       pred_home_score: p.pred_home_score,
@@ -62,9 +58,9 @@ export async function GET() {
     })
   }
 
-  // Sort groups by kickoff time
   const grouped = Array.from(matchMap.values())
     .sort((a, b) => new Date(a.match.kickoff_time).getTime() - new Date(b.match.kickoff_time).getTime())
 
+  console.log('[preds-api] grouped matches:', grouped.length)
   return NextResponse.json(grouped)
 }
