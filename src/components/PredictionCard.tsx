@@ -4,6 +4,7 @@ import { useState } from 'react'
 import type { Match, Prediction } from '@/types'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
+import TeamHistoryModal from './TeamHistoryModal'
 
 const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
 const STAGE_LABELS: Record<string, string> = {
@@ -26,6 +27,7 @@ export default function PredictionCard({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(!!prediction)
+  const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
 
   const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
   const isDraw = homeScore !== '' && awayScore !== '' && homeScore === awayScore
@@ -66,6 +68,7 @@ export default function PredictionCard({
 
   if (done && prediction) {
     return (
+      <>
       <div className="bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700/40 rounded-2xl p-4 space-y-2 shadow-sm">
         <div className="flex justify-between items-start">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
@@ -80,17 +83,21 @@ export default function PredictionCard({
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 flex-1 justify-end">
-            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{homeName}</span>
+            <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{homeName}</button>
             {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
           </div>
           <div className="shrink-0 px-3 text-gray-900 dark:text-gray-100 font-bold text-base">{prediction.pred_home_score} – {prediction.pred_away_score}</div>
           <div className="flex items-center gap-1.5 flex-1 justify-start">
             {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{awayName}</span>
+            <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{awayName}</button>
           </div>
         </div>
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center">竞猜已锁定，不可修改</p>
       </div>
+      {historyTeam && (
+        <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
+      )}
+      </>
     )
   }
 
@@ -114,7 +121,7 @@ export default function PredictionCard({
 
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right">{homeName}</span>
+          <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{homeName}</button>
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
         </div>
         <div className="flex items-center gap-1 shrink-0">
@@ -124,7 +131,7 @@ export default function PredictionCard({
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-start">
           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left">{awayName}</span>
+          <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{awayName}</button>
         </div>
       </div>
 
@@ -159,6 +166,10 @@ export default function PredictionCard({
         className="w-full bg-amber-500 hover:bg-amber-400 active:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors shadow-sm">
         {loading ? '提交中...' : '提交预测'}
       </button>
+
+      {historyTeam && (
+        <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
+      )}
     </form>
   )
 }
