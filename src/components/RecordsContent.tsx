@@ -23,6 +23,11 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
   const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [editingPredId, setEditingPredId] = useState<string | null>(null)
+  const [editHome, setEditHome] = useState('')
+  const [editAway, setEditAway] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+  const [editMsg, setEditMsg] = useState('')
 
   useEffect(() => {
     if (!selectedGameId) return
@@ -70,6 +75,35 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
     }
     setSyncing(false)
     setTimeout(() => setSyncMsg(''), 3000)
+  }
+
+  function startEdit(pred: any) {
+    setEditingPredId(pred.id)
+    setEditHome(String(pred.pred_home_score))
+    setEditAway(String(pred.pred_away_score))
+    setEditMsg('')
+  }
+
+  async function handleEditSave(predId: string) {
+    setEditSaving(true)
+    const res = await fetch(`/api/predictions/${predId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pred_home_score: Number(editHome), pred_away_score: Number(editAway) }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setEditingPredId(null)
+      // Reload match data
+      if (selectedGameId) {
+        fetch(`/api/records?game_id=${selectedGameId}`)
+          .then(r => r.json())
+          .then(d => { setMatches(d.matches || []); setMembers(d.members || []) })
+      }
+    } else {
+      setEditMsg(data.error || '保存失败')
+    }
+    setEditSaving(false)
   }
 
   const COMMENTS = ['遥遥领先 👑', '紧追不舍 🔥', '不甘落后 💪', '奋起直追 ⚡', '加油别放弃 💫']
@@ -197,14 +231,9 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                           const profile = pred.profiles
                           const name = profile?.display_name || profile?.username || '未知'
                           const initial = name[0].toUpperCase()
-                          const predHome = pred.pred_home_score
-                          const predAway = pred.pred_away_score
                           const points = pred.points_earned
-
-                          let resultIcon = null
-                          if (isFinished && points != null) {
-                            resultIcon = points > 0 ? '✓' : '✗'
-                          }
+                          const canEdit = !isFinished && predictions.length === 1
+                          const isEditing = editingPredId === pred.id
 
                           return (
                             <tr key={pred.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -221,21 +250,61 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                 </div>
                               </td>
                               <td className="px-3 py-2.5 text-center text-gray-900 dark:text-gray-100">
-                                <span className="font-mono">{predHome}–{predAway}</span>
-                                {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
-                                  <span className="text-gray-400 dark:text-gray-500 text-xs"> · 延:{pred.pred_et_winner}</span>
-                                )}
-                                {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (
-                                  <span className="text-gray-400 dark:text-gray-500 text-xs"> · 点球:{pred.pred_penalty_winner}</span>
+                                {isEditing ? (
+                                  <div className="flex items-center justify-center gap-1">
+                                    <input
+                                      type="number" min="0" max="99" value={editHome}
+                                      onChange={e => setEditHome(e.target.value)}
+                                      className="w-10 text-center bg-gray-100 dark:bg-gray-700 border border-amber-400 rounded px-1 py-0.5 text-sm font-mono focus:outline-none"
+                                    />
+                                    <span className="text-gray-400">–</span>
+                                    <input
+                                      type="number" min="0" max="99" value={editAway}
+                                      onChange={e => setEditAway(e.target.value)}
+                                      className="w-10 text-center bg-gray-100 dark:bg-gray-700 border border-amber-400 rounded px-1 py-0.5 text-sm font-mono focus:outline-none"
+                                    />
+                                  </div>
+                                ) : (
+                                  <span className="font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
                                 )}
                               </td>
                               <td className="px-4 py-2.5 text-right font-bold">
-                                {points != null ? (
+                                {isEditing ? (
+                                  <div className="flex items-center justify-end gap-1">
+                                    <button
+                                      onClick={() => handleEditSave(pred.id)}
+                                      disabled={editSaving}
+                                      className="text-xs text-white bg-amber-500 hover:bg-amber-400 px-2 py-1 rounded transition-colors disabled:opacity-50"
+                                    >
+                                      {editSaving ? '…' : '保存'}
+                                    </button>
+                                    <button
+                                      onClick={() => { setEditingPredId(null); setEditMsg('') }}
+                                      className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 px-1.5 py-1 rounded transition-colors"
+                                    >
+                                      取消
+                                    </button>
+                                  </div>
+                                ) : points != null ? (
                                   <span className={points > 0 ? 'text-amber-500' : points < 0 ? 'text-red-500' : 'text-gray-500'}>
                                     {points > 0 ? `+${points}` : points}
                                   </span>
                                 ) : (
-                                  <span className="text-zinc-600 font-normal text-xs">待结算</span>
+                                  <div className="flex items-center justify-end gap-2">
+                                    <span className="text-zinc-600 font-normal text-xs">待结算</span>
+                                    {canEdit && (
+                                      <button
+                                        onClick={() => startEdit(pred)}
+                                        className="text-xs text-gray-400 hover:text-amber-500 transition-colors"
+                                        title="修改竞猜"
+                                      >
+                                        ✎
+                                      </button>
+                                    )}
+                                  </div>
+                                )}
+                                {isEditing && editMsg && (
+                                  <p className="text-red-400 text-xs mt-1 text-right">{editMsg}</p>
                                 )}
                               </td>
                             </tr>
