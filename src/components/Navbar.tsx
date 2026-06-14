@@ -17,6 +17,10 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   const router = useRouter()
   const [unread, setUnread] = useState(0)
   const supabaseRef = useRef(createClient())
+  const pathnameRef = useRef(pathname)
+
+  // Keep pathnameRef current so async callbacks can read the latest value
+  useEffect(() => { pathnameRef.current = pathname }, [pathname])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -32,7 +36,8 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
     async function fetchUnread() {
       const res = await fetch('/api/chat/unread')
       const d = await res.json()
-      if (mounted) setUnread(d.count ?? 0)
+      // If user is on chat page when this resolves, keep badge at 0
+      if (mounted) setUnread(pathnameRef.current === '/chat' ? 0 : (d.count ?? 0))
     }
 
     fetchUnread()
