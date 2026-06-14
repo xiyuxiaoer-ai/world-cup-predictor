@@ -44,6 +44,8 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   const onlineIds = useOnlineIds()
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [showEmoji, setShowEmoji] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const [unreadConvIds, setUnreadConvIds] = useState<Set<string>>(new Set())
   const [showSidebar, setShowSidebar] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -166,6 +168,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   async function handleSend() {
     if (!text.trim() || !selectedConvId || sending) return
     setSending(true)
+    setShowEmoji(false)
     const content = text.trim()
     setText('')
     await fetch('/api/chat/messages', {
@@ -370,9 +373,50 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
             </div>
 
             {/* Input bar */}
-            <div className="px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0">
-              <form onSubmit={e => { e.preventDefault(); handleSend() }} className="flex gap-2">
+            <div className="px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0 relative">
+              {/* Emoji picker panel */}
+              {showEmoji && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setShowEmoji(false)} />
+                  <div className="absolute bottom-full mb-2 left-4 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-3 z-20">
+                    {[
+                      ['⚽', '🏆', '🥅', '🏅', '🥇', '🥈', '🥉', '🎯'],
+                      ['🎉', '🎊', '🥳', '👏', '🙌', '🤜', '🤛', '💪'],
+                      ['🔥', '❤️', '⭐', '🌟', '😂', '😭', '🤩', '😱'],
+                      ['😅', '🤣', '😎', '🥺', '😤', '👑', '✨', '💦'],
+                      ['🇧🇷', '🇩🇪', '🇫🇷', '🇦🇷', '🇪🇸', '🇵🇹', '🇯🇵', '🇰🇷'],
+                    ].map((row, ri) => (
+                      <div key={ri} className="flex gap-1 mb-1 last:mb-0">
+                        {row.map(emoji => (
+                          <button
+                            key={emoji}
+                            type="button"
+                            onClick={() => {
+                              setText(prev => prev + emoji)
+                              setShowEmoji(false)
+                              setTimeout(() => inputRef.current?.focus(), 50)
+                            }}
+                            className="flex-1 text-xl py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <form onSubmit={e => { e.preventDefault(); handleSend() }} className="flex gap-2 items-center">
+                <button
+                  type="button"
+                  onClick={() => setShowEmoji(p => !p)}
+                  className={`text-xl shrink-0 w-9 h-9 flex items-center justify-center rounded-full transition-colors ${showEmoji ? 'bg-amber-100 dark:bg-amber-900/30' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                >
+                  😊
+                </button>
                 <input
+                  ref={inputRef}
                   type="text"
                   value={text}
                   onChange={e => setText(e.target.value)}
