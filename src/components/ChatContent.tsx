@@ -381,10 +381,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
                   <div className="absolute bottom-full mb-2 left-4 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-3 z-20">
                     {[
                       ['⚽', '🏆', '🥅', '🏅', '🥇', '🥈', '🥉', '🎯'],
-                      ['🎉', '🎊', '🥳', '👏', '🙌', '🤜', '🤛', '💪'],
-                      ['🔥', '❤️', '⭐', '🌟', '😂', '😭', '🤩', '😱'],
                       ['😅', '🤣', '😎', '🥺', '😤', '👑', '✨', '💦'],
-                      ['🇧🇷', '🇩🇪', '🇫🇷', '🇦🇷', '🇪🇸', '🇵🇹', '🇯🇵', '🇰🇷'],
                     ].map((row, ri) => (
                       <div key={ri} className="flex gap-1 mb-1 last:mb-0">
                         {row.map(emoji => (
