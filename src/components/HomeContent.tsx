@@ -107,6 +107,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   }
 
   const [showAllMatches, setShowAllMatches] = useState(false)
+  const [finishedExpanded, setFinishedExpanded] = useState(false)
 
   const recentResults = matches
     .filter(m => m.status === 'finished' && m.result_90)
@@ -144,6 +145,84 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         const t = new Date(m.kickoff_time)
         return t >= oneWeekAgo && t <= oneWeekLater
       })
+
+  function renderMatch(match: Match) {
+    const pred = predictions[match.id]
+    const isLocked = new Date(match.lock_time) <= now
+    const kickoff = new Date(match.kickoff_time)
+    const homeTla = getTeamDisplay((match as any).home_tla, match.home_team)
+    const awayTla = getTeamDisplay((match as any).away_tla, match.away_team)
+    const homeFlagUrl = getFlagUrl((match as any).home_tla)
+    const awayFlagUrl = getFlagUrl((match as any).away_tla)
+    const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
+
+    return (
+      <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-3 space-y-2 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+        <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
+          <span>{STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}</span>
+          <span>
+            {match.status === 'finished'
+              ? '已结束'
+              : `${kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })} ${kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
+            }
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 flex-1">
+            {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{homeTla}</button>
+          </div>
+          <div className="text-center shrink-0 px-2">
+            {match.status === 'finished' ? (
+              <div>
+                <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                  {match.home_score_90} – {match.away_score_90}
+                </div>
+                {match.home_score_et != null && match.home_score_pen == null && (
+                  <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
+                )}
+                {match.home_score_pen != null && (
+                  <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
+                )}
+              </div>
+            ) : (
+              <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5 flex-1 justify-end">
+            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{awayTla}</button>
+            {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+          </div>
+        </div>
+        <div className="text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
+          {pred ? (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-gray-500 dark:text-gray-400">
+                我猜：<span className="text-gray-700 dark:text-gray-200 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
+                {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
+                  <> · 延:<span className="text-zinc-300">{pred.pred_et_winner}</span></>
+                )}
+                {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (
+                  <> · 点球:<span className="text-zinc-300">{pred.pred_penalty_winner}</span></>
+                )}
+              </span>
+              {pred.points_earned != null ? (
+                <span className={`shrink-0 ${pred.points_earned > 0 ? 'text-amber-500 font-semibold' : pred.points_earned < 0 ? 'text-red-500' : 'text-zinc-500'}`}>
+                  {pred.points_earned > 0 ? `+${pred.points_earned}分` : pred.points_earned < 0 ? `${pred.points_earned}分` : '0分'}
+                </span>
+              ) : (
+                <span className="text-gray-400 dark:text-gray-500 shrink-0">待结算</span>
+              )}
+            </div>
+          ) : isLocked ? (
+            <span className="text-gray-400 dark:text-gray-500">未猜</span>
+          ) : (
+            <span className="text-gray-500 dark:text-gray-400">待猜</span>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   if (!selectedGameId) {
     return (
@@ -288,88 +367,35 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               {displayMatches.length === 0 && (
                 <p className="text-zinc-500 text-sm">本周暂无比赛，<button onClick={() => setShowAllMatches(true)} className="text-amber-500 underline">查看全部赛程</button></p>
               )}
-              {displayMatches.map(match => {
-                const pred = predictions[match.id]
-                const isLocked = new Date(match.lock_time) <= now
-                const kickoff = new Date(match.kickoff_time)
-                const homeTla = getTeamDisplay((match as any).home_tla, match.home_team)
-                const awayTla = getTeamDisplay((match as any).away_tla, match.away_team)
-                const homeFlagUrl = getFlagUrl((match as any).home_tla)
-                const awayFlagUrl = getFlagUrl((match as any).away_tla)
-                const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
-
+              {/* 已结束比赛 - 折叠区 */}
+              {(() => {
+                const finished = displayMatches.filter(m => m.status === 'finished')
+                const upcoming = displayMatches.filter(m => m.status !== 'finished')
                 return (
-                  <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-3 space-y-2 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
-                    {/* Row 1: meta */}
-                    <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
-                      <span>{STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}</span>
-                      <span>
-                        {match.status === 'finished'
-                          ? '已结束'
-                          : `${kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })} ${kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
-                        }
-                      </span>
-                    </div>
-
-                    {/* Row 2: teams + score */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 flex-1">
-                        {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-                        <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{homeTla}</button>
-                      </div>
-                      <div className="text-center shrink-0 px-2">
-                        {match.status === 'finished' ? (
-                          <div>
-                            <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                              {match.home_score_90} – {match.away_score_90}
-                            </div>
-                            {match.home_score_et != null && match.home_score_pen == null && (
-                              <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">延 {match.home_score_et} – {match.away_score_et}</div>
-                            )}
-                            {match.home_score_pen != null && (
-                              <div className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {match.home_score_pen} – {match.away_score_pen}</div>
-                            )}
+                  <>
+                    {finished.length > 0 && (
+                      <div>
+                        <button
+                          onClick={() => setFinishedExpanded(p => !p)}
+                          className="w-full flex items-center gap-2 py-2 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        >
+                          <span className={`transition-transform duration-200 ${finishedExpanded ? 'rotate-90' : ''}`}>▶</span>
+                          <span>已结束 {finished.length} 场</span>
+                          <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                        </button>
+                        {finishedExpanded && (
+                          <div className="space-y-2 mt-1">
+                            {finished.map(match => renderMatch(match))}
                           </div>
-                        ) : (
-                          <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 flex-1 justify-end">
-                        <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{awayTla}</button>
-                        {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-                      </div>
+                    )}
+                    <div className="space-y-2">
+                      {upcoming.map(match => renderMatch(match))}
                     </div>
-
-                    {/* Row 3: prediction */}
-                    <div className="text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
-                      {pred ? (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-gray-500 dark:text-gray-400">
-                            我猜：<span className="text-gray-700 dark:text-gray-200 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
-                            {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (
-                              <> · 延:<span className="text-zinc-300">{pred.pred_et_winner}</span></>
-                            )}
-                            {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (
-                              <> · 点球:<span className="text-zinc-300">{pred.pred_penalty_winner}</span></>
-                            )}
-                          </span>
-                          {pred.points_earned != null ? (
-                            <span className={`shrink-0 ${pred.points_earned > 0 ? 'text-amber-500 font-semibold' : pred.points_earned < 0 ? 'text-red-500' : 'text-zinc-500'}`}>
-                              {pred.points_earned > 0 ? `+${pred.points_earned}分` : pred.points_earned < 0 ? `${pred.points_earned}分` : '0分'}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400 dark:text-gray-500 shrink-0">待结算</span>
-                          )}
-                        </div>
-                      ) : isLocked ? (
-                        <span className="text-gray-400 dark:text-gray-500">未猜</span>
-                      ) : (
-                        <span className="text-gray-500 dark:text-gray-400">待猜</span>
-                      )}
-                    </div>
-                  </div>
+                  </>
                 )
-              })}
+              })()}
             </div>
           </div>
         </>
