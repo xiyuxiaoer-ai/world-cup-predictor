@@ -79,7 +79,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
         const group = data.find(c => c.type === 'group')
         if (group) {
           setSelectedConvId(group.id)
-          setUnreadConvIds(prev => { const next = new Set(prev); next.delete(group.id); return next })
+          // Don't clear unread here — wait until messages actually load
           setShowSidebar(false)
         }
       })
@@ -102,6 +102,8 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
       .then(data => {
         setMessages(Array.isArray(data) ? data : [])
         markRead(selectedConvId)
+        // Clear unread dot only after messages are actually shown
+        setUnreadConvIds(prev => { const n = new Set(prev); n.delete(selectedConvId); return n })
       })
   }, [selectedConvId, markRead])
 
