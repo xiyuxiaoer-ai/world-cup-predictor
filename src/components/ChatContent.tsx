@@ -235,24 +235,6 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {/* Group chat — always first */}
-          {conversations.filter(c => c.type === 'group').map(conv => (
-            <button
-              key={conv.id}
-              onClick={() => { setSelectedConvId(conv.id); setUnreadConvIds(prev => { const n = new Set(prev); n.delete(conv.id); return n }); setShowSidebar(false) }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedConvId === conv.id ? 'bg-amber-50 dark:bg-amber-900/20 border-r-2 border-amber-400' : ''}`}
-            >
-              <div className="relative w-9 h-9 shrink-0">
-                <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-lg">⚽</div>
-                {unreadConvIds.has(conv.id) && <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">群聊</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500">{members.length} 位成员</div>
-              </div>
-            </button>
-          ))}
-
           {/* Unified member list — sorted: online first, then has DM, then alpha */}
           {[...members.filter(m => m.user_id !== currentUser.id)].sort((a, b) => {
             const aOnline = onlineIds.has(a.user_id) ? 2 : 0
@@ -302,6 +284,24 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
               </button>
             )
           })}
+
+          {/* Group chat — bottom */}
+          {conversations.filter(c => c.type === 'group').map(conv => (
+            <button
+              key={conv.id}
+              onClick={() => { setSelectedConvId(conv.id); setUnreadConvIds(prev => { const n = new Set(prev); n.delete(conv.id); return n }); setShowSidebar(false) }}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedConvId === conv.id ? 'bg-amber-50 dark:bg-amber-900/20 border-r-2 border-amber-400' : ''}`}
+            >
+              <div className="relative w-9 h-9 shrink-0">
+                <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-lg">⚽</div>
+                {unreadConvIds.has(conv.id) && <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">群聊</div>
+                <div className="text-xs text-gray-400 dark:text-gray-500">{members.length} 位成员</div>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
