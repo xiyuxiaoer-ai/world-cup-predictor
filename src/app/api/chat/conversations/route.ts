@@ -30,7 +30,34 @@ export async function GET(request: Request) {
     .order('created_at', { ascending: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data || [])
+  const convs = data || []
+  if (convs.length === 0) return NextResponse.json([])
+
+  // Compute has_unread per conversation
+  const convIds = convs.map((c: any) => c.id)
+  const { data: reads } = await supabase
+    .from('message_reads')
+    .select('conversation_id, last_read_at')
+    .eq('user_id', user.id)
+    .in('conversation_id', convIds)
+
+  const readMap: Record<string, string> = {}
+  reads?.forEach((r: any) => { readMap[r.conversation_id] = r.last_read_at })
+
+  const unread: Record<string, boolean> = {}
+  for (const conv of convs) {
+    const lastRead = readMap[conv.id]
+    let q = supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('conversation_id', conv.id)
+      .neq('sender_id', user.id)
+    if (lastRead) q = q.gt('created_at', lastRead)
+    const { count } = await q
+    unread[conv.id] = (count ?? 0) > 0
+  }
+
+  return NextResponse.json(convs.map((c: any) => ({ ...c, has_unread: unread[c.id] ?? false })))
 }
 
 export async function POST(request: Request) {

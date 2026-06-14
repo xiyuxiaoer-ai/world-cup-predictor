@@ -44,14 +44,17 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   const onlineIds = useOnlineIds()
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [unreadConvIds, setUnreadConvIds] = useState<Set<string>>(new Set())
   const [showSidebar, setShowSidebar] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabaseRef = useRef(createClient())
   const supabase = supabaseRef.current
   const membersRef = useRef<Member[]>([])
+  const selectedConvIdRef = useRef<string | null>(null)
 
-  // Keep membersRef in sync so realtime handler can read fresh data
+  // Keep refs in sync for use inside realtime callbacks
   useEffect(() => { membersRef.current = members }, [members])
+  useEffect(() => { selectedConvIdRef.current = selectedConvId }, [selectedConvId])
 
   const markRead = useCallback((convId: string) => {
     fetch('/api/chat/read', {
@@ -68,12 +71,15 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
     setMessages([])
     fetch(`/api/chat/conversations?game_id=${selectedGameId}`)
       .then(r => r.json())
-      .then((data: Conversation[]) => {
+      .then((data: (Conversation & { has_unread?: boolean })[]) => {
         if (!Array.isArray(data)) return
         setConversations(data)
+        // Seed initial unread state from API
+        setUnreadConvIds(new Set(data.filter(c => c.has_unread).map(c => c.id)))
         const group = data.find(c => c.type === 'group')
         if (group) {
           setSelectedConvId(group.id)
+          setUnreadConvIds(prev => { const next = new Set(prev); next.delete(group.id); return next })
           setShowSidebar(false)
         }
       })
@@ -129,6 +135,26 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
 
     return () => { supabase.removeChannel(channel) }
   }, [selectedConvId, supabase, markRead])
+
+  // Realtime: listen for messages in ALL conversations to update sidebar unread dots
+  useEffect(() => {
+    if (!selectedGameId || conversations.length === 0) return
+    const gameConvIds = new Set(conversations.map(c => c.id))
+
+    const channel = supabase
+      .channel(`sidebar-unread:${selectedGameId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        const msg = payload.new as { id: string; conversation_id: string; sender_id: string }
+        if (msg.sender_id === currentUser.id) return
+        if (msg.conversation_id === selectedConvIdRef.current) return
+        if (gameConvIds.has(msg.conversation_id)) {
+          setUnreadConvIds(prev => new Set([...prev, msg.conversation_id]))
+        }
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [selectedGameId, conversations, currentUser.id, supabase])
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -209,10 +235,13 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
           {conversations.filter(c => c.type === 'group').map(conv => (
             <button
               key={conv.id}
-              onClick={() => { setSelectedConvId(conv.id); setShowSidebar(false) }}
+              onClick={() => { setSelectedConvId(conv.id); setUnreadConvIds(prev => { const n = new Set(prev); n.delete(conv.id); return n }); setShowSidebar(false) }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedConvId === conv.id ? 'bg-amber-50 dark:bg-amber-900/20 border-r-2 border-amber-400' : ''}`}
             >
-              <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-lg shrink-0">⚽</div>
+              <div className="relative w-9 h-9 shrink-0">
+                <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-lg">⚽</div>
+                {unreadConvIds.has(conv.id) && <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />}
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">群聊</div>
                 <div className="text-xs text-gray-400 dark:text-gray-500">{members.length} 位成员</div>
@@ -227,7 +256,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
             return (
               <button
                 key={conv.id}
-                onClick={() => { setSelectedConvId(conv.id); setShowSidebar(false) }}
+                onClick={() => { setSelectedConvId(conv.id); setUnreadConvIds(prev => { const n = new Set(prev); n.delete(conv.id); return n }); setShowSidebar(false) }}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedConvId === conv.id ? 'bg-amber-50 dark:bg-amber-900/20 border-r-2 border-amber-400' : ''}`}
               >
                 <div className="relative shrink-0">
@@ -238,7 +267,9 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
                       {(other?.profiles?.display_name || other?.profiles?.username || '?')[0].toUpperCase()}
                     </div>
                   )}
+                  {/* Online dot (bottom-right) — unread dot (top-right) */}
                   <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-800 ${isOnline ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                  {unreadConvIds.has(conv.id) && <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-white dark:border-gray-800" />}
                 </div>
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                   {other?.profiles?.display_name || other?.profiles?.username || '私信'}
