@@ -6,6 +6,7 @@ import { useSelectedGame } from '@/hooks/useSelectedGame'
 import ScrollingBanner from './ScrollingBanner'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
+import TeamHistoryModal from './TeamHistoryModal'
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛', round_of_32: '32强', round_of_16: '16强',
@@ -23,6 +24,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
   const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [editingPredId, setEditingPredId] = useState<string | null>(null)
   const [editHome, setEditHome] = useState('')
   const [editAway, setEditAway] = useState('')
@@ -190,7 +192,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-1.5 flex-1 justify-end">
-                      <span className="text-sm font-bold">{homeName}</span>
+                      <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-bold hover:text-amber-500 transition-colors">{homeName}</button>
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
                     </div>
                     <div className="text-center shrink-0 px-2">
@@ -210,7 +212,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                     </div>
                     <div className="flex items-center gap-1.5 flex-1 justify-start">
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-                      <span className="text-sm font-bold">{awayName}</span>
+                      <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-bold hover:text-amber-500 transition-colors">{awayName}</button>
                     </div>
                   </div>
                 </div>
@@ -323,6 +325,9 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             )
           })}
         </div>
+      )}
+      {historyTeam && (
+        <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
       )}
     </div>
   )

@@ -9,6 +9,7 @@ import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
 import JoinGameModal from './JoinGameModal'
 import ScrollingBanner from './ScrollingBanner'
+import TeamHistoryModal from './TeamHistoryModal'
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛',
@@ -34,6 +35,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [confirmDeleteGame, setConfirmDeleteGame] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
+  const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
 
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
@@ -313,7 +315,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-1">
                         {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-                        <span className="text-sm font-bold tracking-wide">{homeTla}</span>
+                        <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{homeTla}</button>
                       </div>
                       <div className="text-center shrink-0 px-2">
                         {match.status === 'finished' ? (
@@ -333,7 +335,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 flex-1 justify-end">
-                        <span className="text-sm font-bold tracking-wide">{awayTla}</span>
+                        <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{awayTla}</button>
                         {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
                       </div>
                     </div>
@@ -378,6 +380,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       )}
       {showJoinModal && (
         <JoinGameModal onJoined={handleGameJoined} onClose={() => setShowJoinModal(false)} />
+      )}
+      {historyTeam && (
+        <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
       )}
     </div>
   )
