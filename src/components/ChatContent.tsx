@@ -45,8 +45,8 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [showEmoji, setShowEmoji] = useState(false)
-  const [emojiTab, setEmojiTab] = useState<'emoji' | 'sticker'>('emoji')
-  const STICKER_COUNT = 11
+  const [emojiTab, setEmojiTab] = useState<'emoji' | 'sticker'>('sticker')
+  const STICKER_ORDER = [11, 12, 13, 1, 2, 3, 4, 5, 6, 7, 8, 9]
   const inputRef = useRef<HTMLInputElement>(null)
   const [unreadConvIds, setUnreadConvIds] = useState<Set<string>>(new Set())
   const [showSidebar, setShowSidebar] = useState(true)
@@ -398,17 +398,17 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
                     <div className="flex border-b border-gray-200 dark:border-gray-700">
                       <button
                         type="button"
-                        onClick={() => setEmojiTab('emoji')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-tl-2xl transition-colors ${emojiTab === 'emoji' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                        onClick={() => setEmojiTab('sticker')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-tl-2xl transition-colors ${emojiTab === 'sticker' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                       >
-                        😊 表情
+                        🎭 贴纸
                       </button>
                       <button
                         type="button"
-                        onClick={() => setEmojiTab('sticker')}
-                        className={`flex-1 py-2 text-sm font-medium rounded-tr-2xl transition-colors ${emojiTab === 'sticker' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                        onClick={() => setEmojiTab('emoji')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-tr-2xl transition-colors ${emojiTab === 'emoji' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                       >
-                        🎭 贴纸
+                        😊 表情
                       </button>
                     </div>
 
@@ -442,7 +442,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
                     {/* Sticker grid */}
                     {emojiTab === 'sticker' && (
                       <div className="p-3 grid grid-cols-4 gap-2 max-h-52 overflow-y-auto">
-                        {Array.from({ length: STICKER_COUNT }, (_, i) => i + 1).map(n => (
+                        {STICKER_ORDER.map(n => (
                           <button
                             key={n}
                             type="button"
