@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import { createClient } from '@/lib/supabase/client'
+import { useOnlineIds } from './PresenceProvider'
 
 interface Message {
   id: string
@@ -40,7 +41,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   const [selectedConvId, setSelectedConvId] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [members, setMembers] = useState<Member[]>([])
-  const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set())
+  const onlineIds = useOnlineIds()
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [showSidebar, setShowSidebar] = useState(true)
@@ -128,19 +129,6 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
 
     return () => { supabase.removeChannel(channel) }
   }, [selectedConvId, supabase, markRead])
-
-  // Presence: track online users
-  useEffect(() => {
-    const channel = supabase.channel('online-users')
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState()
-        setOnlineIds(new Set(Object.keys(state)))
-      })
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }, [supabase])
 
   // Auto-scroll to bottom
   useEffect(() => {

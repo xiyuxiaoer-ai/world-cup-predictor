@@ -1,9 +1,16 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-export default function PresenceProvider() {
+const PresenceContext = createContext<Set<string>>(new Set())
+
+export function useOnlineIds(): Set<string> {
+  return useContext(PresenceContext)
+}
+
+export default function PresenceProvider({ children }: { children: React.ReactNode }) {
+  const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set())
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>['channel']> | null>(null)
 
   useEffect(() => {
@@ -17,11 +24,21 @@ export default function PresenceProvider() {
         config: { presence: { key: user.id } },
       })
 
-      channel.subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await channel.track({ user_id: user.id, online_at: new Date().toISOString() })
-        }
-      })
+      const updateState = () => {
+        if (!mounted) return
+        const state = channel.presenceState()
+        setOnlineIds(new Set(Object.keys(state)))
+      }
+
+      channel
+        .on('presence', { event: 'sync' }, updateState)
+        .on('presence', { event: 'join' }, updateState)
+        .on('presence', { event: 'leave' }, updateState)
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.track({ user_id: user.id, online_at: new Date().toISOString() })
+          }
+        })
 
       channelRef.current = channel
     })
@@ -32,5 +49,9 @@ export default function PresenceProvider() {
     }
   }, [])
 
-  return null
+  return (
+    <PresenceContext.Provider value={onlineIds}>
+      {children}
+    </PresenceContext.Provider>
+  )
 }
