@@ -106,7 +106,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     setPredictions(prev => ({ ...prev, [matchId]: pred }))
   }
 
-  const [showAllMatches, setShowAllMatches] = useState(false)
   const [finishedExpanded, setFinishedExpanded] = useState(false)
 
   const recentResults = matches
@@ -137,14 +136,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
     .slice(0, 3)
 
-  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-  const oneWeekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-  const displayMatches = showAllMatches
-    ? matches
-    : matches.filter(m => {
-        const t = new Date(m.kickoff_time)
-        return t >= oneWeekAgo && t <= oneWeekLater
-      })
+  const displayMatches = matches
 
   function renderMatch(match: Match) {
     const pred = predictions[match.id]
@@ -348,12 +340,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             <div className="flex items-center gap-3 mb-3">
               <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">2026世界杯赛程安排</h2>
               <button
-                onClick={() => setShowAllMatches(prev => !prev)}
-                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 px-2 py-1 rounded-lg transition-colors"
-              >
-                {showAllMatches ? '只看近期' : '全部比赛'}
-              </button>
-              <button
                 onClick={handleSync}
                 disabled={syncing}
                 className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 transition-colors"
@@ -365,7 +351,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             </div>
             <div className="space-y-2">
               {displayMatches.length === 0 && (
-                <p className="text-zinc-500 text-sm">本周暂无比赛，<button onClick={() => setShowAllMatches(true)} className="text-amber-500 underline">查看全部赛程</button></p>
+                <p className="text-zinc-500 text-sm">暂无赛程</p>
               )}
               {/* 已结束比赛 - 折叠区 */}
               {(() => {
