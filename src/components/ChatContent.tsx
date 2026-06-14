@@ -214,7 +214,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 56px)' }}>
+    <div className="flex h-full overflow-hidden">
 
       {/* ——— Sidebar ——— */}
       <div className={`${showSidebar ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800`}>

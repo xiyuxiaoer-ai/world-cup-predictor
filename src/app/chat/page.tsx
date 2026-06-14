@@ -29,9 +29,11 @@ export default async function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex flex-col overflow-hidden" style={{ height: '100dvh' }}>
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
-      <ChatContent games={games} currentUser={currentUser} />
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <ChatContent games={games} currentUser={currentUser} />
+      </div>
     </div>
   )
 }
