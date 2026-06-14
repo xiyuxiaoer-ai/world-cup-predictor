@@ -45,6 +45,8 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [showEmoji, setShowEmoji] = useState(false)
+  const [emojiTab, setEmojiTab] = useState<'emoji' | 'sticker'>('emoji')
+  const STICKER_COUNT = 11
   const inputRef = useRef<HTMLInputElement>(null)
   const [unreadConvIds, setUnreadConvIds] = useState<Set<string>>(new Set())
   const [showSidebar, setShowSidebar] = useState(true)
@@ -165,18 +167,22 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  async function handleSend() {
-    if (!text.trim() || !selectedConvId || sending) return
+  async function handleSend(overrideContent?: string) {
+    const content = overrideContent ?? text.trim()
+    if (!content || !selectedConvId || sending) return
     setSending(true)
     setShowEmoji(false)
-    const content = text.trim()
-    setText('')
+    if (!overrideContent) setText('')
     await fetch('/api/chat/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ conversation_id: selectedConvId, content }),
     })
     setSending(false)
+  }
+
+  function sendSticker(n: number) {
+    handleSend(`[sticker:${n}]`)
   }
 
   async function startDM(memberId: string) {
@@ -361,9 +367,18 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
                       {!isSelf && (
                         <span className="text-xs text-gray-400 dark:text-gray-500 mb-1">{name}</span>
                       )}
-                      <div className={`px-3 py-2 rounded-2xl text-sm break-words ${isSelf ? 'bg-amber-500 text-white rounded-tr-sm' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm shadow-sm'}`}>
-                        {msg.content}
-                      </div>
+                      {/^\[sticker:(\d+)\]$/.test(msg.content) ? (
+                        <img
+                          src={`/stickers/${msg.content.match(/\d+/)?.[0]}.png`}
+                          alt="sticker"
+                          className="w-28 h-28 object-contain"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className={`px-3 py-2 rounded-2xl text-sm break-words ${isSelf ? 'bg-amber-500 text-white rounded-tr-sm' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm shadow-sm'}`}>
+                          {msg.content}
+                        </div>
+                      )}
                       <span className="text-[10px] text-gray-400 dark:text-gray-500 mt-1">{timeStr}</span>
                     </div>
                   </div>
@@ -374,32 +389,71 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
 
             {/* Input bar */}
             <div className="px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0 relative">
-              {/* Emoji picker panel */}
+              {/* Emoji / sticker picker panel */}
               {showEmoji && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowEmoji(false)} />
-                  <div className="absolute bottom-full mb-2 left-4 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl p-3 z-20">
-                    {[
-                      ['⚽', '🏆', '🥅', '🏅', '🥇', '🥈', '🥉', '🎯'],
-                      ['😅', '🤣', '😎', '🥺', '😤', '👑', '✨', '💦'],
-                    ].map((row, ri) => (
-                      <div key={ri} className="flex gap-1 mb-1 last:mb-0">
-                        {row.map(emoji => (
+                  <div className="absolute bottom-full mb-2 left-4 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl z-20">
+                    {/* Tabs */}
+                    <div className="flex border-b border-gray-200 dark:border-gray-700">
+                      <button
+                        type="button"
+                        onClick={() => setEmojiTab('emoji')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-tl-2xl transition-colors ${emojiTab === 'emoji' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                      >
+                        😊 表情
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEmojiTab('sticker')}
+                        className={`flex-1 py-2 text-sm font-medium rounded-tr-2xl transition-colors ${emojiTab === 'sticker' ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+                      >
+                        🎭 贴纸
+                      </button>
+                    </div>
+
+                    {/* Emoji grid */}
+                    {emojiTab === 'emoji' && (
+                      <div className="p-3">
+                        {[
+                          ['⚽', '🏆', '🥅', '🏅', '🥇', '🥈', '🥉', '🎯'],
+                          ['😅', '🤣', '😎', '🥺', '😤', '👑', '✨', '💦'],
+                        ].map((row, ri) => (
+                          <div key={ri} className="flex gap-1 mb-1 last:mb-0">
+                            {row.map(emoji => (
+                              <button
+                                key={emoji}
+                                type="button"
+                                onClick={() => {
+                                  setText(prev => prev + emoji)
+                                  setShowEmoji(false)
+                                  setTimeout(() => inputRef.current?.focus(), 50)
+                                }}
+                                className="flex-1 text-xl py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Sticker grid */}
+                    {emojiTab === 'sticker' && (
+                      <div className="p-3 grid grid-cols-4 gap-2 max-h-52 overflow-y-auto">
+                        {Array.from({ length: STICKER_COUNT }, (_, i) => i + 1).map(n => (
                           <button
-                            key={emoji}
+                            key={n}
                             type="button"
-                            onClick={() => {
-                              setText(prev => prev + emoji)
-                              setShowEmoji(false)
-                              setTimeout(() => inputRef.current?.focus(), 50)
-                            }}
-                            className="flex-1 text-xl py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            onClick={() => { sendSticker(n); setShowEmoji(false) }}
+                            className="aspect-square rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors p-1 flex items-center justify-center"
                           >
-                            {emoji}
+                            <img src={`/stickers/${n}.png`} alt={`sticker ${n}`} className="w-full h-full object-contain" loading="lazy" />
                           </button>
                         ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </>
               )}
