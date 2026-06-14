@@ -78,14 +78,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
       .then((data: (Conversation & { has_unread?: boolean })[]) => {
         if (!Array.isArray(data)) return
         setConversations(data)
-        // Seed initial unread state from API
         setUnreadConvIds(new Set(data.filter(c => c.has_unread).map(c => c.id)))
-        const group = data.find(c => c.type === 'group')
-        if (group) {
-          setSelectedConvId(group.id)
-          // Don't clear unread here — wait until messages actually load
-          setShowSidebar(false)
-        }
       })
   }, [selectedGameId])
 
