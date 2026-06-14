@@ -47,6 +47,10 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const supabaseRef = useRef(createClient())
   const supabase = supabaseRef.current
+  const membersRef = useRef<Member[]>([])
+
+  // Keep membersRef in sync so realtime handler can read fresh data
+  useEffect(() => { membersRef.current = members }, [members])
 
   const markRead = useCallback((convId: string) => {
     fetch('/api/chat/read', {
@@ -102,19 +106,22 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${selectedConvId}` },
-        async (payload) => {
-          const { data } = await supabase
-            .from('messages')
-            .select('*, profiles!sender_id(username, display_name, avatar_url)')
-            .eq('id', (payload.new as { id: string }).id)
-            .single()
-          if (data) {
-            setMessages(prev => {
-              if (prev.some(m => m.id === data.id)) return prev
-              return [...prev, data as Message]
-            })
-            markRead(selectedConvId)
+        (payload) => {
+          const raw = payload.new as { id: string; conversation_id: string; sender_id: string; content: string; created_at: string }
+          // Build profiles from local state — avoids extra DB round-trip
+          let profiles: Message['profiles']
+          if (raw.sender_id === currentUser.id) {
+            profiles = { username: currentUser.username, display_name: currentUser.display_name, avatar_url: currentUser.avatar_url }
+          } else {
+            const member = membersRef.current.find(m => m.user_id === raw.sender_id)
+            profiles = member?.profiles ?? { username: raw.sender_id.slice(0, 8), display_name: null, avatar_url: null }
           }
+          const fullMsg: Message = { ...raw, profiles }
+          setMessages(prev => {
+            if (prev.some(m => m.id === fullMsg.id)) return prev
+            return [...prev, fullMsg]
+          })
+          markRead(selectedConvId)
         }
       )
       .subscribe()
