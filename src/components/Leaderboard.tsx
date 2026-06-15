@@ -91,6 +91,11 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                       {entry.total_points}分
                     </div>
                     <div className="text-xs text-gray-400 dark:text-gray-500">{entry.prediction_count}猜</div>
+                    {entry.pending_count > 0 && (
+                      <div className={`text-xs font-medium ${entry.pending_count > 5 ? 'text-green-500' : entry.pending_count > 3 ? 'text-yellow-500' : 'text-red-500'}`}>
+                        {entry.pending_count}待开
+                      </div>
+                    )}
                   </div>
                 </button>
               )

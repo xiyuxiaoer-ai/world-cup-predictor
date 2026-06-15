@@ -48,4 +48,5 @@ export interface LeaderboardEntry {
   avatar_url: string | null
   total_points: number
   prediction_count: number
+  pending_count: number
 }
