@@ -522,11 +522,23 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-right"><TeamName tla={(m as any).home_tla} zh={homeTla} /></span>
                           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                         </div>
-                        <div className="px-2 text-center">
+                        <div className="px-2 text-center flex flex-col items-center">
                           {finished ? (
-                            <span className="text-base font-bold text-gray-900 dark:text-gray-100">{m.home_score_90} – {m.away_score_90}</span>
+                            <>
+                              <span className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">{m.home_score_90} – {m.away_score_90}</span>
+                              {predictions[m.id] && (
+                                <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我: {predictions[m.id].pred_home_score}–{predictions[m.id].pred_away_score}</span>
+                              )}
+                            </>
+                          ) : predictions[m.id] ? (
+                            <span className="text-[10px] text-amber-500 font-medium leading-tight whitespace-nowrap">我: {predictions[m.id].pred_home_score}–{predictions[m.id].pred_away_score}</span>
                           ) : (
-                            <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
+                            <button
+                              onClick={() => { setGroupModal(null) }}
+                              className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap"
+                            >
+                              待猜球
+                            </button>
                           )}
                         </div>
                         <div className="flex items-center gap-1.5 justify-start">
