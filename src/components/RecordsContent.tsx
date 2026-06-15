@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
@@ -20,6 +21,7 @@ const STAGE_LABELS: Record<string, string> = {
 type Filter = 'all' | 'finished' | 'upcoming'
 
 export default function RecordsContent({ games }: { games: GameWithRole[] }) {
+  const router = useRouter()
   const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [matches, setMatches] = useState<any[]>([])
   const [members, setMembers] = useState<any[]>([])
@@ -460,9 +462,23 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                           </div>
                           {homeJa && <span className="w-full text-[10px] font-normal text-gray-400 dark:text-gray-500 text-right pr-[26px]">{homeJa}</span>}
                         </div>
-                        <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2">
+                        <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2 flex flex-col items-center">
                           {finished ? (
-                            <span className="text-base font-bold text-gray-900 dark:text-gray-100">{m.home_score_90} – {m.away_score_90}</span>
+                            <>
+                              <span className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">{m.home_score_90} – {m.away_score_90}</span>
+                              {m.user_prediction && (
+                                <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我: {m.user_prediction.pred_home_score}–{m.user_prediction.pred_away_score}</span>
+                              )}
+                            </>
+                          ) : m.user_prediction ? (
+                            <span className="text-[10px] text-amber-500 font-medium leading-tight whitespace-nowrap">我: {m.user_prediction.pred_home_score}–{m.user_prediction.pred_away_score}</span>
+                          ) : new Date() < new Date(m.lock_time) ? (
+                            <button
+                              onClick={() => { setGroupModal(null); router.push('/') }}
+                              className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap"
+                            >
+                              待猜球
+                            </button>
                           ) : (
                             <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                           )}
