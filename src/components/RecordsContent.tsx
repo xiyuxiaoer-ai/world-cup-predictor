@@ -398,12 +398,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                   <table className="w-full text-xs">
                     <thead>
                       <tr className="text-gray-400 dark:text-gray-500">
-                        <th className="text-left pb-1.5 font-medium w-5">#</th>
-                        <th className="text-left pb-1.5 font-medium">球队</th>
-                        <th className="text-center pb-1.5 font-medium w-7">赛</th>
-                        <th className="text-center pb-1.5 font-medium w-7">胜</th>
-                        <th className="text-center pb-1.5 font-medium w-7">平</th>
-                        <th className="text-center pb-1.5 font-medium w-7">负</th>
+                        <th className="text-left pb-1.5 font-medium w-4">#</th>
+                        <th className="pb-1.5 w-6"></th>
+                        <th className="text-center pb-1.5 font-medium w-8">赛</th>
+                        <th className="text-center pb-1.5 font-medium w-8">胜</th>
+                        <th className="text-center pb-1.5 font-medium w-8">平</th>
+                        <th className="text-center pb-1.5 font-medium w-8">负</th>
                         <th className="text-center pb-1.5 font-medium w-12">进/失</th>
                         <th className="text-center pb-1.5 font-medium w-8">积分</th>
                       </tr>
@@ -413,12 +413,9 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                         const flagUrl = getFlagUrl(team.tla)
                         return (
                           <tr key={team.tla} className="border-t border-gray-100 dark:border-gray-800">
-                            <td className="py-1.5 text-gray-400 dark:text-gray-500">{idx + 1}</td>
+                            <td className="py-1.5 text-gray-400 dark:text-gray-500 text-xs">{idx + 1}</td>
                             <td className="py-1.5">
-                              <div className="flex items-center gap-1.5">
-                                {flagUrl && <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                                <span className="font-medium text-gray-900 dark:text-gray-100 truncate">{team.name}</span>
-                              </div>
+                              {flagUrl && <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm" />}
                             </td>
                             <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.played}</td>
                             <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.won}</td>
@@ -453,19 +450,19 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                           </>
                         )}
                       </div>
-                      <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0">
+                      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-1 flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 justify-end">
                           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={m.home_tla} zh={homeTla} /></span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-right"><TeamName tla={m.home_tla} zh={homeTla} /></span>
                         </div>
-                        <div className="shrink-0 px-2 text-center">
+                        <div className="px-2 text-center">
                           {finished ? (
                             <span className="text-base font-bold text-gray-900 dark:text-gray-100">{m.home_score_90} – {m.away_score_90}</span>
                           ) : (
                             <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-1.5 flex-1 justify-start min-w-0">
+                        <div className="flex items-center gap-1.5 justify-start">
                           <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={m.away_tla} zh={awayTla} /></span>
                           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                         </div>
