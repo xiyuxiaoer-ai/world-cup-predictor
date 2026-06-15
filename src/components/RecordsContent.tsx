@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import ScrollingBanner from './ScrollingBanner'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
+
+const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛', round_of_32: '32强', round_of_16: '16强',
@@ -26,6 +29,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [groupModal, setGroupModal] = useState<{ stage: string; group_name: string | null; label: string } | null>(null)
+  const [mapMatch, setMapMatch] = useState<{ homeTla: string; awayTla: string; homeTeam: string; awayTeam: string; venue: { stadium: string; city: string; coordinates: [number, number] } } | null>(null)
   const [editingPredId, setEditingPredId] = useState<string | null>(null)
   const [editHome, setEditHome] = useState('')
   const [editAway, setEditAway] = useState('')
@@ -193,7 +197,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                       >
                         {STAGE_LABELS[match.stage]} {group}
                       </button>
-                      {venue && <span className="shrink-0 text-gray-400 dark:text-gray-500">📍 {venue.city} · {venue.stadium}</span>}
+                      {venue && <button type="button" onClick={() => setMapMatch({ homeTla: match.home_tla, awayTla: match.away_tla, homeTeam: homeName, awayTeam: awayName, venue })} className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-amber-500 transition-colors">📍 {venue.city} · {venue.stadium}</button>}
                     </div>
                     <span className="shrink-0 text-right">
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
@@ -339,6 +343,16 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
       )}
       {historyTeam && (
         <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
+      )}
+      {mapMatch && (
+        <StadiumMapModal
+          homeTla={mapMatch.homeTla}
+          awayTla={mapMatch.awayTla}
+          homeTeam={mapMatch.homeTeam}
+          awayTeam={mapMatch.awayTeam}
+          venue={mapMatch.venue}
+          onClose={() => setMapMatch(null)}
+        />
       )}
 
       {groupModal && (() => {
