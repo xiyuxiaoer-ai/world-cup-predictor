@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import ScrollingBanner from './ScrollingBanner'
-import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
+import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
 import TeamName from './TeamName'
@@ -180,6 +180,8 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             const awayFlagUrl = getFlagUrl(match.away_tla)
             const homeName = getTeamDisplay(match.home_tla, match.home_team)
             const awayName = getTeamDisplay(match.away_tla, match.away_team)
+            const homeJa = getTeamJa(match.home_tla)
+            const awayJa = getTeamJa(match.away_tla)
             const hasPredicted = !!match.user_prediction
             const predictions: any[] = match.predictions || []
             const venue = MATCH_VENUES[match.api_match_id]
@@ -210,9 +212,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-1.5 flex-1 justify-end">
-                      <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-bold hover:text-amber-500 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
-                      {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+                    <div className="flex flex-col flex-1 items-end">
+                      <div className="flex items-center gap-1.5">
+                        <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-bold hover:text-amber-500 transition-colors">{homeName}</button>
+                        {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+                      </div>
+                      {homeJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pr-[30px]">{homeJa}</span>}
                     </div>
                     <div className="text-center shrink-0 px-2">
                       {isFinished ? (
@@ -229,9 +234,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                         <span className="text-zinc-600 text-sm">vs</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-1.5 flex-1 justify-start">
-                      {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-                      <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-bold hover:text-amber-500 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
+                    <div className="flex flex-col flex-1 items-start">
+                      <div className="flex items-center gap-1.5">
+                        {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+                        <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-bold hover:text-amber-500 transition-colors">{awayName}</button>
+                      </div>
+                      {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pl-[30px]">{awayJa}</span>}
                     </div>
                   </div>
                 </div>
