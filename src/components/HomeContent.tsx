@@ -172,7 +172,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </span>
         </div>
         <div className="relative flex items-center">
-          <div className="w-1/2 flex items-start gap-1.5 pr-10">
+          <div className="w-1/2 flex items-start justify-start gap-1.5 pr-10">
             {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0 mt-[3px]" />}
             <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).home_tla} zh={homeTla} /></button>
           </div>
