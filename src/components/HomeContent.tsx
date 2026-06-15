@@ -36,6 +36,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
+  const [groupModal, setGroupModal] = useState<{ stage: string; group_name: string | null; label: string } | null>(null)
 
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
@@ -324,6 +325,11 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                       gameIds={syncAllGames ? games.map(g => g.id) : [selectedGameId]}
                       prediction={predictions[match.id]}
                       onSubmitted={pred => handlePredictionSubmitted(match.id, pred)}
+                      onGroupClick={() => setGroupModal({
+                        stage: match.stage,
+                        group_name: match.group_name ?? null,
+                        label: `${STAGE_LABELS[match.stage]}${match.group_name ? ' ' + match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''}`,
+                      })}
                     />
                   ))}
                 </div>
@@ -396,6 +402,65 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       {historyTeam && (
         <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
       )}
+
+      {/* 小组/阶段比赛总览弹窗 */}
+      {groupModal && (() => {
+        const groupMatches = matches.filter(m =>
+          groupModal.group_name ? m.group_name === groupModal.group_name : m.stage === groupModal.stage
+        ).sort((a, b) => new Date(a.kickoff_time).getTime() - new Date(b.kickoff_time).getTime())
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setGroupModal(null)}>
+            <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+                <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{groupModal.label} · 全部比赛</h2>
+                <button onClick={() => setGroupModal(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
+              </div>
+              <div className="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-gray-800">
+                {groupMatches.map(m => {
+                  const homeTla = getTeamDisplay((m as any).home_tla, m.home_team)
+                  const awayTla = getTeamDisplay((m as any).away_tla, m.away_team)
+                  const homeFlagUrl = getFlagUrl((m as any).home_tla)
+                  const awayFlagUrl = getFlagUrl((m as any).away_tla)
+                  const kickoff = new Date(m.kickoff_time)
+                  const finished = m.status === 'finished'
+                  return (
+                    <div key={m.id} className="flex items-center gap-3 px-5 py-3">
+                      <div className="text-xs text-gray-400 dark:text-gray-500 w-14 shrink-0 text-center">
+                        {finished ? (
+                          <span className="text-gray-400">已结束</span>
+                        ) : (
+                          <>
+                            <div>{kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</div>
+                            <div>{kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</div>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0">
+                          {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{homeTla}</span>
+                        </div>
+                        <div className="shrink-0 px-2 text-center">
+                          {finished ? (
+                            <span className="text-base font-bold text-gray-900 dark:text-gray-100">{m.home_score_90} – {m.away_score_90}</span>
+                          ) : (
+                            <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-1 justify-start min-w-0">
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{awayTla}</span>
+                          {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

@@ -16,9 +16,9 @@ const inputClass = "w-11 text-center bg-gray-100 dark:bg-gray-700 border border-
 const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
 
 export default function PredictionCard({
-  match, gameIds, prediction, onSubmitted,
+  match, gameIds, prediction, onSubmitted, onGroupClick,
 }: {
-  match: Match; gameIds: string[]; prediction?: Prediction; onSubmitted: (pred: Prediction) => void
+  match: Match; gameIds: string[]; prediction?: Prediction; onSubmitted: (pred: Prediction) => void; onGroupClick?: () => void
 }) {
   const [homeScore, setHomeScore] = useState(prediction?.pred_home_score?.toString() ?? '')
   const [awayScore, setAwayScore] = useState(prediction?.pred_away_score?.toString() ?? '')
@@ -75,7 +75,10 @@ export default function PredictionCard({
             <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
               {new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
               {' '}{new Date(match.kickoff_time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-              {' · '}{STAGE_LABELS[match.stage]}
+              {' · '}
+              <button type="button" onClick={onGroupClick} className="underline decoration-dotted hover:text-amber-500 transition-colors">
+                {STAGE_LABELS[match.stage]}{match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+              </button>
             </span>
             {venue && <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">📍 {venue.city} · {venue.stadium}</span>}
           </div>
@@ -108,8 +111,10 @@ export default function PredictionCard({
           <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
             {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
             {' '}{kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-            {' · '}{STAGE_LABELS[match.stage]}
-            {match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+            {' · '}
+            <button type="button" onClick={onGroupClick} className="underline decoration-dotted hover:text-amber-500 transition-colors">
+              {STAGE_LABELS[match.stage]}{match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
+            </button>
           </span>
           {venue && <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">📍 {venue.city} · {venue.stadium}</span>}
         </div>
