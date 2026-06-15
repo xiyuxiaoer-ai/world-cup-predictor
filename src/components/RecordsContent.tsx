@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import ScrollingBanner from './ScrollingBanner'
-import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
+import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
 import TeamName from './TeamName'
@@ -436,6 +436,8 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                   const awayTla = getTeamDisplay(m.away_tla, m.away_team)
                   const homeFlagUrl = getFlagUrl(m.home_tla)
                   const awayFlagUrl = getFlagUrl(m.away_tla)
+                  const homeJa = getTeamJa(m.home_tla)
+                  const awayJa = getTeamJa(m.away_tla)
                   const kickoff = new Date(m.kickoff_time)
                   const finished = m.status === 'finished'
                   return (
@@ -451,9 +453,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                         )}
                       </div>
                       <div className="relative flex items-start flex-1 min-w-0">
-                        <div className="w-1/2 flex items-start gap-1.5 justify-end pr-8">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-right"><TeamName tla={m.home_tla} zh={homeTla} /></span>
-                          {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0 mt-[3px]" />}
+                        <div className="w-1/2 flex flex-col pr-8">
+                          <div className="flex items-center gap-1.5 justify-end">
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{homeTla}</span>
+                            {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
+                          </div>
+                          {homeJa && <span className="w-full text-[10px] font-normal text-gray-400 dark:text-gray-500 text-right pr-[26px]">{homeJa}</span>}
                         </div>
                         <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2">
                           {finished ? (
@@ -462,9 +467,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                             <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                           )}
                         </div>
-                        <div className="w-1/2 flex items-start gap-1.5 justify-start pl-8">
-                          {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0 mt-[3px]" />}
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={m.away_tla} zh={awayTla} /></span>
+                        <div className="w-1/2 flex flex-col pl-8">
+                          <div className="flex items-center gap-1.5">
+                            {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{awayTla}</span>
+                          </div>
+                          {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pl-[26px]">{awayJa}</span>}
                         </div>
                       </div>
                     </div>
