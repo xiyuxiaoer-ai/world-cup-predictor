@@ -53,7 +53,9 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
   const homeFlagUrl = getFlagUrl(homeTla)
   const awayFlagUrl = getFlagUrl(awayTla)
 
+  const isMainlandChina = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Shanghai'
   const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${venue.coordinates[1]},${venue.coordinates[0]}`
+  const amapUrl = `https://www.amap.com/search?query=${encodeURIComponent(venue.stadium + ' ' + venue.city)}`
 
   return (
     <div
@@ -132,12 +134,12 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
             </span>
           </div>
           <a
-            href={gmapsUrl}
+            href={isMainlandChina ? amapUrl : gmapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs text-amber-500 hover:text-amber-600 font-medium shrink-0"
           >
-            在地图中打开 →
+            {isMainlandChina ? '在高德地图打开 →' : '在地图中打开 →'}
           </a>
         </div>
       </div>
