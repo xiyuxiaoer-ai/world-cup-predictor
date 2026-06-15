@@ -28,26 +28,35 @@ export async function POST() {
 
   const { matches } = await res.json()
 
-  // 先拿已经是 finished 的比赛 ID，防止 API 抖动时把它们覆盖回 scheduled
+  // 拿已经是 finished 且有比分的比赛，防止 API 抖动时把它们覆盖回去
   const { data: alreadyFinished } = await supabaseAdmin
     .from('matches')
-    .select('api_match_id')
+    .select('api_match_id, home_score_90, away_score_90, result_90, et_winner, penalty_winner')
     .eq('status', 'finished')
-  const finishedIds = new Set((alreadyFinished || []).map((m: any) => m.api_match_id))
+  // 用 String() 统一类型，避免 number vs string 的 has() 失效
+  const finishedMap = new Map(
+    (alreadyFinished || []).map((m: any) => [String(m.api_match_id), m])
+  )
 
   const transformed = matches.map((match: any) => {
     const kickoffTime = new Date(match.utcDate)
     const lockTime = new Date(kickoffTime.getTime() - 60 * 60 * 1000)
-    const isFinished = match.status === 'FINISHED' || finishedIds.has(match.id)
+    const existing = finishedMap.get(String(match.id))
+    const isFinished = match.status === 'FINISHED' || !!existing
 
-    let result90 = null, etWinner = null, penaltyWinner = null
+    let result90 = existing?.result_90 ?? null
+    let etWinner = existing?.et_winner ?? null
+    let penaltyWinner = existing?.penalty_winner ?? null
 
-    if (isFinished) {
+    // 只有 API 明确返回 FINISHED 时才从 API 取比分（不信任 existing 保护下的 API 数据）
+    if (match.status === 'FINISHED') {
       const h = match.score.fullTime.home
       const a = match.score.fullTime.away
-      if (h > a) result90 = 'home_win'
-      else if (a > h) result90 = 'away_win'
-      else result90 = 'draw'
+      if (h != null && a != null) {
+        if (h > a) result90 = 'home_win'
+        else if (a > h) result90 = 'away_win'
+        else result90 = 'draw'
+      }
 
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
@@ -59,6 +68,12 @@ export async function POST() {
       }
     }
 
+    // 比分：优先用 DB 已有的值，其次用 API 返回的值（仅 API 明确为 FINISHED 时）
+    const apiHome = match.status === 'FINISHED' ? match.score.fullTime.home : null
+    const apiAway = match.status === 'FINISHED' ? match.score.fullTime.away : null
+    const home90 = existing?.home_score_90 ?? apiHome
+    const away90 = existing?.away_score_90 ?? apiAway
+
     return {
       api_match_id: match.id,
       stage: STAGE_MAP[match.stage] || 'group',
@@ -69,8 +84,8 @@ export async function POST() {
       kickoff_time: match.utcDate,
       lock_time: lockTime.toISOString(),
       status: isFinished ? 'finished' : 'scheduled',
-      home_score_90: isFinished ? match.score.fullTime.home : null,
-      away_score_90: isFinished ? match.score.fullTime.away : null,
+      home_score_90: isFinished ? home90 : null,
+      away_score_90: isFinished ? away90 : null,
       result_90: result90,
       et_winner: etWinner,
       penalty_winner: penaltyWinner,
