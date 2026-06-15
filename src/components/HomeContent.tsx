@@ -511,8 +511,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                       </div>
                       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-1 flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 justify-end">
-                          {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-right"><TeamName tla={(m as any).home_tla} zh={homeTla} /></span>
+                          {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                         </div>
                         <div className="px-2 text-center">
                           {finished ? (
@@ -522,8 +522,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                           )}
                         </div>
                         <div className="flex items-center gap-1.5 justify-start">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={(m as any).away_tla} zh={awayTla} /></span>
                           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={(m as any).away_tla} zh={awayTla} /></span>
                         </div>
                       </div>
                     </div>
