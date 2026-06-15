@@ -75,6 +75,44 @@ const TLA_TO_ZH: Record<string, string> = {
   GUA: '危地马拉', NCA: '尼加拉瓜', DOM: '多米尼加', CUR: '库拉索', SWE: '瑞典',
 }
 
+const TLA_TO_JA: Record<string, string> = {
+  // Americas
+  MEX: 'メキシコ', USA: 'アメリカ', CAN: 'カナダ', BRA: 'ブラジル', ARG: 'アルゼンチン',
+  COL: 'コロンビア', URU: 'ウルグアイ', URY: 'ウルグアイ', ECU: 'エクアドル', PAR: 'パラグアイ', BOL: 'ボリビア',
+  VEN: 'ベネズエラ', CHI: 'チリ', PER: 'ペルー', CRC: 'コスタリカ', PAN: 'パナマ',
+  JAM: 'ジャマイカ', HON: 'ホンジュラス', SLV: 'エルサルバドル',
+  GUA: 'グアテマラ', NCA: 'ニカラグア', DOM: 'ドミニカ共和国', TRI: 'トリニダード・トバゴ',
+  CUB: 'キューバ', HAI: 'ハイチ', SUR: 'スリナム', GUY: 'ガイアナ', CUR: 'キュラソー',
+  // Europe
+  FRA: 'フランス', GER: 'ドイツ', ESP: 'スペイン', ENG: 'イングランド', POR: 'ポルトガル',
+  NED: 'オランダ', BEL: 'ベルギー', ITA: 'イタリア', CRO: 'クロアチア', SRB: 'セルビア',
+  SUI: 'スイス', DEN: 'デンマーク', AUT: 'オーストリア', SVK: 'スロバキア', SCO: 'スコットランド',
+  TUR: 'トルコ', POL: 'ポーランド', ROU: 'ルーマニア', UKR: 'ウクライナ', HUN: 'ハンガリー',
+  SVN: 'スロベニア', GRE: 'ギリシャ', GEO: 'ジョージア', WAL: 'ウェールズ', NIR: '北アイルランド',
+  CZE: 'チェコ', NOR: 'ノルウェー', BIH: 'ボスニア・ヘルツェゴビナ', MKD: '北マケドニア',
+  ALB: 'アルバニア', MNE: 'モンテネグロ', ISL: 'アイスランド', FIN: 'フィンランド',
+  LUX: 'ルクセンブルク', KVX: 'コソボ', ARM: 'アルメニア', IRL: 'アイルランド', CYP: 'キプロス',
+  SWE: 'スウェーデン',
+  // Africa
+  MAR: 'モロッコ', SEN: 'セネガル', EGY: 'エジプト', CMR: 'カメルーン', NGA: 'ナイジェリア',
+  CIV: 'コートジボワール', ALG: 'アルジェリア', TUN: 'チュニジア', MLI: 'マリ', RSA: '南アフリカ',
+  GHA: 'ガーナ', ZIM: 'ジンバブエ', MOZ: 'モザンビーク', UGA: 'ウガンダ', TAN: 'タンザニア',
+  COD: 'コンゴ民主共和国', ZAM: 'ザンビア', CPV: 'カーボベルデ', GUI: 'ギニア', KEN: 'ケニア',
+  ANG: 'アンゴラ', GAB: 'ガボン', NIG: 'ニジェール', ETH: 'エチオピア',
+  BEN: 'ベナン', BFA: 'ブルキナファソ', EQG: '赤道ギニア', COM: 'コモロ',
+  // Asia
+  JPN: '日本', KOR: '韓国', AUS: 'オーストラリア', QAT: 'カタール', UZB: 'ウズベキスタン',
+  IRN: 'イラン', KSA: 'サウジアラビア', CHN: '中国', IND: 'インド', THA: 'タイ',
+  JOR: 'ヨルダン', IRQ: 'イラク', KUW: 'クウェート', IDN: 'インドネシア', VIE: 'ベトナム',
+  // Oceania
+  NZL: 'ニュージーランド', FIJ: 'フィジー',
+}
+
+export function getTeamJa(tla: string | null | undefined): string | null {
+  if (!tla) return null
+  return TLA_TO_JA[tla.toUpperCase()] ?? null
+}
+
 export function getFlagUrl(tla: string | null | undefined): string | null {
   if (!tla) return null
   const iso2 = TLA_TO_ISO2[tla.toUpperCase()]

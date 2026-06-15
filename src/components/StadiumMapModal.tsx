@@ -2,6 +2,7 @@
 
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { getFlagUrl } from '@/lib/flags'
+import TeamName from './TeamName'
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
 
@@ -71,12 +72,12 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               {homeFlagUrl && <img src={homeFlagUrl} alt={homeTeam} className="w-6 h-4 object-cover rounded-sm" />}
-              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{homeTeam}</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100"><TeamName tla={homeTla} zh={homeTeam} /></span>
             </div>
             <span className="text-gray-300 dark:text-gray-600 text-xs">vs</span>
             <div className="flex items-center gap-1.5">
               {awayFlagUrl && <img src={awayFlagUrl} alt={awayTeam} className="w-6 h-4 object-cover rounded-sm" />}
-              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{awayTeam}</span>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100"><TeamName tla={awayTla} zh={awayTeam} /></span>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none ml-3">✕</button>

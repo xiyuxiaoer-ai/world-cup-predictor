@@ -5,6 +5,7 @@ import type { GameWithRole, Match, Prediction } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import PredictionCard from './PredictionCard'
+import TeamName from './TeamName'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
 import JoinGameModal from './JoinGameModal'
@@ -173,7 +174,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 flex-1">
             {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{homeTla}</button>
+            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).home_tla} zh={homeTla} /></button>
           </div>
           <div className="text-center shrink-0 px-2">
             {match.status === 'finished' ? (
@@ -193,7 +194,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             )}
           </div>
           <div className="flex items-center gap-1.5 flex-1 justify-end">
-            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{awayTla}</button>
+            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).away_tla} zh={awayTla} /></button>
             {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
           </div>
         </div>
@@ -514,7 +515,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                       <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
                         <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0">
                           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{homeTla}</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={(m as any).home_tla} zh={homeTla} /></span>
                         </div>
                         <div className="shrink-0 px-2 text-center">
                           {finished ? (
@@ -524,7 +525,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                           )}
                         </div>
                         <div className="flex items-center gap-1.5 flex-1 justify-start min-w-0">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{awayTla}</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={(m as any).away_tla} zh={awayTla} /></span>
                           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                         </div>
                       </div>

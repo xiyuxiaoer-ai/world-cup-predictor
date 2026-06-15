@@ -8,6 +8,7 @@ import ScrollingBanner from './ScrollingBanner'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
+import TeamName from './TeamName'
 
 const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
@@ -207,7 +208,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-1.5 flex-1 justify-end">
-                      <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-bold hover:text-amber-500 transition-colors">{homeName}</button>
+                      <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-bold hover:text-amber-500 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
                     </div>
                     <div className="text-center shrink-0 px-2">
@@ -227,7 +228,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                     </div>
                     <div className="flex items-center gap-1.5 flex-1 justify-start">
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-                      <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-bold hover:text-amber-500 transition-colors">{awayName}</button>
+                      <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-bold hover:text-amber-500 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
                     </div>
                   </div>
                 </div>
@@ -455,7 +456,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                       <div className="flex-1 flex items-center justify-between gap-2 min-w-0">
                         <div className="flex items-center gap-1.5 flex-1 justify-end min-w-0">
                           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{homeTla}</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={m.home_tla} zh={homeTla} /></span>
                         </div>
                         <div className="shrink-0 px-2 text-center">
                           {finished ? (
@@ -465,7 +466,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                           )}
                         </div>
                         <div className="flex items-center gap-1.5 flex-1 justify-start min-w-0">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{awayTla}</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={m.away_tla} zh={awayTla} /></span>
                           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                         </div>
                       </div>

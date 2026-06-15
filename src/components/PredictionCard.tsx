@@ -6,6 +6,7 @@ import type { Match, Prediction } from '@/types'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
+import TeamName from './TeamName'
 
 const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
@@ -90,13 +91,13 @@ export default function PredictionCard({
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 flex-1 justify-end">
-            <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{homeName}</button>
+            <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
             {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
           </div>
           <div className="shrink-0 px-3 text-gray-900 dark:text-gray-100 font-bold text-base">{prediction.pred_home_score} – {prediction.pred_away_score}</div>
           <div className="flex items-center gap-1.5 flex-1 justify-start">
             {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-            <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{awayName}</button>
+            <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
           </div>
         </div>
         <p className="text-xs text-gray-400 dark:text-gray-500 text-center">竞猜已锁定，不可修改</p>
@@ -140,7 +141,7 @@ export default function PredictionCard({
 
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{homeName}</button>
+          <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
         </div>
         <div className="flex items-center gap-1 shrink-0">
@@ -150,7 +151,7 @@ export default function PredictionCard({
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-start">
           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-          <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left hover:text-amber-500 dark:hover:text-amber-400 transition-colors">{awayName}</button>
+          <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
         </div>
       </div>
 
