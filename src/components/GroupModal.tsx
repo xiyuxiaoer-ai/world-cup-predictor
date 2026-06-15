@@ -144,18 +144,23 @@ export default function GroupModal({
                           <span className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {m.home_score_pen}–{m.away_score_pen}</span>
                         )}
                         {m.userPrediction && (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我: {m.userPrediction.pred_home_score}–{m.userPrediction.pred_away_score}</span>
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {m.userPrediction.pred_home_score}–{m.userPrediction.pred_away_score}</span>
                         )}
                       </>
-                    ) : m.userPrediction ? (
-                      <span className="text-[10px] text-amber-500 font-medium leading-tight whitespace-nowrap">我: {m.userPrediction.pred_home_score}–{m.userPrediction.pred_away_score}</span>
                     ) : (
-                      <button
-                        onClick={() => { onClose(); onPredictClick() }}
-                        className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap"
-                      >
-                        待猜球
-                      </button>
+                      <>
+                        <span className="text-gray-300 dark:text-gray-600 text-sm font-bold leading-tight">vs</span>
+                        {m.userPrediction ? (
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {m.userPrediction.pred_home_score}–{m.userPrediction.pred_away_score}</span>
+                        ) : (
+                          <button
+                            onClick={() => { onClose(); onPredictClick() }}
+                            className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap leading-tight mt-0.5"
+                          >
+                            待猜球
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="w-1/2 flex flex-col pl-8">
