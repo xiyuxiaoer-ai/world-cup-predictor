@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import type { GameWithRole, Match, Prediction } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
-import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
+import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
 import PredictionCard from './PredictionCard'
 import TeamName from './TeamName'
 import Leaderboard from './Leaderboard'
@@ -148,6 +148,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     const awayTla = getTeamDisplay((match as any).away_tla, match.away_team)
     const homeFlagUrl = getFlagUrl((match as any).home_tla)
     const awayFlagUrl = getFlagUrl((match as any).away_tla)
+    const homeJa = getTeamJa((match as any).home_tla)
+    const awayJa = getTeamJa((match as any).away_tla)
     const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
 
     return (
@@ -172,9 +174,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </span>
         </div>
         <div className="relative flex items-center">
-          <div className="w-1/2 flex items-start justify-start gap-1.5 pr-10">
-            {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0 mt-[3px]" />}
-            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).home_tla} zh={homeTla} /></button>
+          <div className="w-1/2 flex flex-col pr-10">
+            <div className="flex items-center gap-1.5">
+              {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+              <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{homeTla}</button>
+            </div>
+            {homeJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pl-[30px]">{homeJa}</span>}
           </div>
           <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2">
             {match.status === 'finished' ? (
@@ -193,9 +198,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
             )}
           </div>
-          <div className="w-1/2 flex items-start gap-1.5 justify-end pl-10">
-            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors text-right"><TeamName tla={(match as any).away_tla} zh={awayTla} /></button>
-            {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0 mt-[3px]" />}
+          <div className="w-1/2 flex flex-col pl-10 items-end">
+            <div className="flex items-center gap-1.5">
+              <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors">{awayTla}</button>
+              {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+            </div>
+            {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pr-[30px]">{awayJa}</span>}
           </div>
         </div>
         <div className="text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
