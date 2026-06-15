@@ -1,10 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import type { Match, Prediction } from '@/types'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
+
+const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
 const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
 const STAGE_LABELS: Record<string, string> = {
@@ -28,6 +31,7 @@ export default function PredictionCard({
   const [error, setError] = useState('')
   const [done, setDone] = useState(!!prediction)
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
+  const [showMap, setShowMap] = useState(false)
 
   const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
   const isDraw = homeScore !== '' && awayScore !== '' && homeScore === awayScore
@@ -80,7 +84,7 @@ export default function PredictionCard({
                 {STAGE_LABELS[match.stage]}{match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
               </button>
             </span>
-            {venue && <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">📍 {venue.city} · {venue.stadium}</span>}
+            {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors">📍 {venue.city} · {venue.stadium}</button>}
           </div>
           <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-medium shrink-0 ml-2">✓ 已提交</span>
         </div>
@@ -100,6 +104,16 @@ export default function PredictionCard({
       {historyTeam && (
         <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
       )}
+      {showMap && venue && (
+        <StadiumMapModal
+          homeTla={match.home_tla!}
+          awayTla={match.away_tla!}
+          homeTeam={homeName}
+          awayTeam={awayName}
+          venue={venue}
+          onClose={() => setShowMap(false)}
+        />
+      )}
       </>
     )
   }
@@ -116,7 +130,7 @@ export default function PredictionCard({
               {STAGE_LABELS[match.stage]}{match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
             </button>
           </span>
-          {venue && <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">📍 {venue.city} · {venue.stadium}</span>}
+          {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors">📍 {venue.city} · {venue.stadium}</button>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {isDouble && <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded font-semibold">🔥 双倍积分</span>}
@@ -174,6 +188,16 @@ export default function PredictionCard({
 
       {historyTeam && (
         <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
+      )}
+      {showMap && venue && (
+        <StadiumMapModal
+          homeTla={match.home_tla!}
+          awayTla={match.away_tla!}
+          homeTeam={homeName}
+          awayTeam={awayName}
+          venue={venue}
+          onClose={() => setShowMap(false)}
+        />
       )}
     </form>
   )
