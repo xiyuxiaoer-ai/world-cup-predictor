@@ -435,8 +435,13 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 ? { pred_home_score: predictions[m.id].pred_home_score, pred_away_score: predictions[m.id].pred_away_score }
                 : null
             }))}
+          gameId={selectedGameId}
           onClose={() => setGroupModal(null)}
-          onPredictClick={() => {}}
+          onPredictionSaved={() => {
+            fetch(`/api/matches?game_id=${selectedGameId}`)
+              .then(r => r.json())
+              .then(d => { setMatches(d.matches || []); setPredictions(d.predictions || {}) })
+          }}
         />
       )}
     </div>

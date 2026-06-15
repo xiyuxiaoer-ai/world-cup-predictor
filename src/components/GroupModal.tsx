@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
 
 export interface GroupModalMatch {
@@ -24,14 +25,56 @@ export interface GroupModalMatch {
 export default function GroupModal({
   label,
   matches,
+  gameId,
   onClose,
-  onPredictClick,
+  onPredictionSaved,
 }: {
   label: string
   matches: GroupModalMatch[]
+  gameId: string
   onClose: () => void
-  onPredictClick: () => void
+  onPredictionSaved?: () => void
 }) {
+  const [predictingMatch, setPredictingMatch] = useState<GroupModalMatch | null>(null)
+  const [predHome, setPredHome] = useState('')
+  const [predAway, setPredAway] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const [localPredictions, setLocalPredictions] = useState<Record<string, { pred_home_score: number; pred_away_score: number }>>({})
+
+  async function handleSave() {
+    if (!predictingMatch || predHome === '' || predAway === '') return
+    setSaving(true)
+    setSaveError('')
+    try {
+      const res = await fetch('/api/predictions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          game_id: gameId,
+          match_id: predictingMatch.id,
+          pred_home_score: parseInt(predHome),
+          pred_away_score: parseInt(predAway),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setSaveError(data.error || '保存失败')
+      } else {
+        setLocalPredictions(prev => ({
+          ...prev,
+          [predictingMatch.id]: { pred_home_score: parseInt(predHome), pred_away_score: parseInt(predAway) },
+        }))
+        setPredictingMatch(null)
+        onPredictionSaved?.()
+      }
+    } catch {
+      setSaveError('网络错误，请重试')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const standings = (() => {
     if (!matches[0]?.group_name) return []
     const tm: Record<string, { tla: string; name: string; played: number; won: number; drawn: number; lost: number; gf: number; ga: number; pts: number }> = {}
@@ -59,7 +102,65 @@ export default function GroupModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+
+        {/* 猜分浮层 */}
+        {predictingMatch && (
+          <div className="absolute inset-0 bg-white dark:bg-gray-900 z-10 flex flex-col rounded-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+              <button onClick={() => { setPredictingMatch(null); setSaveError('') }} className="text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">← 返回</button>
+              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">猜比分</span>
+              <div className="w-12" />
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center gap-6 px-6 py-8">
+              {/* 队名 + 国旗 */}
+              <div className="flex items-center justify-center gap-3 w-full">
+                <div className="flex flex-col items-center gap-1 flex-1">
+                  {getFlagUrl(predictingMatch.home_tla) && (
+                    <img src={getFlagUrl(predictingMatch.home_tla)!} alt="" className="w-8 h-5.5 object-cover rounded-sm" />
+                  )}
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-center">{getTeamDisplay(predictingMatch.home_tla, predictingMatch.home_team)}</span>
+                </div>
+                <span className="text-gray-300 dark:text-gray-600 text-sm font-bold shrink-0">vs</span>
+                <div className="flex flex-col items-center gap-1 flex-1">
+                  {getFlagUrl(predictingMatch.away_tla) && (
+                    <img src={getFlagUrl(predictingMatch.away_tla)!} alt="" className="w-8 h-5.5 object-cover rounded-sm" />
+                  )}
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-center">{getTeamDisplay(predictingMatch.away_tla, predictingMatch.away_team)}</span>
+                </div>
+              </div>
+
+              {/* 比分输入 */}
+              <div className="flex items-center gap-4">
+                <input
+                  type="number" min="0" max="20" value={predHome}
+                  onChange={e => setPredHome(e.target.value)}
+                  placeholder="0"
+                  className="w-18 h-16 text-center text-2xl font-bold border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-500 focus:outline-none"
+                />
+                <span className="text-gray-400 dark:text-gray-500 text-2xl font-bold">–</span>
+                <input
+                  type="number" min="0" max="20" value={predAway}
+                  onChange={e => setPredAway(e.target.value)}
+                  placeholder="0"
+                  className="w-18 h-16 text-center text-2xl font-bold border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+
+              {saveError && <p className="text-red-500 text-xs">{saveError}</p>}
+
+              <button
+                onClick={handleSave}
+                disabled={saving || predHome === '' || predAway === ''}
+                className="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-200 dark:disabled:bg-gray-700 text-white disabled:text-gray-400 rounded-xl font-semibold transition-colors"
+              >
+                {saving ? '保存中...' : '确认猜测'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 弹窗主内容 */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
           <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{label} · 全部比赛</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
@@ -113,6 +214,7 @@ export default function GroupModal({
             const awayJa = getTeamJa(m.away_tla)
             const kickoff = new Date(m.kickoff_time)
             const finished = m.status === 'finished'
+            const effectivePrediction = m.userPrediction || localPredictions[m.id] || null
             return (
               <div key={m.id} className="flex items-center gap-3 px-5 py-3">
                 <div className="text-xs text-gray-400 dark:text-gray-500 w-14 shrink-0 text-center">
@@ -143,18 +245,18 @@ export default function GroupModal({
                         {m.home_score_pen != null && (
                           <span className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {m.home_score_pen}–{m.away_score_pen}</span>
                         )}
-                        {m.userPrediction && (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {m.userPrediction.pred_home_score}–{m.userPrediction.pred_away_score}</span>
+                        {effectivePrediction && (
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}</span>
                         )}
                       </>
                     ) : (
                       <>
                         <span className="text-gray-300 dark:text-gray-600 text-sm font-bold leading-tight">vs</span>
-                        {m.userPrediction ? (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {m.userPrediction.pred_home_score}–{m.userPrediction.pred_away_score}</span>
+                        {effectivePrediction ? (
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}</span>
                         ) : (
                           <button
-                            onClick={() => { onClose(); onPredictClick() }}
+                            onClick={() => { setPredictingMatch(m); setPredHome(''); setPredAway(''); setSaveError('') }}
                             className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap leading-tight mt-0.5"
                           >
                             待猜球

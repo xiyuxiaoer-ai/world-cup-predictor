@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import GroupModal from './GroupModal'
 import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
@@ -22,7 +21,6 @@ const STAGE_LABELS: Record<string, string> = {
 type Filter = 'all' | 'finished' | 'upcoming'
 
 export default function RecordsContent({ games }: { games: GameWithRole[] }) {
-  const router = useRouter()
   const [selectedGameId, setSelectedGameId] = useSelectedGame(games)
   const [matches, setMatches] = useState<any[]>([])
   const [members, setMembers] = useState<any[]>([])
@@ -379,8 +377,13 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                 ? { pred_home_score: m.user_prediction.pred_home_score, pred_away_score: m.user_prediction.pred_away_score }
                 : null
             }))}
+          gameId={selectedGameId}
           onClose={() => setGroupModal(null)}
-          onPredictClick={() => router.push('/')}
+          onPredictionSaved={() => {
+            fetch(`/api/records?game_id=${selectedGameId}`)
+              .then(r => r.json())
+              .then(data => { setMatches(data.matches || []); setMembers(data.members || []) })
+          }}
         />
       )}
     </div>
