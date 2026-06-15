@@ -472,15 +472,13 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                             </>
                           ) : m.user_prediction ? (
                             <span className="text-[10px] text-amber-500 font-medium leading-tight whitespace-nowrap">我: {m.user_prediction.pred_home_score}–{m.user_prediction.pred_away_score}</span>
-                          ) : new Date() < new Date(m.lock_time) ? (
+                          ) : (
                             <button
                               onClick={() => { setGroupModal(null); router.push('/') }}
                               className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap"
                             >
                               待猜球
                             </button>
-                          ) : (
-                            <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                           )}
                         </div>
                         <div className="w-1/2 flex flex-col pl-8">
