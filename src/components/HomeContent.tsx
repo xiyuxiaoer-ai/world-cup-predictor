@@ -152,7 +152,17 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     return (
       <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-3 space-y-2 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
         <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
-          <span>{STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}</span>
+          <button
+            type="button"
+            onClick={() => setGroupModal({
+              stage: match.stage,
+              group_name: match.group_name ?? null,
+              label: `${STAGE_LABELS[match.stage]}${group ? ' ' + group : ''}`,
+            })}
+            className="underline decoration-dotted hover:text-amber-500 transition-colors"
+          >
+            {STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}
+          </button>
           <span>
             {match.status === 'finished'
               ? '已结束'
