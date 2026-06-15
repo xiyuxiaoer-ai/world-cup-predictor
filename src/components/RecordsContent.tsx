@@ -346,6 +346,31 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
           groupModal.group_name ? m.group_name === groupModal.group_name : m.stage === groupModal.stage
         ).sort((a, b) => new Date(a.kickoff_time).getTime() - new Date(b.kickoff_time).getTime())
 
+        const standings = (() => {
+          if (!groupModal.group_name) return []
+          const tm: Record<string, { tla: string; name: string; played: number; won: number; drawn: number; lost: number; gf: number; ga: number; pts: number }> = {}
+          groupMatches.forEach(m => {
+            const hTla = m.home_tla || m.home_team
+            const aTla = m.away_tla || m.away_team
+            if (!tm[hTla]) tm[hTla] = { tla: hTla, name: getTeamDisplay(m.home_tla, m.home_team), played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 }
+            if (!tm[aTla]) tm[aTla] = { tla: aTla, name: getTeamDisplay(m.away_tla, m.away_team), played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 }
+            if (m.status === 'finished' && m.home_score_90 != null && m.away_score_90 != null) {
+              const h = m.home_score_90; const a = m.away_score_90
+              tm[hTla].played++; tm[aTla].played++
+              tm[hTla].gf += h; tm[hTla].ga += a
+              tm[aTla].gf += a; tm[aTla].ga += h
+              if (h > a) { tm[hTla].won++; tm[hTla].pts += 3; tm[aTla].lost++ }
+              else if (h === a) { tm[hTla].drawn++; tm[hTla].pts++; tm[aTla].drawn++; tm[aTla].pts++ }
+              else { tm[aTla].won++; tm[aTla].pts += 3; tm[hTla].lost++ }
+            }
+          })
+          return Object.values(tm).sort((a, b) =>
+            b.pts !== a.pts ? b.pts - a.pts :
+            (b.gf - b.ga) !== (a.gf - a.ga) ? (b.gf - b.ga) - (a.gf - a.ga) :
+            b.gf - a.gf
+          )
+        })()
+
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setGroupModal(null)}>
             <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
@@ -353,6 +378,46 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                 <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{groupModal.label} · 全部比赛</h2>
                 <button onClick={() => setGroupModal(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
               </div>
+              {standings.length > 0 && (
+                <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-gray-400 dark:text-gray-500">
+                        <th className="text-left pb-1.5 font-medium w-5">#</th>
+                        <th className="text-left pb-1.5 font-medium">球队</th>
+                        <th className="text-center pb-1.5 font-medium w-7">赛</th>
+                        <th className="text-center pb-1.5 font-medium w-7">胜</th>
+                        <th className="text-center pb-1.5 font-medium w-7">平</th>
+                        <th className="text-center pb-1.5 font-medium w-7">负</th>
+                        <th className="text-center pb-1.5 font-medium w-12">进/失</th>
+                        <th className="text-center pb-1.5 font-medium w-8">积分</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {standings.map((team, idx) => {
+                        const flagUrl = getFlagUrl(team.tla)
+                        return (
+                          <tr key={team.tla} className="border-t border-gray-100 dark:border-gray-800">
+                            <td className="py-1.5 text-gray-400 dark:text-gray-500">{idx + 1}</td>
+                            <td className="py-1.5">
+                              <div className="flex items-center gap-1.5">
+                                {flagUrl && <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
+                                <span className="font-medium text-gray-900 dark:text-gray-100 truncate">{team.name}</span>
+                              </div>
+                            </td>
+                            <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.played}</td>
+                            <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.won}</td>
+                            <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.drawn}</td>
+                            <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.lost}</td>
+                            <td className="py-1.5 text-center text-gray-500 dark:text-gray-400">{team.gf}/{team.ga}</td>
+                            <td className="py-1.5 text-center font-bold text-gray-900 dark:text-gray-100">{team.pts}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
               <div className="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-gray-800">
                 {groupMatches.map(m => {
                   const homeTla = getTeamDisplay(m.home_tla, m.home_team)
