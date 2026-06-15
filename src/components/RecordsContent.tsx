@@ -450,19 +450,19 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                           </>
                         )}
                       </div>
-                      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-1 flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 justify-end">
+                      <div className="relative flex items-center flex-1 min-w-0">
+                        <div className="w-1/2 flex items-center gap-1.5 justify-end pr-8">
                           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 text-right"><TeamName tla={m.home_tla} zh={homeTla} /></span>
                           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                         </div>
-                        <div className="px-2 text-center">
+                        <div className="absolute left-1/2 -translate-x-1/2 text-center">
                           {finished ? (
                             <span className="text-base font-bold text-gray-900 dark:text-gray-100">{m.home_score_90} – {m.away_score_90}</span>
                           ) : (
                             <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-1.5 justify-start">
+                        <div className="w-1/2 flex items-center gap-1.5 justify-start pl-8">
                           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                           <span className="text-sm font-medium text-gray-900 dark:text-gray-100"><TeamName tla={m.away_tla} zh={awayTla} /></span>
                         </div>
