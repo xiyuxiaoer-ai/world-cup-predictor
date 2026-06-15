@@ -171,12 +171,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             }
           </span>
         </div>
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 flex-1">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-x-2">
+          <div className="flex items-center gap-1.5 justify-start">
             {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
             <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).home_tla} zh={homeTla} /></button>
           </div>
-          <div className="text-center shrink-0 px-2">
+          <div className="text-center px-2">
             {match.status === 'finished' ? (
               <div>
                 <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
@@ -193,8 +193,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
             )}
           </div>
-          <div className="flex items-center gap-1.5 flex-1 justify-end">
-            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).away_tla} zh={awayTla} /></button>
+          <div className="flex items-center gap-1.5 justify-end">
+            <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors text-right"><TeamName tla={(match as any).away_tla} zh={awayTla} /></button>
             {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
           </div>
         </div>
