@@ -172,11 +172,11 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </span>
         </div>
         <div className="relative flex items-center">
-          <div className="w-1/2 flex items-center gap-1.5 pr-10">
-            {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+          <div className="w-1/2 flex items-start gap-1.5 pr-10">
+            {homeFlagUrl && <img src={homeFlagUrl} alt={homeTla} className="w-6 h-4 object-cover rounded-sm shrink-0 mt-[3px]" />}
             <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).home_tla, name: match.home_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors"><TeamName tla={(match as any).home_tla} zh={homeTla} /></button>
           </div>
-          <div className="absolute left-1/2 -translate-x-1/2 text-center">
+          <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2">
             {match.status === 'finished' ? (
               <div>
                 <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
@@ -193,9 +193,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               <span className="text-gray-300 dark:text-gray-600 text-sm font-bold">vs</span>
             )}
           </div>
-          <div className="w-1/2 flex items-center gap-1.5 justify-end pl-10">
+          <div className="w-1/2 flex items-start gap-1.5 justify-end pl-10">
             <button type="button" onClick={() => setHistoryTeam({ tla: (match as any).away_tla, name: match.away_team })} className="text-sm font-bold tracking-wide hover:text-amber-500 transition-colors text-right"><TeamName tla={(match as any).away_tla} zh={awayTla} /></button>
-            {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0" />}
+            {awayFlagUrl && <img src={awayFlagUrl} alt={awayTla} className="w-6 h-4 object-cover rounded-sm shrink-0 mt-[3px]" />}
           </div>
         </div>
         <div className="text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
