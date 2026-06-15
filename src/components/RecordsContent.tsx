@@ -23,7 +23,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [matches, setMatches] = useState<any[]>([])
   const [members, setMembers] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [filter, setFilter] = useState<Filter>('finished')
+  const [filter, setFilter] = useState<Filter>('upcoming')
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
   const [leaderboard, setLeaderboard] = useState<any[]>([])
@@ -151,7 +151,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
         <div className="flex gap-1">
-          {(['finished', 'upcoming', 'all'] as Filter[]).map(f => (
+          {(['upcoming', 'finished', 'all'] as Filter[]).map(f => (
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-amber-500 text-white' : 'text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'}`}>
               {f === 'finished' ? '已结束' : f === 'upcoming' ? '待开赛' : '全部'}
