@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
+import TeamHistoryModal from './TeamHistoryModal'
 
 export interface GroupModalMatch {
   id: string
@@ -41,6 +42,7 @@ export default function GroupModal({
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [localPredictions, setLocalPredictions] = useState<Record<string, { pred_home_score: number; pred_away_score: number }>>({})
+  const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
 
   async function handleSave() {
     if (!predictingMatch || predHome === '' || predAway === '') return
@@ -101,6 +103,7 @@ export default function GroupModal({
   })()
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
 
@@ -230,7 +233,7 @@ export default function GroupModal({
                 <div className="relative flex items-start flex-1 min-w-0">
                   <div className="w-1/2 flex flex-col pr-8">
                     <div className="flex items-center gap-1.5 justify-end">
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{homeTla}</span>
+                      <button type="button" onClick={() => m.home_tla && setHistoryTeam({ tla: m.home_tla, name: m.home_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors">{homeTla}</button>
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                     </div>
                     {homeJa && <span className="w-full text-[10px] font-normal text-gray-400 dark:text-gray-500 text-right pr-[26px]">{homeJa}</span>}
@@ -268,7 +271,7 @@ export default function GroupModal({
                   <div className="w-1/2 flex flex-col pl-8">
                     <div className="flex items-center gap-1.5">
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{awayTla}</span>
+                      <button type="button" onClick={() => m.away_tla && setHistoryTeam({ tla: m.away_tla, name: m.away_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors">{awayTla}</button>
                     </div>
                     {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pl-[26px]">{awayJa}</span>}
                   </div>
@@ -279,5 +282,10 @@ export default function GroupModal({
         </div>
       </div>
     </div>
+
+    {historyTeam && (
+      <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
+    )}
+    </>
   )
 }
