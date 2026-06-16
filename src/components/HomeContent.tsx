@@ -37,6 +37,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [confirmDeleteGame, setConfirmDeleteGame] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState('')
+  const [leaderboardKey, setLeaderboardKey] = useState(0)
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [groupModal, setGroupModal] = useState<{ stage: string; group_name: string | null; label: string } | null>(null)
 
@@ -98,6 +99,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       await fetch(`/api/matches?game_id=${selectedGameId}`)
         .then(r => r.json())
         .then(d => { setMatches(d.matches || []); setPredictions(d.predictions || {}) })
+      setLeaderboardKey(k => k + 1)
     } else {
       setSyncMsg('更新失败')
     }
@@ -357,7 +359,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             </div>
             <div>
               <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">积分榜</h2>
-              <Leaderboard gameId={selectedGameId} />
+              <Leaderboard key={leaderboardKey} gameId={selectedGameId} />
             </div>
           </div>
 
