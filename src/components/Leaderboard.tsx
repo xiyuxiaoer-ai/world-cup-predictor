@@ -93,7 +93,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                     <div className="text-xs text-gray-400 dark:text-gray-500">
                       {entry.prediction_count}猜
                       {entry.pending_count > 0 && (
-                        <span className={`ml-1 font-medium ${entry.pending_count > 5 ? 'text-green-500' : entry.pending_count > 3 ? 'text-yellow-500' : 'text-red-500'}`}>
+                        <span className={`ml-1 font-medium ${entry.pending_count > 10 ? 'text-green-500' : entry.pending_count > 5 ? 'text-orange-400' : 'text-red-500'}`}>
                           · {entry.pending_count}待开
                         </span>
                       )}
