@@ -62,7 +62,6 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
       return matches
         .filter(m => m.status === 'finished')
         .sort((a, b) => new Date(b.kickoff_time).getTime() - new Date(a.kickoff_time).getTime())
-        .slice(0, 5)
     }
     if (filter === 'upcoming') return matches.filter(m => m.status !== 'finished')
     return matches
