@@ -65,6 +65,7 @@ export default function PredictionCard({
   }
 
   const kickoff = new Date(match.kickoff_time)
+  const isNearUnpredicted = !prediction && (kickoff.getTime() - now.getTime()) <= 2 * 24 * 60 * 60 * 1000
   const homeFlagUrl = getFlagUrl(match.home_tla)
   const awayFlagUrl = getFlagUrl(match.away_tla)
   const homeName = getTeamDisplay(match.home_tla, match.home_team)
@@ -123,7 +124,7 @@ export default function PredictionCard({
     <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start gap-1">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
-          <span className="text-xs text-gray-500 dark:text-gray-400 shrink-0">
+          <span className={`text-xs shrink-0 ${isNearUnpredicted ? 'text-red-500 animate-pulse font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
             {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
             {' '}{kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
             {' · '}
