@@ -147,6 +147,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     const pred = predictions[match.id]
     const isLocked = new Date(match.lock_time) <= now
     const kickoff = new Date(match.kickoff_time)
+    const isUrgent = !pred && match.status !== 'finished' && (kickoff.getTime() - now.getTime()) <= 2 * 24 * 60 * 60 * 1000
     const homeTla = getTeamDisplay((match as any).home_tla, match.home_team)
     const awayTla = getTeamDisplay((match as any).away_tla, match.away_team)
     const homeFlagUrl = getFlagUrl((match as any).home_tla)
@@ -169,7 +170,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           >
             {STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}
           </button>
-          <span>
+          <span className={isUrgent ? 'text-red-500 animate-pulse font-medium' : ''}>
             {match.status === 'finished'
               ? '已结束'
               : `${kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })} ${kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
