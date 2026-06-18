@@ -28,15 +28,26 @@ export async function POST() {
 
   const { matches } = await res.json()
 
-  // 拿已经是 finished 且有比分的比赛，防止 API 抖动时把它们覆盖回去
+  // 拿已经是 finished 的比赛
   const { data: alreadyFinished } = await supabaseAdmin
     .from('matches')
     .select('api_match_id, home_score_90, away_score_90, result_90, et_winner, penalty_winner')
     .eq('status', 'finished')
-  // 用 String() 统一类型，避免 number vs string 的 has() 失效
+  // 额外：通过已有积分的预测反查比赛 ID（防止 status 被重置后仍能保护）
+  const { data: scoredPredictions } = await supabaseAdmin
+    .from('predictions')
+    .select('match_id, matches(api_match_id, home_score_90, away_score_90, result_90, et_winner, penalty_winner)')
+    .not('points_earned', 'is', null)
+  // 合并两个来源，用 String() 统一类型，避免 number vs string 的 has() 失效
   const finishedMap = new Map(
     (alreadyFinished || []).map((m: any) => [String(m.api_match_id), m])
   )
+  for (const p of scoredPredictions || []) {
+    const m = Array.isArray(p.matches) ? p.matches[0] : p.matches
+    if (m?.api_match_id != null && !finishedMap.has(String(m.api_match_id))) {
+      finishedMap.set(String(m.api_match_id), m)
+    }
+  }
 
   const transformed = matches.map((match: any) => {
     const kickoffTime = new Date(match.utcDate)
