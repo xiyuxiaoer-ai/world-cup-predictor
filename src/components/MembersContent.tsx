@@ -141,7 +141,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             const isFlipped = flippedCards.has(userId)
 
             return (
-              <div key={userId} className="card-flip-container rounded-2xl" style={{ height: champPreds[userId] ? 250 : 220 }}
+              <div key={userId} className="card-flip-container rounded-2xl" style={{ height: 250 }}
                    onClick={() => handleCardFlip(userId)}>
               <div className={`card-flip-inner ${isFlipped ? 'flipped' : ''}`}>
 
@@ -175,15 +175,22 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   {profile?.bio && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 line-clamp-2">{profile.bio}</p>
                   )}
-                  {champPreds[userId] && (() => {
+                  {(() => {
                     const cp = champPreds[userId]
-                    const teamName = getTeamDisplay(cp.predicted_team_tla, cp.predicted_team)
+                    if (cp) {
+                      const teamName = getTeamDisplay(cp.predicted_team_tla, cp.predicted_team)
+                      return (
+                        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center justify-between gap-1">
+                          <span className="text-xs text-gray-600 dark:text-gray-300 truncate">🏆 {teamName}</span>
+                          <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-500' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-400'}`}>
+                            +{cp.bonus_points}
+                          </span>
+                        </div>
+                      )
+                    }
                     return (
-                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center justify-between gap-1">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate">🏆 {teamName}</span>
-                        <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-500' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-400'}`}>
-                          +{cp.bonus_points}
-                        </span>
+                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center gap-1">
+                        <span className="text-xs text-gray-400 dark:text-gray-500">🏆 彩蛋未猜</span>
                       </div>
                     )
                   })()}
