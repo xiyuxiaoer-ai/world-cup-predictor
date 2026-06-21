@@ -10,7 +10,7 @@ export default function ChampionEggModal({
   onDismiss: () => void
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
         <div className="flex items-start justify-between mb-4">
           <div className="text-4xl">🏆</div>
