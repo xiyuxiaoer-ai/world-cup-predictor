@@ -61,8 +61,8 @@ export default async function RulesPage() {
               { stage: '小组赛期间猜', range: '37–50 分' },
               { stage: '32强期间猜',   range: '29–34 分' },
               { stage: '16强期间猜',   range: '22–26 分' },
-              { stage: '8强期间猜',    range: '17–19 分' },
-              { stage: '4强期间猜',    range: '11–13 分' },
+              { stage: '8强期间猜',    range: '8–10 分' },
+              { stage: '4强期间猜',    range: '4–6 分' },
             ].map(r => (
               <div key={r.stage} className="flex items-center justify-between gap-3">
                 <span className="text-sm text-gray-700 dark:text-gray-200">{r.stage}</span>
