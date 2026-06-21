@@ -28,6 +28,7 @@ export default function ChampionEggModal({
         <div className="space-y-2">
           <a
             href="/rules"
+            onClick={() => sessionStorage.setItem('egg_dismissed', '1')}
             className="block w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm text-center"
           >
             查看彩蛋规则
