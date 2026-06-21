@@ -47,6 +47,35 @@ export default async function RulesPage() {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8 space-y-4">
         <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">积分规则</h1>
 
+        {/* 彩蛋：猜冠军额外奖励 */}
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/10 border border-amber-300 dark:border-amber-600/40 rounded-2xl p-5 space-y-4 shadow-sm">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="font-bold text-base text-gray-900 dark:text-gray-100">🏆 彩蛋：猜冠军</h2>
+              <span className="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-700/40 px-2 py-0.5 rounded-full font-medium">额外奖励</span>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">猜对本届世界杯冠军，可获得额外积分 · 越早猜、积分越高</p>
+          </div>
+          <div className="space-y-2">
+            {[
+              { stage: '小组赛期间猜', range: '37–50 分' },
+              { stage: '32强期间猜',   range: '29–34 分' },
+              { stage: '16强期间猜',   range: '22–26 分' },
+              { stage: '8强期间猜',    range: '17–19 分' },
+              { stage: '4强期间猜',    range: '11–13 分' },
+            ].map(r => (
+              <div key={r.stage} className="flex items-center justify-between gap-3">
+                <span className="text-sm text-gray-700 dark:text-gray-200">{r.stage}</span>
+                <span className="text-sm font-bold text-amber-500 shrink-0">{r.range}</span>
+              </div>
+            ))}
+          </div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 border-t border-amber-100 dark:border-amber-800/30 pt-3 space-y-1">
+            <p>积分每天自动递减，约少 1–2 分 · 距决赛越远得分越高</p>
+            <p>🔒 每人只能猜一次，决赛开始后锁定</p>
+          </div>
+        </div>
+
         {STAGE_RULES.map(stage => (
           <div key={stage.title} className={`bg-white dark:bg-gray-800 border ${stage.color} rounded-2xl p-5 space-y-4 shadow-sm hover:shadow-md transition-shadow`}>
             <div>
