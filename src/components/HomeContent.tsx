@@ -10,7 +10,6 @@ import TeamName from './TeamName'
 import Leaderboard from './Leaderboard'
 import CreateGameModal from './CreateGameModal'
 import JoinGameModal from './JoinGameModal'
-import ScrollingBanner from './ScrollingBanner'
 import TeamHistoryModal from './TeamHistoryModal'
 import ChampionEggModal from './ChampionEggModal'
 import ChampionPredictModal from './ChampionPredictModal'
@@ -131,30 +130,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   }
 
   const [finishedExpanded, setFinishedExpanded] = useState(false)
-
-  const recentResults = matches
-    .filter(m => m.status === 'finished' && m.result_90)
-    .slice(-8)
-    .map(m => {
-      const home = getTeamDisplay((m as any).home_tla, m.home_team)
-      const away = getTeamDisplay((m as any).away_tla, m.away_team)
-      return `✓ ${home} ${m.home_score_90}–${m.away_score_90} ${away}`
-    })
-
-  const upcomingBannerItems = matches
-    .filter(m => m.status === 'scheduled' && new Date(m.kickoff_time) >= now)
-    .slice(0, 8)
-    .map(m => {
-      const home = getTeamDisplay((m as any).home_tla, m.home_team)
-      const away = getTeamDisplay((m as any).away_tla, m.away_team)
-      const d = new Date(m.kickoff_time)
-      const time = d.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' }) + ' ' + d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
-      return `🗓 ${time} ${home} vs ${away}`
-    })
-
-  const homeBannerItems = [...recentResults, ...upcomingBannerItems].length > 0
-    ? [...recentResults, ...upcomingBannerItems]
-    : ['🏆 2026 FIFA World Cup']
 
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
@@ -285,7 +260,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   return (
     <div className="space-y-8">
-      <ScrollingBanner items={homeBannerItems} />
       {/* Game Selector */}
       <div className="space-y-2">
         <select

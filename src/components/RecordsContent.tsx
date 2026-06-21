@@ -5,7 +5,6 @@ import GroupModal from './GroupModal'
 import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
-import ScrollingBanner from './ScrollingBanner'
 import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
@@ -114,20 +113,10 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
     setEditSaving(false)
   }
 
-  const COMMENTS = ['遥遥领先 👑', '紧追不舍 🔥', '不甘落后 💪', '奋起直追 ⚡', '加油别放弃 💫']
-  const recordsBannerItems = leaderboard.length > 0
-    ? leaderboard.map((e, i) => {
-        const name = e.display_name || e.username
-        const comment = COMMENTS[Math.min(i, COMMENTS.length - 1)]
-        return `${['🥇','🥈','🥉'][i] || '·'} ${name} ${e.total_points}分 ${e.total_points > 0 ? comment : '加油！💫'}`
-      })
-    : ['🎯 提交你的竞猜预测', '⏰ 等待比赛结果', '🏆 看谁猜得最准', '⚽ World Cup 2026']
-
   if (!selectedGameId) return <p className="text-gray-500 dark:text-gray-400">你还没有加入任何 Game</p>
 
   return (
     <div className="space-y-5">
-      <ScrollingBanner items={recordsBannerItems} peek={false} />
       <div className="flex items-center justify-between relative z-20">
         <h1 className="text-xl font-bold">竞猜记录</h1>
         <div className="flex items-center gap-2">
