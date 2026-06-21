@@ -26,12 +26,12 @@ export default function ChampionEggModal({
           <p className="text-xs text-amber-500/70 mt-0.5">每天递减，越晚越少</p>
         </div>
         <div className="space-y-2">
-          <button
-            onClick={onPredict}
-            className="w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm"
+          <a
+            href="/rules"
+            className="block w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-colors shadow-sm text-center"
           >
-            马上猜冠军 →
-          </button>
+            查看彩蛋规则
+          </a>
           <button
             onClick={onDismiss}
             className="w-full text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 py-2 transition-colors"
