@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
+import { getTeamDisplay } from '@/lib/flags'
+import { STAGE_LABELS } from '@/lib/championBonus'
 
 const CARD_IMAGES = [
   '/cards/1.png', '/cards/2.png', '/cards/3.png', '/cards/4.png',
@@ -20,6 +22,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
   const [showInviteModal, setShowInviteModal] = useState(false)
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set())
   const [cardImages, setCardImages] = useState<Record<string, string>>({})
+  const [champPreds, setChampPreds] = useState<Record<string, any>>({})
 
   function handleCardFlip(userId: string) {
     setFlippedCards(prev => {
@@ -46,7 +49,8 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
     Promise.all([
       fetch(`/api/games/${selectedGameId}/members`).then(r => r.json()),
       fetch(`/api/leaderboard?game_id=${selectedGameId}`).then(r => r.json()),
-    ]).then(([mem, lb]) => {
+      fetch('/api/champion-prediction').then(r => r.json()),
+    ]).then(([mem, lb, champData]) => {
       const lbList = Array.isArray(lb) ? lb : []
       const memList = Array.isArray(mem) ? mem : []
       memList.sort((a, b) =>
@@ -54,8 +58,20 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       )
       setMembers(memList)
       setLeaderboard(lbList)
+      // 取所有成员的彩蛋预测（需要另一个接口）
       setLoading(false)
     })
+    // 取所有人的彩蛋预测
+    fetch(`/api/champion-prediction/members?game_id=${selectedGameId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const map: Record<string, any> = {}
+          for (const p of data) map[p.user_id] = p
+          setChampPreds(map)
+        }
+      })
+      .catch(() => {})
   }
 
   useEffect(() => { loadMembers() }, [selectedGameId])
@@ -161,7 +177,19 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   {profile?.bio && (
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 line-clamp-2">{profile.bio}</p>
                   )}
-                  <div className="flex items-center justify-end mt-2">
+                  {champPreds[userId] && (() => {
+                    const cp = champPreds[userId]
+                    const teamName = getTeamDisplay(cp.predicted_team_tla, cp.predicted_team)
+                    return (
+                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center justify-between gap-1">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 truncate">🏆 {teamName}</span>
+                        <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-500' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-400'}`}>
+                          +{cp.bonus_points}
+                        </span>
+                      </div>
+                    )
+                  })()}
+                  <div className="flex items-center justify-end mt-1">
                     {isAdmin && !isSelf && (
                       <button
                         onClick={e => { e.stopPropagation(); handleDeleteMember(userId, profile?.display_name || profile?.username) }}

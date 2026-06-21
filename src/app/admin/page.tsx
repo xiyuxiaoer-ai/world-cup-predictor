@@ -10,7 +10,7 @@ const STAGE_LABELS: Record<string, string> = {
   quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
 }
 
-type Tab = 'users' | 'games' | 'predictions'
+type Tab = 'users' | 'games' | 'predictions' | 'champion'
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('users')
@@ -26,6 +26,8 @@ export default function AdminPage() {
   const [newPassword, setNewPassword] = useState('')
   const [msg, setMsg] = useState('')
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [finalizing, setFinalizing] = useState(false)
+  const [finalizeResult, setFinalizeResult] = useState<string>('')
   const router = useRouter()
 
   useEffect(() => {
@@ -86,6 +88,19 @@ export default function AdminPage() {
     setConfirmDelete(null)
   }
 
+  async function handleFinalize() {
+    if (!confirm('确定要结算彩蛋积分吗？此操作只能执行一次！')) return
+    setFinalizing(true); setFinalizeResult('')
+    const res = await fetch('/api/champion-prediction/finalize', { method: 'POST' })
+    const data = await res.json()
+    if (res.ok) {
+      setFinalizeResult(`✅ 结算完成！冠军：${data.champion}，猜中 ${data.correct} 人，更新 ${data.applied} 条积分记录`)
+    } else {
+      setFinalizeResult(`❌ ${data.error}`)
+    }
+    setFinalizing(false)
+  }
+
   async function handleDeletePrediction(id: string) {
     const res = await fetch(`/api/admin/predictions/${id}`, { method: 'DELETE' })
     const data = await res.json()
@@ -136,10 +151,10 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          {(['users', 'games', 'predictions'] as Tab[]).map(t => (
+          {(['users', 'games', 'predictions', 'champion'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
-              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : `猜球管理 (${totalPreds})`}
+              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : '🏆 彩蛋结算'}
             </button>
           ))}
         </div>
@@ -302,6 +317,27 @@ export default function AdminPage() {
                 </div>
               )
             })}
+          </div>
+        )}
+
+        {/* Champion Tab */}
+        {tab === 'champion' && (
+          <div className="space-y-4">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold text-amber-400">🏆 彩蛋：计算最终得分</h2>
+              <p className="text-sm text-zinc-400">决赛结束并同步后，点击下方按钮自动识别冠军，将猜中用户的彩蛋积分写入各 Game 积分榜。</p>
+              <p className="text-xs text-zinc-500">⚠️ 此操作只能执行一次，执行前请确认决赛比赛结果已同步。</p>
+              {finalizeResult && (
+                <div className="text-sm bg-zinc-800 rounded-lg p-3 text-emerald-400 break-all">{finalizeResult}</div>
+              )}
+              <button
+                onClick={handleFinalize}
+                disabled={finalizing}
+                className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                {finalizing ? '结算中...' : '计算最终得分'}
+              </button>
+            </div>
           </div>
         )}
 

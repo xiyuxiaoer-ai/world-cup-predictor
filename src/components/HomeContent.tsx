@@ -12,6 +12,9 @@ import CreateGameModal from './CreateGameModal'
 import JoinGameModal from './JoinGameModal'
 import ScrollingBanner from './ScrollingBanner'
 import TeamHistoryModal from './TeamHistoryModal'
+import ChampionEggModal from './ChampionEggModal'
+import ChampionPredictModal from './ChampionPredictModal'
+import { calculateChampionBonus } from '@/lib/championBonus'
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛',
@@ -39,10 +42,27 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [leaderboardKey, setLeaderboardKey] = useState(0)
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [groupModal, setGroupModal] = useState<{ stage: string; group_name: string | null; label: string } | null>(null)
+  const [showEggModal, setShowEggModal] = useState(false)
+  const [showPredictModal, setShowPredictModal] = useState(false)
+  const [eggBonus, setEggBonus] = useState(0)
 
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
   const now = new Date()
+
+  useEffect(() => {
+    // 检查是否已猜过，未猜且本次 session 未关闭过则弹出
+    if (sessionStorage.getItem('egg_dismissed')) return
+    fetch('/api/champion-prediction')
+      .then(r => r.json())
+      .then(data => {
+        if (!data.prediction && !data.isLocked) {
+          setEggBonus(data.currentBonus || calculateChampionBonus())
+          setShowEggModal(true)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!selectedGameId) return
@@ -434,6 +454,19 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               .then(r => r.json())
               .then(d => { setMatches(d.matches || []); setPredictions(d.predictions || {}) })
           }}
+        />
+      )}
+      {showEggModal && (
+        <ChampionEggModal
+          currentBonus={eggBonus}
+          onPredict={() => { setShowEggModal(false); setShowPredictModal(true) }}
+          onDismiss={() => { setShowEggModal(false); sessionStorage.setItem('egg_dismissed', '1') }}
+        />
+      )}
+      {showPredictModal && (
+        <ChampionPredictModal
+          onClose={() => setShowPredictModal(false)}
+          onSuccess={() => { setShowPredictModal(false); sessionStorage.setItem('egg_dismissed', '1') }}
         />
       )}
     </div>

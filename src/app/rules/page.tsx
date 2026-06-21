@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import PageBackground from '@/components/PageBackground'
+import ChampionButton from '@/components/ChampionButton'
 
 
 const STAGE_RULES = [
@@ -74,6 +75,7 @@ export default async function RulesPage() {
             <p>积分每天自动递减，约少 1–2 分 · 距决赛越远得分越高</p>
             <p>🔒 每人只能猜一次，决赛开始后锁定</p>
           </div>
+          <ChampionButton />
         </div>
 
         {STAGE_RULES.map(stage => (
