@@ -1,12 +1,12 @@
-// Final: July 23, 2026 (approximate kickoff UTC)
 const FINAL_DATE = new Date('2026-07-23T21:00:00Z')
 
 export function calculateChampionBonus(predictedAt: Date = new Date()): number {
-  const daysUntilFinal = (FINAL_DATE.getTime() - predictedAt.getTime()) / (1000 * 60 * 60 * 24)
-  if (daysUntilFinal < 4) return 0 // locked after semi-finals
-  if (daysUntilFinal <= 10) return Math.min(10, Math.round(daysUntilFinal)) // QF/SF: 4–10
-  const raw = Math.round(daysUntilFinal * 1.5) + 5
-  return Math.min(50, raw) // Group/R32/R16: 22–50
+  const d = (FINAL_DATE.getTime() - predictedAt.getTime()) / (1000 * 60 * 60 * 24)
+  if (d < 7) return 0                                   // 锁定（4强结束后）
+  if (d < 15) return Math.round(d - 3)                 // 4强+8强: 4–10
+  if (d < 19) return Math.round(d * 4 / 3 + 2)        // 16强: 22–26
+  if (d < 25) return Math.round(d + 10)                // 32强: 29–34
+  return Math.min(50, Math.round(d * 2.2 - 18))        // 小组赛: 37–50
 }
 
 export const STAGE_LABELS: Record<string, string> = {
