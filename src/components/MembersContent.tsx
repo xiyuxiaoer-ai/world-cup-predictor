@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
-import { getTeamDisplay } from '@/lib/flags'
+import { getTeamDisplay, getFlagUrl } from '@/lib/flags'
 import { STAGE_LABELS } from '@/lib/championBonus'
 
 const CARD_IMAGES = [
@@ -179,9 +179,12 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                     const cp = champPreds[userId]
                     if (cp) {
                       const teamName = getTeamDisplay(cp.predicted_team_tla, cp.predicted_team)
+                      const flagUrl = getFlagUrl(cp.predicted_team_tla)
                       return (
                         <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center justify-between gap-1">
-                          <span className="text-xs text-gray-600 dark:text-gray-300 truncate">🏆 {teamName}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-300 truncate flex items-center gap-1">
+                            🏆{flagUrl && <img src={flagUrl} alt="" className="inline w-4 h-3 object-cover rounded-sm" />}{teamName}
+                          </span>
                           <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-500' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-400'}`}>
                             +{cp.bonus_points}
                           </span>
