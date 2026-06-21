@@ -49,8 +49,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
     Promise.all([
       fetch(`/api/games/${selectedGameId}/members`).then(r => r.json()),
       fetch(`/api/leaderboard?game_id=${selectedGameId}`).then(r => r.json()),
-      fetch('/api/champion-prediction').then(r => r.json()),
-    ]).then(([mem, lb, champData]) => {
+    ]).then(([mem, lb]) => {
       const lbList = Array.isArray(lb) ? lb : []
       const memList = Array.isArray(mem) ? mem : []
       memList.sort((a, b) =>
@@ -58,7 +57,6 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       )
       setMembers(memList)
       setLeaderboard(lbList)
-      // 取所有成员的彩蛋预测（需要另一个接口）
       setLoading(false)
     })
     // 取所有人的彩蛋预测
@@ -143,7 +141,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             const isFlipped = flippedCards.has(userId)
 
             return (
-              <div key={userId} className="card-flip-container rounded-2xl" style={{ height: 220 }}
+              <div key={userId} className="card-flip-container rounded-2xl" style={{ height: champPreds[userId] ? 250 : 220 }}
                    onClick={() => handleCardFlip(userId)}>
               <div className={`card-flip-inner ${isFlipped ? 'flipped' : ''}`}>
 
