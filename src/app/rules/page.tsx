@@ -74,6 +74,7 @@ export default async function RulesPage() {
           <div className="text-xs text-gray-400 dark:text-gray-500 border-t border-amber-100 dark:border-amber-800/30 pt-3 space-y-1">
             <p>积分每天自动递减，约少 1–2 分 · 距决赛越远得分越高</p>
             <p>🔒 每人只能猜一次，决赛开始后锁定</p>
+            <p>👥 所有人的猜测结果可在「成员」页面查看</p>
           </div>
           <ChampionButton />
         </div>
