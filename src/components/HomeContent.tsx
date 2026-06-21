@@ -31,7 +31,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [loading, setLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
-  const [syncAllGames, setSyncAllGames] = useState(false)
   const [copied, setCopied] = useState(false)
   const [deletingGame, setDeletingGame] = useState(false)
   const [confirmDeleteGame, setConfirmDeleteGame] = useState(false)
@@ -326,15 +325,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">待竞猜</h2>
-                {games.length > 1 && (
-                  <button
-                    onClick={() => setSyncAllGames(prev => !prev)}
-                    className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  >
-                    同步所有 Game
-                    <div className={`w-8 h-4 rounded-full transition-colors ${syncAllGames ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'}`} />
-                  </button>
-                )}
               </div>
               {pendingMatches.length === 0 ? (
                 <p className="text-gray-400 dark:text-gray-500 text-sm">暂无待竞猜比赛 🎉</p>
@@ -344,7 +334,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                     <PredictionCard
                       key={match.id}
                       match={match}
-                      gameIds={syncAllGames ? games.map(g => g.id) : [selectedGameId]}
+                      gameIds={games.map(g => g.id)}
                       prediction={predictions[match.id]}
                       onSubmitted={pred => handlePredictionSubmitted(match.id, pred)}
                       onGroupClick={() => setGroupModal({
@@ -437,7 +427,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 ? { pred_home_score: predictions[m.id].pred_home_score, pred_away_score: predictions[m.id].pred_away_score }
                 : null
             }))}
-          gameId={selectedGameId}
+          gameIds={games.map(g => g.id)}
           onClose={() => setGroupModal(null)}
           onPredictionSaved={() => {
             fetch(`/api/matches?game_id=${selectedGameId}`)

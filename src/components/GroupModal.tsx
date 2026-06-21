@@ -26,13 +26,13 @@ export interface GroupModalMatch {
 export default function GroupModal({
   label,
   matches,
-  gameId,
+  gameIds,
   onClose,
   onPredictionSaved,
 }: {
   label: string
   matches: GroupModalMatch[]
-  gameId: string
+  gameIds: string[]
   onClose: () => void
   onPredictionSaved?: () => void
 }) {
@@ -49,26 +49,31 @@ export default function GroupModal({
     setSaving(true)
     setSaveError('')
     try {
-      const res = await fetch('/api/predictions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          game_id: gameId,
-          match_id: predictingMatch.id,
-          pred_home_score: parseInt(predHome),
-          pred_away_score: parseInt(predAway),
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setSaveError(data.error || '保存失败')
-      } else {
+      const body = {
+        match_id: predictingMatch.id,
+        pred_home_score: parseInt(predHome),
+        pred_away_score: parseInt(predAway),
+      }
+      let anyOk = false
+      let lastError = ''
+      for (const gid of gameIds) {
+        const res = await fetch('/api/predictions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...body, game_id: gid }),
+        })
+        if (res.ok) { anyOk = true }
+        else { const d = await res.json(); lastError = d.error || '保存失败' }
+      }
+      if (anyOk) {
         setLocalPredictions(prev => ({
           ...prev,
           [predictingMatch.id]: { pred_home_score: parseInt(predHome), pred_away_score: parseInt(predAway) },
         }))
         setPredictingMatch(null)
         onPredictionSaved?.()
+      } else {
+        setSaveError(lastError || '保存失败')
       }
     } catch {
       setSaveError('网络错误，请重试')

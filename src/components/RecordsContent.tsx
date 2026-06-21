@@ -376,7 +376,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                 ? { pred_home_score: m.user_prediction.pred_home_score, pred_away_score: m.user_prediction.pred_away_score }
                 : null
             }))}
-          gameId={selectedGameId}
+          gameIds={games.map(g => g.id)}
           onClose={() => setGroupModal(null)}
           onPredictionSaved={() => {
             fetch(`/api/records?game_id=${selectedGameId}`)
