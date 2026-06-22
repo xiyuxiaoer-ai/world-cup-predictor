@@ -28,12 +28,13 @@ export async function GET(request: Request) {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
   const footballToken = process.env.FOOTBALL_DATA_API_TOKEN
 
-  // Collect env diagnostics
+  // Collect env diagnostics - all keys and DB-related values
+  const allKeys = Object.keys(process.env).sort()
   const envKeys = Object.keys(process.env)
-    .filter(k => /supabase|postgres|database|db_|pghost|pgport|pguser|pgpass/i.test(k))
+    .filter(k => /supabase|postgres|database|db_|pghost|pgport|pguser|pgpass|password|secret/i.test(k))
     .map(k => {
       const v = process.env[k] || ''
-      return `${k}=${v.slice(0, 30)}${v.length > 30 ? '...' : ''}`
+      return `${k}=${v.slice(0, 40)}${v.length > 40 ? '...' : ''}`
     })
 
   const admin = createClient(supabaseUrl, serviceRoleKey)
@@ -121,6 +122,7 @@ export async function GET(request: Request) {
     ok: !insertError,
     tableCreated,
     createResults,
+    allEnvKeys: allKeys,
     teams: teams.length,
     players: rows.length,
     insertError: insertError?.message,
