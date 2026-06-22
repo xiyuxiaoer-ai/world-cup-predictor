@@ -85,9 +85,14 @@ export function parseSquadHtml(html: string, tla: string): PlayerRow[] {
   return players
 }
 
+const TLA_ALIASES: Record<string, string> = {
+  URY: 'URU',  // football-data.org uses URY; our data uses URU
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
-  const tla = searchParams.get('tla')?.toUpperCase()
+  const rawTla = searchParams.get('tla')?.toUpperCase() ?? ''
+  const tla = TLA_ALIASES[rawTla] ?? rawTla
   if (!tla) return NextResponse.json({ error: 'tla required' }, { status: 400 })
 
   const slug = TLA_TO_SLUG[tla]
