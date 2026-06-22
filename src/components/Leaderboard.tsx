@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import type { LeaderboardEntry } from '@/types'
 import { getTeamDisplay } from '@/lib/flags'
+import { createClient } from '@/lib/supabase/client'
+import MemberProfileModal from './MemberProfileModal'
 
 const RANK_ROW_STYLES = [
   'bg-gradient-to-r from-amber-400/[0.12] to-transparent dark:from-amber-400/[0.08] border-l-[3px] border-amber-400 animate-gold-pulse',
@@ -43,6 +45,14 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null)
   const [breakdown, setBreakdown] = useState<any[]>([])
   const [bdLoading, setBdLoading] = useState(false)
+  const [profileEntry, setProfileEntry] = useState<LeaderboardEntry | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUserId(data.user.id)
+    })
+  }, [])
 
   useEffect(() => {
     if (!gameId) return
@@ -140,13 +150,18 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-black/[0.05] dark:border-white/[0.05]">
               <div className="flex items-center gap-2.5">
-                {selected.avatar_url ? (
-                  <img src={selected.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-amber-300" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm font-bold text-amber-700">
-                    {(selected.display_name || selected.username)?.[0]?.toUpperCase()}
-                  </div>
-                )}
+                <div
+                  className="tap-scale cursor-pointer shrink-0"
+                  onClick={e => { e.stopPropagation(); setProfileEntry(selected) }}
+                >
+                  {selected.avatar_url ? (
+                    <img src={selected.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-amber-300 hover:ring-2 hover:ring-blue-400/40 transition-all" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-sm font-bold text-amber-700 hover:ring-2 hover:ring-blue-400/40 transition-all">
+                      {(selected.display_name || selected.username)?.[0]?.toUpperCase()}
+                    </div>
+                  )}
+                </div>
                 <div>
                   <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
                     {selected.display_name || selected.username}
@@ -198,6 +213,23 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
             </div>
           </div>
         </div>
+      )}
+
+      {profileEntry && currentUserId && (
+        <MemberProfileModal
+          profile={{
+            display_name: profileEntry.display_name,
+            username: profileEntry.username,
+            avatar_url: profileEntry.avatar_url,
+            bio: null,
+          }}
+          userId={profileEntry.user_id}
+          rank={sorted.findIndex(e => e.user_id === profileEntry.user_id) + 1 || null}
+          points={profileEntry.total_points}
+          champPred={null}
+          currentUserId={currentUserId}
+          onClose={() => setProfileEntry(null)}
+        />
       )}
     </>
   )
