@@ -103,16 +103,20 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
                 key={link.href}
                 href={link.href}
                 onClick={() => { if (pathname !== link.href) { setNavigating(true); setNavTarget(link.href) } }}
-                className={`relative px-2 py-1 rounded-lg text-xs whitespace-nowrap font-medium tap-scale ${
+                className={`relative px-2 py-1 rounded-lg text-xs whitespace-nowrap font-medium tap-scale transition-colors ${
                   isActive(link.href)
-                    ? 'bg-amber-100/80 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 shadow-sm'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5 transition-colors'
+                    ? 'text-blue-600 dark:text-blue-300'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5'
                 }`}
-                style={isActive(link.href) ? { boxShadow: '0 0 12px rgba(245,158,11,0.15), inset 0 1px 0 rgba(255,255,255,0.6)' } : {}}
+                style={isActive(link.href) ? {
+                  background: 'rgba(59,130,246,0.08)',
+                  border: '1.5px solid rgba(59,130,246,0.32)',
+                  boxShadow: '0 0 10px rgba(59,130,246,0.10)',
+                } : {}}
               >
                 {link.label}
                 {isActive(link.href) && (
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-amber-500/60" />
+                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-blue-400/70" />
                 )}
               </Link>
             ))}
@@ -125,9 +129,13 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
             onClick={() => { if (pathname !== '/chat') { setNavigating(true); setNavTarget('/chat') } }}
             className={`relative p-1 rounded-lg transition-colors tap-scale ${
               isActive('/chat')
-                ? 'text-amber-600 bg-amber-100/80 dark:bg-amber-900/30'
+                ? 'text-blue-600 dark:text-blue-300'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5'
             }`}
+            style={isActive('/chat') ? {
+              background: 'rgba(59,130,246,0.08)',
+              border: '1.5px solid rgba(59,130,246,0.32)',
+            } : {}}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
