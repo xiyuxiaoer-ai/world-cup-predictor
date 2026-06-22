@@ -34,6 +34,11 @@ body {
 
 * { box-sizing: border-box; }
 
+/* 消除移动端 300ms 点击延迟 */
+button, a, [role="button"], select, input, textarea, label {
+  touch-action: manipulation;
+}
+
 /* ── 足球场中圈背景（登录页） ── */
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
@@ -151,11 +156,11 @@ body {
    iOS 毛玻璃 + 动效系统 (Glassmorphism Premium)
    ══════════════════════════════════════════════════════ */
 
-/* 标准毛玻璃卡片 */
+/* 标准毛玻璃卡片 — blur 从 28px 降至 14px，合成代价大幅降低 */
 .glass {
   background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.60);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.10),
@@ -176,8 +181,8 @@ body {
 /* 较轻毛玻璃（次级面板） */
 .glass-sm {
   background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, 0.55);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
@@ -192,8 +197,8 @@ body {
 /* 导航栏专用强毛玻璃 */
 .glass-nav {
   background: rgba(248, 249, 250, 0.88);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.07);
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03), 0 4px 20px rgba(0, 0, 0, 0.04);
 }
@@ -207,23 +212,23 @@ body {
 
 /* ── 弹性弹入（4 关键帧，更真实的 iOS spring bounce） ── */
 @keyframes spring-in {
-  0%   { opacity: 0; transform: scale(0.82) translateY(36px); }
-  55%  { opacity: 1; transform: scale(1.04) translateY(-5px); }
-  78%  { transform: scale(0.985) translateY(2px); }
+  0%   { opacity: 0; transform: scale(0.86) translateY(24px); }
+  55%  { opacity: 1; transform: scale(1.03) translateY(-3px); }
+  78%  { transform: scale(0.988) translateY(1px); }
   100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 .animate-spring-in {
-  animation: spring-in 0.54s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: spring-in 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* ── 交错入场：expo-out 曲线让落点更干脆 ── */
 @keyframes stagger-in {
-  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .animate-stagger-in {
   opacity: 0;
-  animation: stagger-in 0.46s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: stagger-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ── 弹出（badge / chip 等小元素） ── */
@@ -236,38 +241,42 @@ body {
   animation: pop-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* ── 卡片悬浮：scale + translate 双轴，更有立体感 ── */
+/* ── 卡片悬浮：只 transition transform（GPU 合成），不 transition box-shadow（触发 paint）── */
 .hover-lift {
-  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.hover-lift:hover {
-  transform: translateY(-7px) scale(1.01);
-  box-shadow:
-    0 28px 72px rgba(0, 0, 0, 0.13),
-    0 10px 28px rgba(0, 0, 0, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.90);
-}
-.hover-lift:active {
-  transform: translateY(-1px) scale(0.995);
-  transition: transform 0.08s ease;
-}
-@media (prefers-color-scheme: dark) {
+/* 仅在真正支持 hover 的设备（桌面）上应用悬浮效果，避免移动端触摸触发 */
+@media (hover: hover) {
   .hover-lift:hover {
+    transform: translateY(-4px) scale(1.005);
     box-shadow:
-      0 28px 72px rgba(0, 0, 0, 0.65),
-      0 10px 28px rgba(0, 0, 0, 0.42),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      0 20px 56px rgba(0, 0, 0, 0.12),
+      0 8px 20px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.90);
+  }
+  @media (prefers-color-scheme: dark) {
+    .hover-lift:hover {
+      box-shadow:
+        0 20px 56px rgba(0, 0, 0, 0.55),
+        0 8px 20px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
   }
 }
+.hover-lift:active {
+  transform: translateY(0) scale(0.985);
+  transition: transform 0.07s ease;
+}
 
-/* ── 按钮触觉：快压（0.07s ease-in）慢弹（0.24s spring+overshoot） ── */
+/* ── 按钮触觉：快压慢弹，will-change 预申请合成层 ── */
 .tap-scale {
-  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .tap-scale:active {
   transform: scale(0.91);
-  transition: transform 0.07s cubic-bezier(0.4, 0, 1, 1);
+  transition: transform 0.06s cubic-bezier(0.4, 0, 1, 1);
 }
 
 /* ── 主按钮：亮色=淡蓝填充+边框，暗色=实心蓝 ── */

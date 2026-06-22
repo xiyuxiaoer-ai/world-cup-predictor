@@ -168,7 +168,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     return (
       <div key={match.id}
         className="glass hover-lift rounded-xl px-3 py-3 space-y-2 animate-stagger-in"
-        style={{ animationDelay: `${idx * 55}ms` }}
+        style={{ animationDelay: `${Math.min(idx * 40, 180)}ms` }}
       >
         <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
           <button

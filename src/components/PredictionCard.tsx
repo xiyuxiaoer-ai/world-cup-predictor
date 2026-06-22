@@ -62,11 +62,14 @@ export default function PredictionCard({
       pred_et_winner: showExtraFields ? etWinner || null : null,
       pred_penalty_winner: showExtraFields ? penaltyWinner || null : null,
     }
-    let lastSuccess = null
-    for (const gid of gameIds) {
-      const res = await fetch('/api/predictions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, game_id: gid }) })
-      if (res.ok) { const data = await res.json(); if (!data.skipped) lastSuccess = data }
-    }
+    const results = await Promise.all(
+      gameIds.map(gid =>
+        fetch('/api/predictions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, game_id: gid }) })
+          .then(res => res.ok ? res.json() : null)
+          .catch(() => null)
+      )
+    )
+    const lastSuccess = results.filter(Boolean).findLast((d: any) => !d.skipped)
     if (lastSuccess) { onSubmitted(lastSuccess); setDone(true) }
     else if (gameIds.length > 0) setDone(true)
     else setError('提交失败')
