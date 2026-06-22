@@ -14,6 +14,16 @@ import TeamHistoryModal from './TeamHistoryModal'
 import ChampionEggModal from './ChampionEggModal'
 import ChampionPredictModal from './ChampionPredictModal'
 import { calculateChampionBonus } from '@/lib/championBonus'
+import { MATCH_VENUES } from '@/lib/venues'
+
+function IconPin() {
+  return (
+    <svg viewBox="0 0 10 14" width="8" height="10" fill="currentColor" style={{ display: 'inline', verticalAlign: 'middle', marginBottom: 1, flexShrink: 0 }}>
+      <path d="M5 0.5C2.79 0.5 1 2.29 1 4.5C1 7.75 5 12.5 5 12.5C5 12.5 9 7.75 9 4.5C9 2.29 7.21 0.5 5 0.5Z" fill="currentColor" opacity="0.85"/>
+      <circle cx="5" cy="4.5" r="1.5" fill="white" opacity="0.88"/>
+    </svg>
+  )
+}
 
 const STAGE_LABELS: Record<string, string> = {
   group: '小组赛',
@@ -149,6 +159,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     const homeJa = getTeamJa((match as any).home_tla)
     const awayJa = getTeamJa((match as any).away_tla)
     const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
+    const venue = MATCH_VENUES[(match as any).api_match_id]
 
     return (
       <div key={match.id}
@@ -207,6 +218,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pr-[30px]">{awayJa}</span>}
           </div>
         </div>
+        {venue && (
+          <div className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500 -mt-0.5">
+            <IconPin />
+            <span>{venue.city} · {venue.stadium}</span>
+          </div>
+        )}
         <div className="text-xs border-t border-black/[0.06] dark:border-white/10 pt-2">
           {pred ? (
             <div className="flex items-center justify-between gap-2">
