@@ -82,10 +82,10 @@ function PlayerCard({ player, index }: { player: any; index: number }) {
   const [imgError, setImgError] = useState(false)
   return (
     <a
-      href={player.wikiUrl}
+      href={player.baiduUrl || player.wikiUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex flex-col items-center gap-1.5 py-2 px-1 rounded-xl hover:bg-white/40 dark:hover:bg-white/10 active:scale-95 transition-all duration-200 group animate-stagger-in"
+      className="flex flex-col items-center gap-1 py-2 px-1 rounded-xl hover:bg-white/40 dark:hover:bg-white/10 active:scale-95 transition-all duration-200 group animate-stagger-in"
       style={{ animationDelay: `${index * 0.04}s` }}
     >
       <div className="relative w-16 h-16 sm:w-[70px] sm:h-[70px] rounded-xl overflow-hidden shrink-0 ring-1 ring-white/40 dark:ring-white/10 shadow-md">
@@ -101,16 +101,15 @@ function PlayerCard({ player, index }: { player: any; index: number }) {
             <span className="text-2xl">⚽</span>
           </div>
         )}
-        {/* Glossy overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
       </div>
 
       <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200 text-center leading-tight line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
         {player.name}
       </span>
-      {player.description && (
-        <span className="hidden sm:block text-[10px] text-gray-400 dark:text-gray-500 text-center leading-tight line-clamp-1 px-1">
-          {player.description.slice(0, 30)}
+      {player.era && (
+        <span className="text-[9px] text-amber-500/80 dark:text-amber-400/70 text-center leading-tight">
+          {player.era}
         </span>
       )}
     </a>
@@ -154,28 +153,19 @@ function SectionBlock({ title, children }: { title: string; children: React.Reac
 
 /* ─── Football Legend Tab ─── */
 function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) {
-  const { intro, historyText, worldCupText, players, teamImageUrl, wikiUrl } = data
-  const mainText = historyText || intro || ''
+  const { intro, worldCupRecord, goal2026, players } = data
 
   return (
     <div className="pb-6">
-      {teamImageUrl && (
-        <div className="relative w-full h-32 sm:h-40 overflow-hidden">
-          <img src={teamImageUrl} alt={teamName} className="w-full h-full object-cover object-center" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/60 dark:to-gray-900/80 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-transparent to-black/20 pointer-events-none" />
-        </div>
-      )}
-
-      {mainText ? (
+      {intro ? (
         <SectionBlock title="⚽ 球队历史">
-          <ReadMoreText text={mainText} maxLen={380} />
+          <ReadMoreText text={intro} maxLen={300} />
         </SectionBlock>
       ) : null}
 
-      {worldCupText ? (
+      {worldCupRecord ? (
         <SectionBlock title="🏆 世界杯征程">
-          <ReadMoreText text={worldCupText} maxLen={320} />
+          <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{worldCupRecord}</p>
         </SectionBlock>
       ) : null}
 
@@ -186,18 +176,32 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
               <PlayerCard key={p.name} player={p} index={i} />
             ))}
           </div>
+          <div className="mt-3 space-y-3">
+            {players.filter((p: any) => p.desc).map((p: any, i: number) => (
+              <div key={i} className="flex gap-2 text-[11px] leading-snug">
+                <span className="font-semibold text-amber-600 dark:text-amber-400 shrink-0 min-w-[5rem]">{p.name}</span>
+                <span className="text-gray-600 dark:text-gray-400">{p.desc}</span>
+              </div>
+            ))}
+          </div>
         </SectionBlock>
       )}
 
+      {goal2026 ? (
+        <SectionBlock title="🎯 2026世界杯目标">
+          <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{goal2026}</p>
+        </SectionBlock>
+      ) : null}
+
       <div className="px-4 sm:px-5 pt-4">
         <a
-          href={wikiUrl}
+          href={`https://baike.baidu.com/search/word?word=${encodeURIComponent(teamName + '国家足球队')}`}
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[12px] font-medium text-gray-600 dark:text-gray-300 glass-sm hover:bg-white/50 dark:hover:bg-white/8 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
           <span className="text-base">📖</span>
-          <span>在维基百科查看完整历史</span>
+          <span>在百度百科查看完整历史</span>
           <span className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform">↗</span>
         </a>
       </div>
@@ -289,7 +293,8 @@ export default function TeamHistoryModal({
             relative w-full sm:max-w-xl
             glass rounded-t-3xl sm:rounded-3xl
             overflow-hidden
-            max-h-[90vh] sm:max-h-[88vh]
+            min-h-[75vh] sm:min-h-0
+            max-h-[92vh] sm:max-h-[88vh]
             flex flex-col
             animate-sheet-in
             shadow-2xl shadow-black/30
