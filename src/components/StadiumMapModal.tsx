@@ -4,39 +4,17 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { getFlagUrl } from '@/lib/flags'
-import TeamName from './TeamName'
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
 
-// TLA → ISO 3166-1 numeric (zero-padded 3-digit string) used by world-atlas
-const TLA_TO_ISO: Record<string, string> = {
-  // Americas
-  MEX: '484', USA: '840', CAN: '124', BRA: '076', ARG: '032',
-  COL: '170', URU: '858', URY: '858', ECU: '218', PAR: '600', BOL: '068',
-  VEN: '862', CHI: '152', PER: '604', CRC: '188', PAN: '591',
-  JAM: '388', HON: '340', SLV: '222', GUA: '320', TRI: '780', CUB: '192',
-  HAI: '332', NCA: '558', DOM: '214', SUR: '740', GUY: '328',
-  // Europe
-  FRA: '250', GER: '276', ESP: '724', ENG: '826', POR: '620',
-  NED: '528', BEL: '056', ITA: '380', CRO: '191', SRB: '688',
-  SUI: '756', DEN: '208', AUT: '040', SVK: '703', SCO: '826',
-  TUR: '792', POL: '616', ROU: '642', UKR: '804', HUN: '348',
-  SVN: '705', GRE: '300', GEO: '268', WAL: '826', NIR: '826',
-  CZE: '203', NOR: '578', SWE: '752', ISL: '352', FIN: '246',
-  BIH: '070', MKD: '807', ALB: '008', MNE: '499', LUX: '442',
-  ARM: '051', IRL: '372', CYP: '196',
-  // Africa
-  MAR: '504', SEN: '686', EGY: '818', CMR: '120', NGA: '566',
-  CIV: '384', ALG: '012', TUN: '788', MLI: '466', RSA: '710',
-  GHA: '288', ZIM: '716', MOZ: '508', UGA: '800', TAN: '834',
-  COD: '180', ZAM: '894', CPV: '132', GUI: '324', KEN: '404',
-  ANG: '024', GAB: '266', NIG: '562', ETH: '231',
-  // Asia
-  JPN: '392', KOR: '410', AUS: '036', QAT: '634', UZB: '860',
-  IRN: '364', KSA: '682', CHN: '156', IND: '356', THA: '764',
-  JOR: '400', IRQ: '368', KUW: '414', IDN: '360', VIE: '704',
-  // Oceania
-  NZL: '554', FIJ: '242',
+interface MatchInfo {
+  stadiumInfo: { capacity: number; opened: number; image: string | null } | null
+  weather: {
+    temp: number; maxTemp: number; minTemp: number
+    humidity: number; windspeed: number; desc: string
+  } | null
+  homeWiki: string | null
+  awayWiki: string | null
 }
 
 interface Props {
@@ -45,111 +23,282 @@ interface Props {
   homeTeam: string
   awayTeam: string
   venue: { stadium: string; city: string; coordinates: [number, number] }
+  matchDate?: string  // YYYY-MM-DD
   onClose: () => void
 }
 
-export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, venue, onClose }: Props) {
+function weatherIcon(desc: string): string {
+  const d = desc.toLowerCase()
+  if (d.includes('blizzard') || d.includes('snow')) return '❄️'
+  if (d.includes('thunder')) return '⛈️'
+  if (d.includes('heavy rain')) return '🌧️'
+  if (d.includes('rain') || d.includes('shower') || d.includes('drizzle')) return '🌦️'
+  if (d.includes('fog') || d.includes('mist')) return '🌫️'
+  if (d.includes('overcast') || d.includes('cloud')) return '☁️'
+  if (d.includes('sun') || d.includes('clear')) return '☀️'
+  return '⛅'
+}
+
+const WEATHER_ZH: Record<string, string> = {
+  'Sunny': '晴天', 'Clear': '晴天', 'Partly cloudy': '多云', 'Partly Cloudy': '多云',
+  'Cloudy': '阴天', 'Overcast': '阴天', 'Mist': '薄雾', 'Fog': '大雾',
+  'Light drizzle': '毛毛雨', 'Drizzle': '小雨', 'Light rain': '小雨',
+  'Moderate rain': '中雨', 'Heavy rain': '大雨', 'Patchy rain possible': '局部有雨',
+  'Patchy light rain': '零星小雨', 'Thundery outbreaks possible': '局部雷阵雨',
+  'Blizzard': '暴风雪', 'Light snow': '小雪', 'Moderate snow': '中雪',
+}
+function weatherZh(desc: string) { return WEATHER_ZH[desc] || desc }
+
+function Skeleton({ className }: { className?: string }) {
+  return <div className={`animate-pulse rounded bg-gray-200/60 dark:bg-gray-700/40 ${className ?? ''}`} />
+}
+
+export default function StadiumMapModal({
+  homeTla, awayTla, homeTeam, awayTeam, venue, matchDate, onClose,
+}: Props) {
   const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+  const [info, setInfo] = useState<MatchInfo | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [imgError, setImgError] = useState(false)
 
-  const homeIso = TLA_TO_ISO[homeTla?.toUpperCase()] ?? null
-  const awayIso = TLA_TO_ISO[awayTla?.toUpperCase()] ?? null
-  const highlighted = new Set([homeIso, awayIso].filter(Boolean) as string[])
-
-  const homeFlagUrl = getFlagUrl(homeTla)
-  const awayFlagUrl = getFlagUrl(awayTla)
-
-  const isMainlandChina = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Shanghai'
-  const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${venue.coordinates[1]},${venue.coordinates[0]}`
-  const amapUrl = `https://www.amap.com/search?query=${encodeURIComponent(venue.stadium + ' ' + venue.city)}`
+  useEffect(() => {
+    setMounted(true)
+    const p = new URLSearchParams({
+      stadium:   venue.stadium,
+      lat:       venue.coordinates[1].toString(),
+      lon:       venue.coordinates[0].toString(),
+      home_team: homeTeam,
+      away_team: awayTeam,
+      ...(matchDate ? { date: matchDate } : {}),
+    })
+    fetch(`/api/match-info?${p}`)
+      .then(r => r.json())
+      .then(d => { setInfo(d); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!mounted) return null
 
+  const homeFlagUrl = getFlagUrl(homeTla)
+  const awayFlagUrl  = getFlagUrl(awayTla)
+  const isMainlandChina = Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Shanghai'
+  const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${venue.coordinates[1]},${venue.coordinates[0]}`
+  const amapUrl  = `https://www.amap.com/search?query=${encodeURIComponent(venue.stadium + ' ' + venue.city)}`
+  const mapUrl   = isMainlandChina ? amapUrl : gmapsUrl
+  const mapLabel = isMainlandChina ? '在高德地图打开 →' : '在地图中打开 →'
+
+  const heroImg = !imgError ? info?.stadiumInfo?.image : null
+  const weather = info?.weather
+  const wIcon   = weather ? weatherIcon(weather.desc) : '⛅'
+
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl glass rounded-2xl overflow-hidden animate-spring-in"
+        className="w-full max-w-sm sm:mx-4 glass rounded-t-3xl sm:rounded-2xl overflow-hidden max-h-[92vh] flex flex-col animate-spring-in"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/40 dark:border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              {homeFlagUrl && <img src={homeFlagUrl} alt={homeTeam} className="w-6 h-4 object-cover rounded-sm" />}
-              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100"><TeamName tla={homeTla} zh={homeTeam} /></span>
+
+        {/* ── Hero Image ── */}
+        <div className="relative h-52 shrink-0 bg-gradient-to-br from-slate-700 to-slate-900">
+          {loading && !heroImg ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-7xl opacity-10 select-none">🏟</span>
             </div>
-            <span className="text-gray-300 dark:text-gray-600 text-xs">vs</span>
-            <div className="flex items-center gap-1.5">
-              {awayFlagUrl && <img src={awayFlagUrl} alt={awayTeam} className="w-6 h-4 object-cover rounded-sm" />}
-              <span className="text-sm font-semibold text-gray-900 dark:text-gray-100"><TeamName tla={awayTla} zh={awayTeam} /></span>
+          ) : heroImg ? (
+            <img
+              src={heroImg}
+              alt={venue.stadium}
+              className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-7xl opacity-10 select-none">🏟</span>
             </div>
+          )}
+
+          {/* gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none" />
+
+          {/* close */}
+          <button
+            onClick={onClose}
+            className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/50 text-white text-sm flex items-center justify-center hover:bg-black/70 transition-colors backdrop-blur-sm"
+          >✕</button>
+
+          {/* stadium name */}
+          <div className="absolute bottom-0 left-0 right-0 px-5 pb-4 pointer-events-none">
+            <p className="text-white font-bold text-xl leading-tight drop-shadow-md">{venue.stadium}</p>
+            <p className="text-white/65 text-sm mt-0.5 drop-shadow">{venue.city}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none ml-3">✕</button>
         </div>
 
-        {/* Map */}
-        <div className="bg-sky-50 dark:bg-gray-800">
-          <ComposableMap
-            projectionConfig={{ scale: 140, center: [0, 20] }}
-            style={{ width: '100%', height: 'auto' }}
-          >
-            <Geographies geography={GEO_URL}>
-              {({ geographies }) =>
-                geographies.map((geo) => {
-                  const isHome = geo.id === homeIso
-                  const isAway = geo.id === awayIso
-                  const isBoth = isHome && isAway
-                  return (
+        {/* ── Teams Row ── */}
+        <div className="flex items-center justify-center gap-5 px-5 py-3.5 border-b border-white/20 dark:border-white/10 shrink-0">
+          <div className="flex items-center gap-2">
+            {homeFlagUrl && <img src={homeFlagUrl} alt={homeTeam} className="w-7 h-[18px] object-cover rounded-sm shadow-sm" />}
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{homeTeam}</span>
+          </div>
+          <span className="text-[10px] font-bold text-gray-400 border border-gray-200 dark:border-gray-600 px-2 py-0.5 rounded-full tracking-wider">VS</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{awayTeam}</span>
+            {awayFlagUrl && <img src={awayFlagUrl} alt={awayTeam} className="w-7 h-[18px] object-cover rounded-sm shadow-sm" />}
+          </div>
+        </div>
+
+        {/* ── Scrollable Body ── */}
+        <div className="overflow-y-auto flex-1">
+
+          {/* Mini Map – zoomed North America */}
+          <div className="bg-[#192844] overflow-hidden" style={{ maxHeight: 140 }}>
+            <ComposableMap
+              projectionConfig={{ scale: 480, center: [-96, 38] }}
+              style={{ width: '100%', height: 140 }}
+            >
+              <Geographies geography={GEO_URL}>
+                {({ geographies }) =>
+                  geographies.map(geo => (
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill={
-                        isBoth ? '#f59e0b'
-                        : isHome ? '#fbbf24'
-                        : isAway ? '#fbbf24'
-                        : '#cbd5e1'
-                      }
-                      stroke="#ffffff"
-                      strokeWidth={0.4}
+                      fill="#263d6a"
+                      stroke="#192844"
+                      strokeWidth={0.5}
                       style={{ default: { outline: 'none' } }}
                     />
-                  )
-                })
-              }
-            </Geographies>
+                  ))
+                }
+              </Geographies>
+              <Marker coordinates={venue.coordinates}>
+                <circle r={14} fill="#f59e0b" opacity={0.18} />
+                <circle r={7}  fill="#f59e0b" opacity={0.5}  />
+                <circle r={4}  fill="#f59e0b" stroke="#fff" strokeWidth={1.5} />
+              </Marker>
+            </ComposableMap>
+          </div>
 
-            {/* Stadium marker */}
-            <Marker coordinates={venue.coordinates}>
-              <circle r={5} fill="#ef4444" stroke="#ffffff" strokeWidth={2} />
-              <circle r={9} fill="#ef444430" />
-            </Marker>
-          </ComposableMap>
+          {/* ── Info Grid ── */}
+          <div className="grid grid-cols-2 gap-3 p-4">
+
+            {/* Stadium card */}
+            <div className="rounded-2xl bg-amber-50/80 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-700/30 p-4 space-y-2">
+              <p className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">场馆信息</p>
+              {loading ? (
+                <div className="space-y-2 pt-0.5">
+                  <Skeleton className="h-3.5 w-full" />
+                  <Skeleton className="h-3.5 w-3/4" />
+                </div>
+              ) : info?.stadiumInfo ? (
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base leading-none">🏟</span>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 leading-tight">
+                        {info.stadiumInfo.capacity.toLocaleString('zh-CN')}
+                      </p>
+                      <p className="text-[10px] text-gray-400">座位容量</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base leading-none">📅</span>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 leading-tight">
+                        {info.stadiumInfo.opened} 年
+                      </p>
+                      <p className="text-[10px] text-gray-400">建成年份</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400 pt-1">暂无数据</p>
+              )}
+            </div>
+
+            {/* Weather card */}
+            <div className="rounded-2xl bg-sky-50/80 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-700/30 p-4 space-y-2">
+              <p className="text-[10px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-widest">当地天气</p>
+              {loading ? (
+                <div className="space-y-2 pt-0.5">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-4/5" />
+                </div>
+              ) : weather ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl leading-none">{wIcon}</span>
+                    <span className="text-xl font-bold text-gray-800 dark:text-gray-100">{weather.temp}°</span>
+                  </div>
+                  <p className="text-xs font-medium text-gray-600 dark:text-gray-300">{weatherZh(weather.desc)}</p>
+                  <div className="space-y-0.5">
+                    <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                      <span>💧</span> 湿度 {weather.humidity}%
+                    </p>
+                    <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                      <span>🌬</span> {weather.windspeed} km/h
+                    </p>
+                    <p className="text-[11px] text-gray-400">
+                      最高 {weather.maxTemp}° / 最低 {weather.minTemp}°
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400 pt-1">暂无预报</p>
+              )}
+            </div>
+          </div>
+
+          {/* ── Country Summaries ── */}
+          <div className="px-4 pb-5 space-y-3">
+            <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">参赛国简介</p>
+
+            {[
+              { tla: homeTla, name: homeTeam, flagUrl: homeFlagUrl, wiki: info?.homeWiki },
+              { tla: awayTla, name: awayTeam, flagUrl: awayFlagUrl, wiki: info?.awayWiki },
+            ].map(({ name, flagUrl, wiki }) => (
+              <div
+                key={name}
+                className="rounded-2xl bg-white/35 dark:bg-white/5 border border-white/50 dark:border-white/10 p-4"
+              >
+                <div className="flex items-center gap-2 mb-2.5">
+                  {flagUrl && (
+                    <img src={flagUrl} alt={name} className="w-6 h-4 object-cover rounded-sm shadow-sm" />
+                  )}
+                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{name}</span>
+                </div>
+                {loading ? (
+                  <div className="space-y-1.5">
+                    <Skeleton className="h-2.5 w-full" />
+                    <Skeleton className="h-2.5 w-5/6" />
+                    <Skeleton className="h-2.5 w-3/4" />
+                  </div>
+                ) : wiki ? (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{wiki}</p>
+                ) : (
+                  <p className="text-xs text-gray-400 italic">暂无介绍</p>
+                )}
+              </div>
+            ))}
+          </div>
+
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-between px-5 py-3 border-t border-white/40 dark:border-white/10 bg-white/20 dark:bg-white/5">
-          <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-amber-400 inline-block shrink-0" />
-              参赛国
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-red-500 inline-block shrink-0" />
-              {venue.stadium} · {venue.city}
-            </span>
-          </div>
+        {/* ── Footer ── */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-t border-white/20 dark:border-white/10 shrink-0">
+          <span className="text-xs text-gray-400">📍 {venue.city}</span>
           <a
-            href={isMainlandChina ? amapUrl : gmapsUrl}
+            href={mapUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-amber-500 hover:text-amber-600 font-medium shrink-0"
+            className="text-xs text-amber-500 hover:text-amber-600 font-semibold transition-colors"
           >
-            {isMainlandChina ? '在高德地图打开 →' : '在地图中打开 →'}
+            {mapLabel}
           </a>
         </div>
+
       </div>
     </div>,
     document.body
