@@ -112,7 +112,7 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
                 <div className="flex justify-between items-center text-sm border-t border-black/[0.05] dark:border-white/[0.05] pt-2">
                   <span className="text-gray-400 dark:text-gray-500">我猜：<span className="text-gray-900 dark:text-gray-100 font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span></span>
                   {pred.points_earned != null ? (
-                    <span className={`font-bold ${pred.points_earned > 0 ? 'text-amber-500' : pred.points_earned < 0 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <span className={`font-bold ${pred.points_earned > 0 ? 'text-amber-600 dark:text-amber-400' : pred.points_earned < 0 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
                       {pred.points_earned > 0 ? `+${pred.points_earned}` : pred.points_earned}分
                     </span>
                   ) : isFinished ? (

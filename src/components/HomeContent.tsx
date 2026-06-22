@@ -219,7 +219,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 )}
               </span>
               {pred.points_earned != null ? (
-                <span className={`shrink-0 ${pred.points_earned > 0 ? 'text-amber-500 font-semibold' : pred.points_earned < 0 ? 'text-red-500' : 'text-zinc-500'}`}>
+                <span className={`shrink-0 ${pred.points_earned > 0 ? 'text-amber-600 dark:text-amber-400 font-semibold' : pred.points_earned < 0 ? 'text-red-500' : 'text-zinc-500'}`}>
                   {pred.points_earned > 0 ? `+${pred.points_earned}分` : pred.points_earned < 0 ? `${pred.points_earned}分` : '0分'}
                 </span>
               ) : (
