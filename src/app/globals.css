@@ -15,10 +15,10 @@
 body {
   background:
     linear-gradient(155deg,
-      rgba(255, 251, 232, 1) 0%,
-      rgba(250, 250, 252, 1) 32%,
-      rgba(237, 244, 255, 1) 68%,
-      rgba(248, 249, 253, 1) 100%
+      #F5F5F8 0%,
+      #F8F9FC 38%,
+      #F2F5FA 68%,
+      #F7F8FB 100%
     );
   background-attachment: fixed;
   color: var(--foreground);
