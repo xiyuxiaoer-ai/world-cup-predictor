@@ -127,17 +127,18 @@ function parseSquad(wikitext: string, tla: string): PlayerRow[] {
   return players
 }
 
-// Batch-query Wikipedia zh (Chinese) interwiki for a list of page titles
-// Returns a map: English title → Chinese name
+// Batch-query WikiData for zh-hans (Simplified Chinese) labels
+// Uses enwiki titles as lookup keys → returns map: English title → Simplified Chinese name
 async function fetchZhNames(titles: string[]): Promise<Map<string, string>> {
   const map = new Map<string, string>()
   if (titles.length === 0) return map
 
-  // Wikipedia API allows up to 50 titles per request
+  // WikiData API supports up to 50 titles per request
   for (let i = 0; i < titles.length; i += 50) {
     const batch = titles.slice(i, i + 50)
     const titlesParam = batch.map(t => encodeURIComponent(t)).join('|')
-    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${titlesParam}&prop=langlinks&lllang=zh&format=json&redirects=1`
+    // Request: look up by English Wikipedia title, get zh-hans / zh / zh-cn labels + enwiki sitelink
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=${titlesParam}&props=labels%7Csitelinks&sitefilter=enwiki&languages=zh-hans%7Czh%7Czh-cn&format=json&redirects=yes`
 
     try {
       const res = await fetch(url, {
@@ -147,31 +148,20 @@ async function fetchZhNames(titles: string[]): Promise<Map<string, string>> {
       if (!res.ok) continue
       const json = await res.json()
 
-      // Build redirect map: normalized/redirected title → canonical title
-      const redirectMap = new Map<string, string>()
-      for (const r of json.query?.redirects || []) {
-        redirectMap.set(r.from.toLowerCase(), r.to)
-      }
-      for (const r of json.query?.normalized || []) {
-        redirectMap.set(r.from.toLowerCase(), r.to)
-      }
+      for (const entity of Object.values(json.entities || {}) as any[]) {
+        if (entity.missing !== undefined) continue
+        // Priority: zh-hans > zh > zh-cn (all simplified or close to it)
+        const zhName =
+          entity.labels?.['zh-hans']?.value ||
+          entity.labels?.['zh-cn']?.value ||
+          entity.labels?.['zh']?.value
+        if (!zhName) continue
 
-      for (const page of Object.values(json.query?.pages || {}) as any[]) {
-        const zhLink = page.langlinks?.find((l: any) => l.lang === 'zh')
-        if (zhLink) {
-          const zhName = zhLink['*']
-          // Map both canonical and original titles to zh name
-          map.set(page.title, zhName)
-          // Also map each original batch title that redirected to this page
-          for (const [from, to] of redirectMap) {
-            if (to === page.title) {
-              const orig = batch.find(t => t.toLowerCase() === from)
-              if (orig) map.set(orig, zhName)
-            }
-          }
-        }
+        // Map the canonical English Wikipedia title to the Chinese name
+        const enTitle = entity.sitelinks?.enwiki?.title
+        if (enTitle) map.set(enTitle, zhName)
       }
-    } catch { /* silently skip failed batches */ }
+    } catch { /* silently skip */ }
   }
 
   return map
