@@ -117,10 +117,12 @@ export async function GET(request: Request) {
   // Fetch stadium photo from Supabase (pre-populated), fall back to hardcoded → Wikipedia
   async function getStadiumImage(): Promise<string | null> {
     if (!stadiumMeta) return null
-    if (stadium) {
-      const { data } = await admin.from('stadiums').select('photo_url').eq('name_zh', stadium).maybeSingle()
-      if (data?.photo_url) return proxyImg(data.photo_url)
-    }
+    try {
+      if (stadium) {
+        const { data } = await admin.from('stadiums').select('photo_url').eq('name_zh', stadium).maybeSingle()
+        if (data?.photo_url) return proxyImg(data.photo_url)
+      }
+    } catch { /* Supabase unavailable */ }
     if (stadiumMeta.photo) return proxyImg(stadiumMeta.photo)
     return fetchStadiumImage(stadiumMeta.wikiTitle)
   }

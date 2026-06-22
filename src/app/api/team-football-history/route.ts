@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { TEAM_LEGENDS } from '@/lib/team-legends'
 
+export const dynamic = 'force-dynamic'
+
 const UA = 'WorldCupPredictor/1.0'
 
 function proxyImg(url: string | null | undefined): string | null {
@@ -75,14 +77,17 @@ export async function GET(request: Request) {
   const nameEnList = legend.players.map(p => p.nameEn)
 
   // 1. Try Supabase first (pre-populated, always works for Chinese users)
-  const { data: dbPhotos } = await admin
-    .from('legend_photos')
-    .select('name_en, photo_url')
-    .in('name_en', nameEnList)
-
-  const dbPhotoMap: Record<string, string> = {}
-  for (const row of dbPhotos ?? []) {
-    dbPhotoMap[row.name_en] = proxyImg(row.photo_url)!
+  let dbPhotoMap: Record<string, string> = {}
+  try {
+    const { data: dbPhotos } = await admin
+      .from('legend_photos')
+      .select('name_en, photo_url')
+      .in('name_en', nameEnList)
+    for (const row of dbPhotos ?? []) {
+      if (row.photo_url) dbPhotoMap[row.name_en] = proxyImg(row.photo_url)!
+    }
+  } catch {
+    // Supabase unavailable — fall through to Wikipedia
   }
 
   // 2. For any still missing, fall back to Wikipedia API
