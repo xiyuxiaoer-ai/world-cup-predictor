@@ -47,8 +47,16 @@ export async function GET(request: Request) {
   const name = searchParams.get('name')?.trim() ?? ''
   if (!name) return NextResponse.json([])
 
-  // Search Google News RSS — Chinese + English query for broader coverage
-  const query = encodeURIComponent(`${name} 足球 国家队`)
+  // Restrict to curated professional Chinese-language sports media
+  const SITES = [
+    'sports.sina.com.cn',   // 新浪体育
+    'sports.qq.com',        // 腾讯体育
+    'xinhuanet.com',        // 新华社
+    'bbc.com/zhongwen',     // BBC 中文
+    'thepaper.cn',          // 澎湃新闻
+  ]
+  const siteFilter = SITES.map(s => `site:${s}`).join(' OR ')
+  const query = encodeURIComponent(`${name} 足球 (${siteFilter})`)
   const url = `https://news.google.com/rss/search?q=${query}&hl=zh-CN&gl=CN&ceid=CN:zh-Hans`
 
   try {
