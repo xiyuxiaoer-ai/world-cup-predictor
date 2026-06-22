@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
+import TeamHistoryModal from './TeamHistoryModal'
 import { getTeamDisplay, getFlagUrl } from '@/lib/flags'
 import { STAGE_LABELS } from '@/lib/championBonus'
 
@@ -23,6 +24,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set())
   const [cardImages, setCardImages] = useState<Record<string, string>>({})
   const [champPreds, setChampPreds] = useState<Record<string, any>>({})
+  const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
 
   function handleCardFlip(userId: string) {
     setFlippedCards(prev => {
@@ -111,13 +113,14 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-amber-500 shadow-sm"
+          className="glass rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/40 transition-all"
         >
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
         <button
           onClick={() => setShowInviteModal(true)}
-          className="text-sm text-amber-600 hover:text-amber-700 border border-amber-200 hover:border-amber-400 px-3 py-2 rounded-lg transition-colors font-medium"
+          className="text-sm text-amber-600 glass px-3 py-2 rounded-lg font-medium glow-amber tap-scale"
+          style={{ boxShadow: '0 0 0 1px rgba(245,158,11,0.25)' }}
         >
           + 邀请成员
         </button>
@@ -130,7 +133,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       ) : (
         <>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {members.map(m => {
+          {members.map((m, memberIdx) => {
             const profile = m.profiles
             const userId = m.user_id ?? profile?.id
             const rank = getRank(userId)
@@ -141,12 +144,15 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
             const isFlipped = flippedCards.has(userId)
 
             return (
-              <div key={userId} className="card-flip-container rounded-2xl" style={{ height: 250 }}
-                   onClick={() => handleCardFlip(userId)}>
+              <div key={userId}
+                className="card-flip-container rounded-2xl animate-stagger-in"
+                style={{ height: 250, animationDelay: `${memberIdx * 70}ms` }}
+                onClick={() => handleCardFlip(userId)}
+              >
               <div className={`card-flip-inner ${isFlipped ? 'flipped' : ''}`}>
 
               {/* 正面：成员信息（竖向排列） */}
-              <div className="card-face bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 flex flex-col items-center gap-3 cursor-pointer">
+              <div className="card-face glass hover-lift rounded-2xl p-5 flex flex-col items-center gap-3 cursor-pointer">
                 <div className="relative">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />
@@ -181,10 +187,13 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                       const teamName = getTeamDisplay(cp.predicted_team_tla, cp.predicted_team)
                       const flagUrl = getFlagUrl(cp.predicted_team_tla)
                       return (
-                        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center justify-between gap-1">
-                          <span className="text-xs text-gray-600 dark:text-gray-300 truncate flex items-center gap-1">
+                        <div className="mt-2 pt-2 border-t border-black/[0.05] dark:border-white/[0.05] w-full flex items-center justify-between gap-1">
+                          <button
+                            className="text-xs text-gray-600 dark:text-gray-300 truncate flex items-center gap-1 hover:text-amber-500 transition-colors"
+                            onClick={e => { e.stopPropagation(); setHistoryTeam({ tla: cp.predicted_team_tla, name: cp.predicted_team }) }}
+                          >
                             🏆{flagUrl && <img src={flagUrl} alt="" className="inline w-4 h-3 object-cover rounded-sm" />}{teamName}
-                          </span>
+                          </button>
                           <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-500' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-400'}`}>
                             +{cp.bonus_points}
                           </span>
@@ -192,7 +201,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                       )
                     }
                     return (
-                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 w-full flex items-center gap-1">
+                      <div className="mt-2 pt-2 border-t border-black/[0.05] dark:border-white/[0.05] w-full flex items-center gap-1">
                         <span className="text-xs text-gray-400 dark:text-gray-500">🏆 彩蛋未猜</span>
                       </div>
                     )
@@ -210,7 +219,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   </div>
                 </div>
               </div>
-              <div className="card-face card-face-back bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
+              <div className="card-face card-face-back glass rounded-2xl flex items-center justify-center cursor-pointer overflow-hidden">
                 {cardImages[userId] && (
                   <img src={cardImages[userId]} alt="" className="w-full h-full object-contain" />
                 )}
@@ -228,6 +237,9 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       )}
       {showInviteModal && (
         <InviteMemberModal gameId={selectedGameId} onClose={() => setShowInviteModal(false)} />
+      )}
+      {historyTeam && (
+        <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
       )}
     </div>
   )

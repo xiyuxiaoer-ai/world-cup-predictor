@@ -8,6 +8,13 @@ const STAGE_LABELS: Record<string, string> = {
   quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
 }
 
+const POSITION_LABELS: Record<string, string> = {
+  GK: '门将', DEF: '后卫', MID: '中场', FWD: '前锋',
+  HEAD_COACH: '主教练', ASST_COACH: '助理教练', COACH: '教练组',
+}
+
+const POSITION_ORDER = ['HEAD_COACH', 'ASST_COACH', 'COACH', 'GK', 'DEF', 'MID', 'FWD']
+
 function resultTag(isHome: boolean, homeScore: number, awayScore: number) {
   const won = isHome ? homeScore > awayScore : awayScore > homeScore
   const lost = isHome ? homeScore < awayScore : awayScore < homeScore
@@ -20,21 +27,35 @@ export default function TeamHistoryModal({
   tla,
   teamName,
   onClose,
+  defaultTab = 'history',
 }: {
   tla: string
   teamName: string
   onClose: () => void
+  defaultTab?: 'history' | 'squad'
 }) {
-  const [data, setData] = useState<{ wc: any[]; friendly: any[] } | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState<'history' | 'squad'>(defaultTab)
+  const [historyData, setHistoryData] = useState<{ wc: any[]; friendly: any[] } | null>(null)
+  const [squadData, setSquadData] = useState<any[] | null>(null)
+  const [historyLoading, setHistoryLoading] = useState(false)
+  const [squadLoading, setSquadLoading] = useState(false)
   const flagUrl = getFlagUrl(tla)
   const displayName = getTeamDisplay(tla, teamName)
 
   useEffect(() => {
+    setHistoryLoading(true)
     fetch(`/api/team-history?tla=${tla}`)
       .then(r => r.json())
-      .then(d => { setData(d); setLoading(false) })
+      .then(d => { setHistoryData(d); setHistoryLoading(false) })
   }, [tla])
+
+  useEffect(() => {
+    if (tab !== 'squad' || squadData !== null) return
+    setSquadLoading(true)
+    fetch(`/api/team-squad?tla=${tla}`)
+      .then(r => r.json())
+      .then(d => { setSquadData(Array.isArray(d) ? d : []); setSquadLoading(false) })
+  }, [tab, tla, squadData])
 
   return (
     <div
@@ -49,22 +70,56 @@ export default function TeamHistoryModal({
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-2.5">
             {flagUrl && <img src={flagUrl} alt="" className="w-8 h-6 object-cover rounded" />}
-            <span className="font-semibold text-gray-900 dark:text-gray-100">{displayName} 历史战绩</span>
+            <span className="font-semibold text-gray-900 dark:text-gray-100">{displayName}</span>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => setTab('history')}
+            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+              tab === 'history'
+                ? 'text-amber-500 border-b-2 border-amber-500'
+                : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            历史战绩
+          </button>
+          <button
+            onClick={() => setTab('squad')}
+            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+              tab === 'squad'
+                ? 'text-amber-500 border-b-2 border-amber-500'
+                : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            世界杯名单
+          </button>
+        </div>
+
         {/* Body */}
         <div className="overflow-y-auto flex-1">
-          {loading ? (
-            <div className="p-6 text-center text-gray-400 text-sm">加载中...</div>
-          ) : (
-            <>
-              {/* WC 2026 section */}
-              <Section title="2026世界杯" matches={data?.wc || []} tla={tla} isWC />
-              {/* Friendly section */}
-              <Section title="热身赛" matches={data?.friendly || []} tla={tla} isWC={false} />
-            </>
+          {tab === 'history' && (
+            historyLoading ? (
+              <div className="p-6 text-center text-gray-400 text-sm">加载中...</div>
+            ) : (
+              <>
+                <Section title="2026世界杯" matches={historyData?.wc || []} tla={tla} isWC />
+                <Section title="热身赛" matches={historyData?.friendly || []} tla={tla} isWC={false} />
+              </>
+            )
+          )}
+
+          {tab === 'squad' && (
+            squadLoading ? (
+              <div className="p-6 text-center text-gray-400 text-sm">加载中...</div>
+            ) : !squadData || squadData.length === 0 ? (
+              <div className="p-6 text-center text-gray-400 text-sm">暂无名单数据</div>
+            ) : (
+              <SquadList squad={squadData} />
+            )
           )}
         </div>
       </div>
@@ -116,6 +171,53 @@ function Section({ title, matches, tla, isWC }: { title: string; matches: any[];
           })}
         </div>
       )}
+    </div>
+  )
+}
+
+function SquadList({ squad }: { squad: any[] }) {
+  const grouped: Record<string, any[]> = {}
+  for (const p of squad) {
+    const pos = p.position || 'FWD'
+    if (!grouped[pos]) grouped[pos] = []
+    grouped[pos].push(p)
+  }
+
+  const sections = POSITION_ORDER.filter(pos => grouped[pos]?.length > 0)
+
+  return (
+    <div>
+      {sections.map(pos => (
+        <div key={pos}>
+          <div className="px-5 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {POSITION_LABELS[pos] || pos}
+            </span>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            {grouped[pos].map((p: any, idx: number) => (
+              <div key={idx} className="flex items-center gap-3 px-5 py-2.5">
+                {p.shirt_number != null ? (
+                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500 w-5 text-right shrink-0">{p.shirt_number}</span>
+                ) : (
+                  <span className="w-5 shrink-0" />
+                )}
+                <div className="flex-1 min-w-0">
+                  <span className="text-sm text-gray-800 dark:text-gray-200">
+                    {p.player_name_zh || p.player_name}
+                  </span>
+                  {p.player_name_zh && p.player_name !== p.player_name_zh && (
+                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-1.5">{p.player_name}</span>
+                  )}
+                </div>
+                {p.club && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0 truncate max-w-24">{p.club}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

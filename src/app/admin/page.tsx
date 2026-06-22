@@ -10,7 +10,7 @@ const STAGE_LABELS: Record<string, string> = {
   quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
 }
 
-type Tab = 'users' | 'games' | 'predictions' | 'champion'
+type Tab = 'users' | 'games' | 'predictions' | 'champion' | 'squads'
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('users')
@@ -28,6 +28,8 @@ export default function AdminPage() {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [finalizing, setFinalizing] = useState(false)
   const [finalizeResult, setFinalizeResult] = useState<string>('')
+  const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState<string>('')
   const router = useRouter()
 
   useEffect(() => {
@@ -86,6 +88,19 @@ export default function AdminPage() {
     if (res.ok) { setMsg('Game 已删除'); loadData() }
     else setMsg(data.error || '删除失败')
     setConfirmDelete(null)
+  }
+
+  async function handleSyncSquads() {
+    if (!confirm('将从 football-data.org 拉取全部 48 支球队的名单，并覆盖现有数据。确定继续？')) return
+    setSyncing(true); setSyncResult('')
+    const res = await fetch('/api/admin/sync-squads', { method: 'POST' })
+    const data = await res.json()
+    if (res.ok) {
+      setSyncResult(`✅ 同步完成！共 ${data.teams} 支球队，${data.players} 条球员/教练记录。${data.tableCreated ? '（已自动建表）' : ''}`)
+    } else {
+      setSyncResult(`❌ ${data.error}`)
+    }
+    setSyncing(false)
   }
 
   async function handleFinalize() {
@@ -154,7 +169,7 @@ export default function AdminPage() {
           {(['users', 'games', 'predictions', 'champion'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
-              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : '🏆 彩蛋结算'}
+              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : t === 'champion' ? '🏆 彩蛋结算' : '🗒️ 球队名单'}
             </button>
           ))}
         </div>
@@ -336,6 +351,31 @@ export default function AdminPage() {
                 className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
               >
                 {finalizing ? '结算中...' : '计算最终得分'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Squads Tab */}
+        {tab === 'squads' && (
+          <div className="space-y-4">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold text-blue-400">🗒️ 世界杯球队名单同步</h2>
+              <p className="text-sm text-zinc-400">
+                从 football-data.org 拉取 2026 世界杯全部 48 支球队的出场名单（含球员号码、位置、俱乐部）和主教练信息，写入 Supabase。
+              </p>
+              <p className="text-xs text-zinc-500">⚠️ 第一次运行时若提示「表不存在」，请先在 Supabase SQL Editor 执行 <code className="font-mono bg-zinc-800 px-1 rounded">sql/create_team_squads.sql</code>，再点击同步。</p>
+              {syncResult && (
+                <div className={`text-sm rounded-lg p-3 break-all ${syncResult.startsWith('✅') ? 'bg-zinc-800 text-emerald-400' : 'bg-red-950/40 text-red-400'}`}>
+                  {syncResult}
+                </div>
+              )}
+              <button
+                onClick={handleSyncSquads}
+                disabled={syncing}
+                className="bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                {syncing ? '同步中...' : '同步球队名单'}
               </button>
             </div>
           </div>
