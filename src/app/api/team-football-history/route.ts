@@ -11,42 +11,53 @@ function proxyImg(url: string | null | undefined): string | null {
 async function fetchWikipediaImages(names: string[]): Promise<Record<string, string>> {
   if (names.length === 0) return {}
   const result: Record<string, string> = {}
-  // Wikipedia allows up to 50 titles per request
+
   for (let i = 0; i < names.length; i += 50) {
     const chunk = names.slice(i, i + 50)
-    const titles = chunk.join('|')
     try {
-      const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles)}&prop=pageimages&format=json&pithumbsize=400&redirects=1`
+      const url =
+        `https://en.wikipedia.org/w/api.php?action=query` +
+        `&titles=${encodeURIComponent(chunk.join('|'))}` +
+        `&prop=pageimages&format=json&pithumbsize=400&redirects=1`
       const res = await fetch(url, {
         headers: { 'User-Agent': UA },
-        next: { revalidate: 86400 },
+        // no-store so every deployment gets fresh images (avoids stale Next.js data-cache)
+        cache: 'no-store',
       })
       if (!res.ok) continue
       const data = await res.json()
 
-      // Build reverse-lookup maps for normalized titles and redirects
-      const redirectMap: Record<string, string> = {}
-      for (const r of (data?.query?.redirects ?? [])) {
-        redirectMap[r.to] = r.from
-      }
-      const normalMap: Record<string, string> = {}
-      for (const n of (data?.query?.normalized ?? [])) {
-        normalMap[n.to] = n.from
+      // page title → image URL
+      const pageImages: Record<string, string> = {}
+      for (const page of Object.values(data?.query?.pages ?? {}) as any[]) {
+        if (page.thumbnail?.source) {
+          pageImages[page.title as string] = proxyImg(page.thumbnail.source)!
+        }
       }
 
-      const pages: any[] = Object.values(data?.query?.pages ?? {})
-      for (const page of pages) {
-        if (!page.thumbnail?.source) continue
-        const imgUrl = proxyImg(page.thumbnail.source)!
-        const pageTitle: string = page.title
-        result[pageTitle] = imgUrl
-        const afterRedirect = redirectMap[pageTitle]
-        if (afterRedirect) result[afterRedirect] = imgUrl
-        const afterNorm = normalMap[afterRedirect ?? pageTitle]
-        if (afterNorm) result[afterNorm] = imgUrl
+      // normalization: input title → normalized title
+      const normMap: Record<string, string> = {}
+      for (const n of (data?.query?.normalized ?? []) as any[]) {
+        normMap[n.from as string] = n.to as string
+      }
+
+      // redirect: pre-redirect → post-redirect
+      const rdMap: Record<string, string> = {}
+      for (const r of (data?.query?.redirects ?? []) as any[]) {
+        rdMap[r.from as string] = r.to as string
+      }
+
+      // For each input name: follow normalization then redirect to find the page image
+      for (const name of chunk) {
+        const norm = normMap[name] ?? name
+        const rd1 = rdMap[norm] ?? norm
+        const rd2 = rdMap[rd1] ?? rd1  // double redirect
+        const img =
+          pageImages[rd2] ?? pageImages[rd1] ?? pageImages[norm] ?? pageImages[name]
+        if (img) result[name] = img
       }
     } catch {
-      // Network failure — continue without images for this chunk
+      // network failure — skip this chunk
     }
   }
   return result
@@ -54,15 +65,18 @@ async function fetchWikipediaImages(names: string[]): Promise<Record<string, str
 
 async function fetchBaiduImage(name: string): Promise<string | null> {
   try {
-    const url = `https://baike.baidu.com/api/openapi/BaikeLemmaCardApi?scope=103&format=json&appid=379020&bk_key=${encodeURIComponent(name)}&bk_length=100`
+    const url =
+      `https://baike.baidu.com/api/openapi/BaikeLemmaCardApi` +
+      `?scope=103&format=json&appid=379020` +
+      `&bk_key=${encodeURIComponent(name)}&bk_length=100`
     const res = await fetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' },
-      next: { revalidate: 86400 },
+      cache: 'no-store',
     })
     if (!res.ok) return null
     const data = await res.json()
-    // Baidu Baike API may return different fields depending on scope
-    const imgUrl: string | undefined = data?.image ?? data?.pic_href ?? data?.images?.[0]?.url
+    const imgUrl: string | undefined =
+      data?.image ?? data?.pic_href ?? data?.images?.[0]?.url
     return imgUrl ? proxyImg(imgUrl) : null
   } catch {
     return null
@@ -77,13 +91,13 @@ export async function GET(request: Request) {
   const legend = TEAM_LEGENDS[tla]
   if (!legend) return NextResponse.json({ error: 'No legend data for this team' }, { status: 404 })
 
-  // Batch-fetch player images from English Wikipedia (upload.wikimedia.org CDN is accessible in China)
+  // Batch-fetch player images from English Wikipedia
   const nameEnList = legend.players.map(p => p.nameEn)
   const wikiImages = await fetchWikipediaImages(nameEnList)
 
   // For players still missing images, try Baidu Baike in parallel
   const players = await Promise.all(
-    legend.players.map(async (p) => {
+    legend.players.map(async p => {
       let imageUrl = wikiImages[p.nameEn] ?? null
       if (!imageUrl) {
         imageUrl = await fetchBaiduImage(p.name)
@@ -100,12 +114,7 @@ export async function GET(request: Request) {
   )
 
   return NextResponse.json(
-    {
-      intro: legend.intro,
-      worldCupRecord: legend.worldCupRecord,
-      goal2026: legend.goal2026,
-      players,
-    },
-    { headers: { 'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800' } }
+    { intro: legend.intro, worldCupRecord: legend.worldCupRecord, goal2026: legend.goal2026, players },
+    { headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' } }
   )
 }
