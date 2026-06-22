@@ -98,8 +98,8 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
           世界杯竞猜
         </Link>
 
-        {/* 五个功能键：均分剩余空间，等距排列 */}
-        <div className="flex-1 flex items-center justify-evenly px-3">
+        {/* 五个功能键：移动端均分，桌面端紧凑靠左 */}
+        <div className="flex-1 sm:flex-none flex items-center justify-evenly sm:justify-start sm:gap-1 px-3 sm:px-0 sm:ml-4">
           {navLinks.map(link => (
             <Link
               key={link.href}
@@ -147,6 +147,9 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
             )}
           </Link>
         </div>
+
+        {/* 桌面端弹性间隔，把头像推到最右 */}
+        <div className="hidden sm:block flex-1" />
 
         {/* 头像 + 退出 */}
         <div className="flex items-center gap-2 shrink-0">
