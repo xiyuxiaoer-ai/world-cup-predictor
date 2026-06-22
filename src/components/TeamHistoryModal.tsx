@@ -247,9 +247,10 @@ export default function TeamHistoryModal({
   useEffect(() => {
     if (tab !== 'squad' || squadData !== null) return
     setSquadLoading(true)
-    fetch(`/api/team-squad?tla=${tla}`)
-      .then(r => r.json())
+    fetch(`/api/team-squad?tla=${tla}&_v=2`)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => { setSquadData(Array.isArray(d) ? d : []); setSquadLoading(false) })
+      .catch(() => { setSquadData([]); setSquadLoading(false) })
   }, [tab, tla, squadData])
 
   useEffect(() => {

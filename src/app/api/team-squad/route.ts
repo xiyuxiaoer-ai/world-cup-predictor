@@ -185,27 +185,27 @@ export async function GET(request: Request) {
     .order('shirt_number', { ascending: true, nullsFirst: false })
 
   if (dbData && dbData.length > 0) {
-    return NextResponse.json(dbData)
+    return NextResponse.json(dbData, { headers: { 'Cache-Control': 'no-store' } })
   }
 
   // 2. Fetch from Wikipedia
   const sectionIdx = TLA_TO_SECTION[tla]
-  if (!sectionIdx) return NextResponse.json([])
+  if (!sectionIdx) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
   try {
     const wikiUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_squads&format=json&prop=wikitext&section=${sectionIdx}&disablelimitreport=1`
     const res = await fetch(wikiUrl, {
       headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' },
-      next: { revalidate: 3600 },
+      cache: 'no-store',
     })
-    if (!res.ok) return NextResponse.json([])
+    if (!res.ok) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
     const json = await res.json()
     const wikitext: string = json.parse?.wikitext?.['*'] || ''
-    if (!wikitext) return NextResponse.json([])
+    if (!wikitext) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
     const players = parseSquad(wikitext, tla)
-    if (players.length === 0) return NextResponse.json([])
+    if (players.length === 0) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
     // 3. Batch-fetch Chinese names from Wikipedia zh interwiki
     const wikiTitles = players
@@ -227,9 +227,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json(
       rows.map(({ tla: _tla, ...p }) => p),
-      { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } }
+      { headers: { 'Cache-Control': 'no-store' } }
     )
   } catch {
-    return NextResponse.json([])
+    return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
   }
 }
