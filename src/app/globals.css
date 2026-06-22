@@ -310,6 +310,24 @@ body {
 }
 .glow-amber:active { transform: scale(0.97) translateY(0); }
 
+/* ── Dark 模式：所有交互按钮统一切换到蓝色 ── */
+@media (prefers-color-scheme: dark) {
+  :is(button, a, [type="submit"]).bg-amber-500 {
+    background-color: #3B82F6;
+  }
+  :is(button, a, [type="submit"]).hover\:bg-amber-400:hover,
+  :is(button, a, [type="submit"]).hover\:bg-amber-600:hover {
+    background-color: #2563EB;
+  }
+  :is(button, a, [type="submit"]).active\:bg-amber-600:active {
+    background-color: #1D4ED8;
+  }
+  /* 辉光效果同步改蓝色 */
+  :is(button, a).glow-amber:hover {
+    box-shadow: 0 0 24px rgba(59, 130, 246, 0.45), 0 4px 16px rgba(59, 130, 246, 0.25);
+  }
+}
+
 /* ── 骨架屏扫光 ── */
 @keyframes shimmer {
   from { background-position: -200% 0; }
