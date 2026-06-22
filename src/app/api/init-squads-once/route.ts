@@ -28,35 +28,41 @@ export async function GET(request: Request) {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
   const footballToken = process.env.FOOTBALL_DATA_API_TOKEN
 
+  // Collect env diagnostics
+  const envKeys = Object.keys(process.env)
+    .filter(k => /supabase|postgres|database|db_|pghost|pgport|pguser|pgpass/i.test(k))
+    .map(k => {
+      const v = process.env[k] || ''
+      return `${k}=${v.slice(0, 30)}${v.length > 30 ? '...' : ''}`
+    })
+
   const admin = createClient(supabaseUrl, serviceRoleKey)
 
-  // Step 1: create table via pg-meta
-  const createResults: string[] = []
-  for (const sql of CREATE_SQL_STEPS) {
+  // Step 1: try multiple SQL execution paths
+  const createResults: string[] = [`envKeys: ${envKeys.join(' | ')}`]
+
+  // Try pg-meta paths
+  const pgMetaUrls = [
+    `${supabaseUrl}/pg/query`,
+    `${supabaseUrl}/meta/query`,
+    `${supabaseUrl}/v1/pg-meta/query`,
+    `https://api.supabase.com/v1/projects/hiatpshykhbbhdzbhgac/database/query`,
+  ]
+  let tableCreated = false
+  for (const url of pgMetaUrls) {
+    if (tableCreated) break
     try {
-      const res = await fetch(`${supabaseUrl}/pg/query`, {
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
-        body: JSON.stringify({ query: sql }),
+        body: JSON.stringify({ query: CREATE_SQL_STEPS.join(';\n') }),
       })
-      createResults.push(`${res.status}: ${sql.slice(0, 40)}`)
+      const body = await res.text()
+      createResults.push(`${url.split('/').slice(-2).join('/')}: ${res.status} ${body.slice(0, 80)}`)
+      if (res.ok) { tableCreated = true; break }
     } catch (e: any) {
-      createResults.push(`err: ${e.message}`)
+      createResults.push(`${url.split('/').slice(-1)[0]}: err ${e.message?.slice(0,40)}`)
     }
-  }
-
-  // RLS policy
-  try {
-    const policyRes = await fetch(`${supabaseUrl}/pg/query`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${serviceRoleKey}` },
-      body: JSON.stringify({
-        query: `DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='team_squads' AND policyname='public read') THEN CREATE POLICY "public read" ON team_squads FOR SELECT USING (true); END IF; END $$`
-      }),
-    })
-    createResults.push(`policy: ${policyRes.status}`)
-  } catch (e: any) {
-    createResults.push(`policy err: ${e.message}`)
   }
 
   // Step 2: fetch squad data

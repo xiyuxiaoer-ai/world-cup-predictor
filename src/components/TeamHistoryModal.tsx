@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
 const STAGE_LABELS: Record<string, string> = {
@@ -34,6 +35,7 @@ export default function TeamHistoryModal({
   onClose: () => void
   defaultTab?: 'history' | 'squad'
 }) {
+  const [mounted, setMounted] = useState(false)
   const [tab, setTab] = useState<'history' | 'squad'>(defaultTab)
   const [historyData, setHistoryData] = useState<{ wc: any[]; friendly: any[] } | null>(null)
   const [squadData, setSquadData] = useState<any[] | null>(null)
@@ -41,6 +43,8 @@ export default function TeamHistoryModal({
   const [squadLoading, setSquadLoading] = useState(false)
   const flagUrl = getFlagUrl(tla)
   const displayName = getTeamDisplay(tla, teamName)
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     setHistoryLoading(true)
@@ -57,7 +61,9 @@ export default function TeamHistoryModal({
       .then(d => { setSquadData(Array.isArray(d) ? d : []); setSquadLoading(false) })
   }, [tab, tla, squadData])
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
@@ -123,7 +129,8 @@ export default function TeamHistoryModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
