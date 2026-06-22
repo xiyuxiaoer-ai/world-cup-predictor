@@ -130,6 +130,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   }
 
   const [finishedExpanded, setFinishedExpanded] = useState(false)
+  const [showGameActions, setShowGameActions] = useState(false)
 
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
@@ -275,25 +276,42 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           ))}
         </select>
         <div className="flex items-center gap-2 flex-wrap">
+          {/* 折叠触发 */}
           <button
-            onClick={() => setShowCreateModal(true)}
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
+            onClick={() => setShowGameActions(p => !p)}
+            title="管理 Game"
+            className={`text-xs px-2 py-1.5 rounded-lg border transition-all tap-scale ${
+              showGameActions
+                ? 'text-gray-600 dark:text-gray-300 border-gray-400/60 dark:border-white/20 bg-white/40 dark:bg-white/[0.07]'
+                : 'text-gray-400 dark:text-gray-500 border-gray-300/50 dark:border-white/[0.10] hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-400/60 dark:hover:border-white/20'
+            }`}
           >
-            + 创建
+            ···
           </button>
-          <button
-            onClick={() => setShowJoinModal(true)}
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
-          >
-            + 加入
-          </button>
-          <button
-            onClick={copyGameCode}
-            title="复制 Game 码邀请朋友"
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg font-mono transition-all tap-scale"
-          >
-            {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
-          </button>
+          {/* 展开的操作按钮 */}
+          {showGameActions && (
+            <>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
+              >
+                + 创建
+              </button>
+              <button
+                onClick={() => setShowJoinModal(true)}
+                className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
+              >
+                + 加入
+              </button>
+              <button
+                onClick={copyGameCode}
+                title="复制 Game 码邀请朋友"
+                className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg font-mono transition-all tap-scale"
+              >
+                {copied ? '✓ 已复制' : `码: ${selectedGameId.slice(0, 8)}`}
+              </button>
+            </>
+          )}
           {isAdmin && !confirmDeleteGame && (
             <button
               onClick={() => setConfirmDeleteGame(true)}

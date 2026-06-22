@@ -69,23 +69,9 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2 overflow-hidden">
         <div className="flex items-center gap-3 overflow-x-auto scrollbar-none min-w-0">
           <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale">
-            <svg viewBox="0 0 34 24" fill="none" style={{ width: 34, height: 24, flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
-              {/* White card background */}
-              <rect x="0.5" y="0.5" width="33" height="23" rx="5" fill="white" stroke="#e0e0e0" strokeWidth="0.7"/>
-              {/* "2" – dark crimson, bold */}
-              <text x="9" y="17" textAnchor="middle" fill="#8C0022" fontSize="15" fontWeight="900" fontFamily="Arial Black, Arial, Helvetica, sans-serif">2</text>
-              {/* Trophy cup */}
-              <path d="M15.5 5.5h3v4a1.5 1.5 0 01-3 0V5.5z" fill="#C9971C"/>
-              {/* Trophy handles */}
-              <path d="M15.5 6.8C13.6 6.8 13 8.8 15.5 9.2" stroke="#C9971C" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-              <path d="M18.5 6.8C20.4 6.8 21 8.8 18.5 9.2" stroke="#C9971C" strokeWidth="1.1" fill="none" strokeLinecap="round"/>
-              {/* Trophy stem */}
-              <rect x="16.2" y="9.5" width="1.6" height="2.8" fill="#A97012" rx="0.3"/>
-              {/* Trophy base */}
-              <rect x="14" y="12.3" width="6" height="1.8" rx="0.5" fill="#A97012"/>
-              {/* "6" – dark crimson, bold */}
-              <text x="25" y="17" textAnchor="middle" fill="#8C0022" fontSize="15" fontWeight="900" fontFamily="Arial Black, Arial, Helvetica, sans-serif">6</text>
-            </svg>
+            {/* light 模式用深色版，dark 模式用浅色版 */}
+            <img src="/wc2026-light.png" alt="FIFA World Cup 26" className="h-8 w-auto dark:hidden" style={{ imageRendering: 'crisp-edges' }} />
+            <img src="/wc2026-dark.png" alt="FIFA World Cup 26" className="h-8 w-auto hidden dark:block" style={{ imageRendering: 'crisp-edges' }} />
             <span className="hidden sm:block text-sm">世界杯竞猜</span>
           </Link>
           <div className="flex items-center gap-0.5">
