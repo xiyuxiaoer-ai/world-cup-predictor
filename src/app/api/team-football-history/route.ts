@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 const WIKI_ZH = 'https://zh.wikipedia.org/w/api.php'
 const UA = 'WorldCupPredictor/1.0 (zhou-qiaofeng@sysj.co.jp)'
@@ -143,8 +143,9 @@ function extractPlayers(legendText: string): RawPlayer[] {
   return players.slice(0, 20)
 }
 
-export async function GET(req: NextRequest) {
-  const tla = req.nextUrl.searchParams.get('tla')?.toUpperCase()
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const tla = searchParams.get('tla')?.toUpperCase()
   if (!tla) return NextResponse.json({ error: 'Missing tla' }, { status: 400 })
 
   const wikiTitle = TLA_TO_WIKI[tla]

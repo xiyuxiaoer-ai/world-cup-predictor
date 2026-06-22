@@ -79,7 +79,7 @@ async function fetchTeamLogistics(
       .order('kickoff_time', { ascending: false })
       .limit(1)
     if (!data?.length) return null
-    const prev = data[0]
+    const prev = data[0] as { kickoff_time: string; api_match_id: number }
     const prevVenue = MATCH_VENUES[prev.api_match_id]
     if (!prevVenue) return null
     return {
