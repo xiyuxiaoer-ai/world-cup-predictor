@@ -12,6 +12,8 @@ const ALLOWED_HOSTS = [
   'bcebos.com',             // matches *.bcebos.com
   'baidu.com',              // matches gss0/gss1/gss2/hiphotos/imgsrc.baidu.com
   'bdstatic.com',           // Baidu static CDN
+  // football2026tips.com — Chinese WC data portal with player/stadium photos
+  'football2026tips.com',
 ]
 
 export async function GET(request: Request) {

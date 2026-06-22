@@ -1,116 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-// Country name aliases for Wikipedia section matching (includes alternate spellings)
-const TLA_TO_COUNTRY: Record<string, string[]> = {
-  ALG: ['Algeria'],
-  ARG: ['Argentina'],
-  AUS: ['Australia'],
-  AUT: ['Austria'],
-  BEL: ['Belgium'],
-  BIH: ['Bosnia and Herzegovina'],
-  BRA: ['Brazil'],
-  CAN: ['Canada'],
-  CIV: ['Ivory Coast', "Côte d'Ivoire"],
-  COD: ['DR Congo', 'Democratic Republic of the Congo', 'Congo DR'],
-  COL: ['Colombia'],
-  CPV: ['Cape Verde', 'Cabo Verde'],
-  CRO: ['Croatia'],
-  CUW: ['Curaçao'],
-  CZE: ['Czech Republic', 'Czechia'],
-  ECU: ['Ecuador'],
-  EGY: ['Egypt'],
-  ENG: ['England'],
-  ESP: ['Spain'],
-  FRA: ['France'],
-  GER: ['Germany'],
-  GHA: ['Ghana'],
-  HAI: ['Haiti'],
-  IRN: ['Iran'],
-  IRQ: ['Iraq'],
-  JOR: ['Jordan'],
-  JPN: ['Japan'],
-  KOR: ['South Korea'],
-  KSA: ['Saudi Arabia'],
-  MAR: ['Morocco'],
-  MEX: ['Mexico'],
-  NED: ['Netherlands'],
-  NOR: ['Norway'],
-  NZL: ['New Zealand'],
-  PAN: ['Panama'],
-  PAR: ['Paraguay'],
-  POR: ['Portugal'],
-  QAT: ['Qatar'],
-  RSA: ['South Africa'],
-  SCO: ['Scotland'],
-  SEN: ['Senegal'],
-  SUI: ['Switzerland'],
-  SWE: ['Sweden'],
-  TUN: ['Tunisia'],
-  TUR: ['Turkey', 'Türkiye'],
-  URU: ['Uruguay'],
-  USA: ['United States'],
-  UZB: ['Uzbekistan'],
+const TLA_TO_SLUG: Record<string, string> = {
+  ALG: 'algeria', ARG: 'argentina', AUS: 'australia', AUT: 'austria',
+  BEL: 'belgium', BIH: 'bosnia', BRA: 'brazil', CAN: 'canada',
+  CIV: 'ivory-coast', COD: 'dr-congo', COL: 'colombia', CPV: 'cape-verde',
+  CRO: 'croatia', CUW: 'curacao', CZE: 'czechia', ECU: 'ecuador',
+  EGY: 'egypt', ENG: 'england', ESP: 'spain', FRA: 'france',
+  GER: 'germany', GHA: 'ghana', HAI: 'haiti', IRN: 'iran',
+  IRQ: 'iraq', JOR: 'jordan', JPN: 'japan', KOR: 'south-korea',
+  KSA: 'saudi-arabia', MAR: 'morocco', MEX: 'mexico', NED: 'netherlands',
+  NOR: 'norway', NZL: 'new-zealand', PAN: 'panama', PAR: 'paraguay',
+  POR: 'portugal', QAT: 'qatar', RSA: 'south-africa', SCO: 'scotland',
+  SEN: 'senegal', SUI: 'switzerland', SWE: 'sweden', TUN: 'tunisia',
+  TUR: 'turkey', URU: 'uruguay', USA: 'usa', UZB: 'uzbekistan',
 }
 
-const POSITION_MAP: Record<string, string> = {
-  GK: 'GK', DF: 'DEF', MF: 'MID', FW: 'FWD',
-}
-
-// Dynamically find the correct section index for a team from Wikipedia
-async function findSectionIndex(tla: string): Promise<number | null> {
-  const names = TLA_TO_COUNTRY[tla]
-  if (!names) return null
-
-  try {
-    const res = await fetch(
-      'https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_squads&format=json&prop=sections&disablelimitreport=1',
-      { headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' }, next: { revalidate: 3600 } }
-    )
-    if (!res.ok) return null
-    const sections: any[] = (await res.json()).parse?.sections ?? []
-    const nameSet = new Set(names.map(n => n.toLowerCase()))
-    for (const s of sections) {
-      if (nameSet.has((s.line as string).toLowerCase())) return parseInt(s.index)
-    }
-  } catch { /* ignore */ }
-  return null
-}
-
-function findTemplateEnd(text: string, start: number): number {
-  let depth = 0, i = start
-  while (i < text.length) {
-    if (text[i] === '{' && text[i + 1] === '{') { depth++; i += 2 }
-    else if (text[i] === '}' && text[i + 1] === '}') { depth--; i += 2; if (depth === 0) return i }
-    else i++
-  }
-  return text.length
-}
-
-function getParam(body: string, key: string): string {
-  const needle = `|${key}=`
-  const idx = body.indexOf(needle)
-  if (idx === -1) return ''
-  let val = '', i = idx + needle.length
-  let linkDepth = 0, tmplDepth = 0
-  while (i < body.length) {
-    const c = body[i]
-    if (c === '[' && body[i + 1] === '[') { linkDepth++; val += '[['; i += 2; continue }
-    if (c === ']' && body[i + 1] === ']') { linkDepth--; val += ']]'; i += 2; continue }
-    if (c === '{' && body[i + 1] === '{') { tmplDepth++; i += 2; continue }
-    if (c === '}' && body[i + 1] === '}') { tmplDepth--; i += 2; continue }
-    if (c === '|' && linkDepth === 0 && tmplDepth === 0) break
-    val += c; i++
-  }
-  return val.trim()
-}
-
-function parseLink(str: string): { display: string; wikiTitle: string | null } {
-  const m = str.match(/^\[\[([^\]|]+)(?:\|([^\]]+))?\]\]$/)
-  if (m) return { display: m[1], wikiTitle: m[1] }
-  const display = str.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1').replace(/\[|\]/g, '').trim()
-  return { display, wikiTitle: null }
-}
+const POS_MAP: Record<string, string> = { GK: 'GK', DF: 'DEF', MF: 'MID', FW: 'FWD' }
 
 interface PlayerRow {
   tla: string
@@ -119,99 +25,64 @@ interface PlayerRow {
   player_name: string
   player_name_zh: string | null
   club: string | null
-  _wikiTitle?: string | null
 }
 
-function parseSquad(wikitext: string, tla: string): PlayerRow[] {
+export function parseSquadHtml(html: string, tla: string): PlayerRow[] {
   const players: PlayerRow[] = []
 
-  const playerPrefixes = ['{{nat fs g player|', '{{Nat fs g player|', '{{nat fs player|']
-  for (const prefix of playerPrefixes) {
-    let pos = 0
-    while (true) {
-      const start = wikitext.indexOf(prefix, pos)
-      if (start === -1) break
-      const end = findTemplateEnd(wikitext, start)
-      const body = wikitext.slice(start + prefix.length, end - 2)
-
-      const nameRaw = getParam(body, 'name')
-      const clubRaw = getParam(body, 'club')
-      const { display: name, wikiTitle } = parseLink(nameRaw)
-      const { display: club } = parseLink(clubRaw)
-      const posStr = getParam(body, 'pos')
-      const noStr = getParam(body, 'no')
-
-      if (name) {
-        players.push({
-          tla,
-          shirt_number: noStr ? parseInt(noStr) || null : null,
-          position: POSITION_MAP[posStr?.toUpperCase()] || 'FWD',
-          player_name: name,
-          player_name_zh: null,
-          club: club || null,
-          _wikiTitle: wikiTitle,
-        })
-      }
-      pos = end
-    }
+  // Map position markers (squad-group-head) to their HTML offsets
+  const positionMarkers: Array<{ idx: number; pos: string }> = []
+  const gHeadRe = /class="squad-group-head"[\s\S]{0,500}?(GK|DF|MF|FW)\b/g
+  let m: RegExpExecArray | null
+  while ((m = gHeadRe.exec(html)) !== null) {
+    positionMarkers.push({ idx: m.index, pos: POS_MAP[m[1]] ?? 'FWD' })
   }
 
-  const coachPrefixes = ['{{nat fs g coach|', '{{Nat fs g coach|', '{{nat fs coach|']
-  for (const prefix of coachPrefixes) {
-    let pos = 0
-    while (true) {
-      const start = wikitext.indexOf(prefix, pos)
-      if (start === -1) break
-      const end = findTemplateEnd(wikitext, start)
-      const body = wikitext.slice(start + prefix.length, end - 2)
-      const nameRaw = getParam(body, 'name')
-      const { display: name, wikiTitle } = parseLink(nameRaw)
-      if (name) {
-        players.unshift({
-          tla, shirt_number: null, position: 'HEAD_COACH',
-          player_name: name, player_name_zh: null, club: null,
-          _wikiTitle: wikiTitle,
-        })
-      }
-      pos = end
+  // Extract each squad-player block (lazy, no upper bound — last player extends to end)
+  const playerRe = /class="squad-player"([\s\S]+?)(?=class="squad-player"|class="squad-group-head"|class="player-card"|id="key-players"|<footer|$)/g
+  while ((m = playerRe.exec(html)) !== null) {
+    const pHtml = m[0]
+    const playerIdx = m.index
+
+    // Nearest preceding position marker
+    let position = 'FWD'
+    for (const marker of positionMarkers) {
+      if (marker.idx < playerIdx) position = marker.pos
+      else break
     }
+
+    // Shirt number: squad-numtag (with photo) or squad-numfb (no photo)
+    const numM = pHtml.match(/squad-num(?:tag|fb)[^>]*>(\d+)/)
+    const shirt_number = numM ? parseInt(numM[1]) : null
+
+    // Chinese name: img alt (with photo) OR font-weight:700 span (no photo)
+    const zhM = pHtml.match(/alt="([^"]+)"/)
+      ?? pHtml.match(/font-weight:700[^>]*>([一-鿿][^<]*)</)
+    const player_name_zh = zhM?.[1]?.trim() ?? null
+    if (!player_name_zh) continue
+
+    // English name from font-size:11px or 12px colored div
+    const enM = pHtml.match(/color:rgba\(255,255,255,0\.4\)[^>]*margin-bottom:\d+px[^>]*>([\s\S]*?)<\/div/)
+      ?? pHtml.match(/font-size:11px[^>]*>([\s\S]*?)<\/div/)
+    const player_name = enM?.[1]
+      ?.replace(/<!--[\s\S]*?-->/g, '')
+      ?.replace(/<[^>]+>/g, '')
+      ?.replace(/\s+/g, ' ')
+      ?.trim() || player_name_zh
+
+    // Club from color:#d4af37 div ("Club · Age 岁")
+    const clubM = pHtml.match(/color:#d4af37[^>]*>([\s\S]*?)<\/div/)
+    const clubRaw = clubM?.[1]
+      ?.replace(/<!--[\s\S]*?-->/g, '')
+      ?.replace(/<[^>]+>/g, '')
+      ?.replace(/\s+/g, ' ')
+      ?.trim() ?? ''
+    const club = clubRaw.split('·')[0]?.trim() || null
+
+    players.push({ tla, shirt_number, position, player_name, player_name_zh, club })
   }
 
   return players
-}
-
-async function fetchZhNames(titles: string[]): Promise<Map<string, string>> {
-  const map = new Map<string, string>()
-  if (titles.length === 0) return map
-
-  for (let i = 0; i < titles.length; i += 50) {
-    const batch = titles.slice(i, i + 50)
-    const titlesParam = batch.map(t => encodeURIComponent(t)).join('|')
-    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=${titlesParam}&props=labels%7Csitelinks&sitefilter=enwiki&languages=zh-hans%7Czh%7Czh-cn&format=json&redirects=yes`
-
-    try {
-      const res = await fetch(url, {
-        headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' },
-        next: { revalidate: 86400 },
-      })
-      if (!res.ok) continue
-      const json = await res.json()
-
-      for (const entity of Object.values(json.entities || {}) as any[]) {
-        if (entity.missing !== undefined) continue
-        const zhName =
-          entity.labels?.['zh-hans']?.value ||
-          entity.labels?.['zh-cn']?.value ||
-          entity.labels?.['zh']?.value
-        if (!zhName) continue
-
-        const enTitle = entity.sitelinks?.enwiki?.title
-        if (enTitle) map.set(enTitle, zhName)
-      }
-    } catch { /* silently skip */ }
-  }
-
-  return map
 }
 
 export async function GET(request: Request) {
@@ -219,12 +90,15 @@ export async function GET(request: Request) {
   const tla = searchParams.get('tla')?.toUpperCase()
   if (!tla) return NextResponse.json({ error: 'tla required' }, { status: 400 })
 
+  const slug = TLA_TO_SLUG[tla]
+  if (!slug) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
+
   const admin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // 1. Try DB first
+  // 1. Try Supabase DB first
   const { data: dbData } = await admin
     .from('team_squads')
     .select('shirt_number, position, player_name, player_name_zh, club')
@@ -235,44 +109,24 @@ export async function GET(request: Request) {
     return NextResponse.json(dbData, { headers: { 'Cache-Control': 'no-store' } })
   }
 
-  // 2. Dynamic section lookup from Wikipedia
-  const sectionIdx = await findSectionIndex(tla)
-  if (!sectionIdx) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
-
+  // 2. Fetch from football2026tips.com
   try {
-    const wikiUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_squads&format=json&prop=wikitext&section=${sectionIdx}&disablelimitreport=1`
-    const res = await fetch(wikiUrl, {
-      headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' },
+    const res = await fetch(`https://football2026tips.com/squads/${slug}`, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
       cache: 'no-store',
+      signal: AbortSignal.timeout(12000),
     })
     if (!res.ok) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
-    const json = await res.json()
-    const wikitext: string = json.parse?.wikitext?.['*'] || ''
-    if (!wikitext) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
-
-    const players = parseSquad(wikitext, tla)
+    const html = await res.text()
+    const players = parseSquadHtml(html, tla)
     if (players.length === 0) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
-    // 3. Batch-fetch Chinese names from WikiData
-    const wikiTitles = players
-      .map(p => p._wikiTitle)
-      .filter((t): t is string => !!t)
-
-    const zhMap = await fetchZhNames(wikiTitles)
-
-    for (const p of players) {
-      if (p._wikiTitle && zhMap.has(p._wikiTitle)) {
-        p.player_name_zh = zhMap.get(p._wikiTitle)!
-      }
-    }
-
-    // 4. Cache to DB
-    const rows = players.map(({ _wikiTitle: _, ...p }) => p)
-    admin.from('team_squads').insert(rows).then(() => {})
+    // 3. Cache to DB
+    admin.from('team_squads').insert(players).then(() => {})
 
     return NextResponse.json(
-      rows.map(({ tla: _tla, ...p }) => p),
+      players.map(({ tla: _t, ...p }) => p),
       { headers: { 'Cache-Control': 'no-store' } }
     )
   } catch {
