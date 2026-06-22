@@ -276,17 +276,21 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           ))}
         </select>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* 折叠触发 */}
+          {/* 折叠触发：Chrome 三点风格 */}
           <button
             onClick={() => setShowGameActions(p => !p)}
             title="管理 Game"
-            className={`text-xs px-2 py-1.5 rounded-lg border transition-all tap-scale ${
+            className={`w-8 h-8 flex items-center justify-center rounded-full transition-all tap-scale ${
               showGameActions
-                ? 'text-gray-600 dark:text-gray-300 border-gray-400/60 dark:border-white/20 bg-white/40 dark:bg-white/[0.07]'
-                : 'text-gray-400 dark:text-gray-500 border-gray-300/50 dark:border-white/[0.10] hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-400/60 dark:hover:border-white/20'
+                ? 'bg-black/10 dark:bg-white/[0.12] text-gray-700 dark:text-gray-200'
+                : 'text-gray-400 dark:text-gray-500 hover:bg-black/[0.07] dark:hover:bg-white/[0.08] hover:text-gray-600 dark:hover:text-gray-300'
             }`}
           >
-            ···
+            <svg viewBox="0 0 18 4" width="18" height="4" fill="currentColor">
+              <circle cx="2" cy="2" r="1.6"/>
+              <circle cx="9" cy="2" r="1.6"/>
+              <circle cx="16" cy="2" r="1.6"/>
+            </svg>
           </button>
           {/* 展开的操作按钮 */}
           {showGameActions && (
