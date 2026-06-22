@@ -10,12 +10,10 @@ const UA = 'WorldCupPredictor/1.0'
 // Needed when Wikipedia has a disambiguation page or the name differs slightly
 const WIKI_TITLE_OVERRIDES: Record<string, string> = {
   'Raúl':               'Raúl (footballer)',
-  'Luis Diaz':          'Luis Díaz (footballer, born 1997)',
+  'Luis Diaz':          'Luis Díaz',
   'Chris Wood':         'Chris Wood (New Zealand footballer)',
-  'Mahmoud Hassan':     'Trezeguet',            // Egyptian winger, Wikipedia title is his nickname
+  'Mahmoud Hassan':     'Trezeguet (Egyptian footballer)',
   'Marcelo Etcheverry': 'Marco Etcheverry',     // correct first name on Wikipedia
-  'Emmanuel Sanon':     'Emmanuel Sanon',
-  'Abdulla Khasanov':   'Abdulla Khasanov',
 }
 
 async function batchWikiImages(
@@ -35,7 +33,7 @@ async function batchWikiImages(
       const url =
         `https://en.wikipedia.org/w/api.php?action=query` +
         `&titles=${encodeURIComponent(chunk.join('|'))}` +
-        `&prop=pageimages&format=json&pithumbsize=400&redirects=1`
+        `&prop=pageimages&format=json&pithumbsize=400&redirects=1&pilicense=any`
       const res = await fetch(url, { headers: { 'User-Agent': UA }, cache: 'no-store' })
       if (!res.ok) continue
       const data = await res.json()
