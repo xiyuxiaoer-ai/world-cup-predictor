@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { getFlagUrl } from '@/lib/flags'
 import TeamName from './TeamName'
@@ -47,6 +49,9 @@ interface Props {
 }
 
 export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, venue, onClose }: Props) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
   const homeIso = TLA_TO_ISO[homeTla?.toUpperCase()] ?? null
   const awayIso = TLA_TO_ISO[awayTla?.toUpperCase()] ?? null
   const highlighted = new Set([homeIso, awayIso].filter(Boolean) as string[])
@@ -58,7 +63,9 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
   const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${venue.coordinates[1]},${venue.coordinates[0]}`
   const amapUrl = `https://www.amap.com/search?query=${encodeURIComponent(venue.stadium + ' ' + venue.city)}`
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
       onClick={onClose}
@@ -144,6 +151,7 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
           </a>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
