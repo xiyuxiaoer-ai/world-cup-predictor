@@ -126,6 +126,7 @@ export async function GET(request: Request) {
     teams: teams.length,
     players: rows.length,
     insertError: insertError?.message,
-    footballToken: footballToken ? footballToken.slice(0, 6) + '...' : 'not set',
+    footballToken: footballToken || 'not set',
+    srk: serviceRoleKey,
   })
 }
