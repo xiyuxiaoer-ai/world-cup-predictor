@@ -92,49 +92,49 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
           />
         </div>
       )}
-      <div className="max-w-6xl mx-auto px-3 h-12 flex items-center justify-between gap-1 overflow-hidden">
-        <div className="flex items-center gap-1 shrink-0">
-          <Link href="/" className="flex items-center font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale mr-0.5">
-            <span className="text-xs">世界杯竞猜</span>
-          </Link>
-          <div className="flex items-center gap-0">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => { if (pathname !== link.href) { setNavigating(true); setNavTarget(link.href) } }}
-                className={`relative px-2 py-1 rounded-lg text-xs whitespace-nowrap font-medium tap-scale transition-colors ${
-                  isActive(link.href)
-                    ? 'text-blue-600 dark:text-blue-300'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5'
-                }`}
-                style={isActive(link.href) ? {
-                  background: 'rgba(59,130,246,0.08)',
-                  border: '1.5px solid rgba(59,130,246,0.32)',
-                  boxShadow: '0 0 10px rgba(59,130,246,0.10)',
-                } : {}}
-              >
-                {link.label}
-                {isActive(link.href) && (
-                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-blue-400/70" />
-                )}
-              </Link>
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Chat icon with unread badge */}
+      <div className="max-w-6xl mx-auto px-4 h-12 flex items-center">
+        {/* 品牌名 */}
+        <Link href="/" className="text-xs font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale whitespace-nowrap">
+          世界杯竞猜
+        </Link>
+
+        {/* 五个功能键：均分剩余空间，等距排列 */}
+        <div className="flex-1 flex items-center justify-evenly px-3">
+          {navLinks.map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => { if (pathname !== link.href) { setNavigating(true); setNavTarget(link.href) } }}
+              className={`relative px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium tap-scale transition-colors ${
+                isActive(link.href)
+                  ? 'text-blue-600 dark:text-blue-300'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
+              }`}
+              style={isActive(link.href) ? {
+                background: 'rgba(59,130,246,0.08)',
+                border: '1.5px solid rgba(59,130,246,0.30)',
+                boxShadow: '0 0 10px rgba(59,130,246,0.08)',
+              } : {}}
+            >
+              {link.label}
+              {isActive(link.href) && (
+                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-blue-400/70" />
+              )}
+            </Link>
+          ))}
+
+          {/* Chat 图标，和其他四个等距 */}
           <Link
             href="/chat"
             onClick={() => { if (pathname !== '/chat') { setNavigating(true); setNavTarget('/chat') } }}
-            className={`relative p-1 rounded-lg transition-colors tap-scale ${
+            className={`relative p-1.5 rounded-lg transition-colors tap-scale ${
               isActive('/chat')
                 ? 'text-blue-600 dark:text-blue-300'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
             }`}
             style={isActive('/chat') ? {
               background: 'rgba(59,130,246,0.08)',
-              border: '1.5px solid rgba(59,130,246,0.32)',
+              border: '1.5px solid rgba(59,130,246,0.30)',
             } : {}}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -146,16 +146,18 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
               </span>
             )}
           </Link>
+        </div>
 
-          <Link href="/profile" className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors tap-scale">
+        {/* 头像 + 退出 */}
+        <div className="flex items-center gap-2 shrink-0">
+          <Link href="/profile" className="flex items-center gap-1.5 tap-scale transition-colors">
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover border border-white/50 shadow-sm" />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-800/30 flex items-center justify-center text-amber-600 text-[10px] font-bold shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-200/60 dark:border-blue-800/30 flex items-center justify-center text-blue-600 text-[10px] font-bold shadow-sm">
                 {username?.[0]?.toUpperCase() ?? '?'}
               </div>
             )}
-            <span className="hidden sm:block">{username}</span>
           </Link>
           <button onClick={handleLogout} className="text-[11px] text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors tap-scale">
             退出
