@@ -63,21 +63,25 @@ async function fetchWikipediaImages(names: string[]): Promise<Record<string, str
   return result
 }
 
-async function fetchBaiduImage(name: string): Promise<string | null> {
+async function fetchBingImage(name: string): Promise<string | null> {
   try {
-    const url =
-      `https://baike.baidu.com/api/openapi/BaikeLemmaCardApi` +
-      `?scope=103&format=json&appid=379020` +
-      `&bk_key=${encodeURIComponent(name)}&bk_length=100`
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' },
-      cache: 'no-store',
-    })
+    const res = await fetch(
+      `https://cn.bing.com/images/search?q=${encodeURIComponent(name)}&mkt=zh-CN&count=1`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(8000),
+      }
+    )
     if (!res.ok) return null
-    const data = await res.json()
-    const imgUrl: string | undefined =
-      data?.image ?? data?.pic_href ?? data?.images?.[0]?.url
-    return imgUrl ? proxyImg(imgUrl) : null
+    const html = await res.text()
+    // Prefer turl (Bing's own CDN, stable domain) over murl (third-party, unpredictable)
+    const turlM = html.match(/"turl":"(https?:\/\/[^"]+)"/)
+    if (turlM) return proxyImg(decodeURIComponent(turlM[1]))
+    return null
   } catch {
     return null
   }
@@ -100,7 +104,7 @@ export async function GET(request: Request) {
     legend.players.map(async p => {
       let imageUrl = wikiImages[p.nameEn] ?? null
       if (!imageUrl) {
-        imageUrl = await fetchBaiduImage(p.name)
+        imageUrl = await fetchBingImage(p.name)
       }
       return {
         name: p.name,
