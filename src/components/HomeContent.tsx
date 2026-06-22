@@ -266,17 +266,17 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     <div className="space-y-8">
       {/* Game Selector */}
       <div className="space-y-2">
-        <select
-          value={selectedGameId}
-          onChange={e => setSelectedGameId(e.target.value)}
-          className="glass rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/40 transition-all"
-        >
-          {games.map(g => (
-            <option key={g.id} value={g.id}>{g.name}</option>
-          ))}
-        </select>
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* 折叠触发：Chrome 三点风格 */}
+        <div className="flex items-center gap-1.5">
+          <select
+            value={selectedGameId}
+            onChange={e => setSelectedGameId(e.target.value)}
+            className="glass rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400/40 transition-all"
+          >
+            {games.map(g => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+          </select>
+          {/* 竖排三点：Chrome ⋮ 风格，与 select 同行 */}
           <button
             onClick={() => setShowGameActions(p => !p)}
             title="管理 Game"
@@ -286,13 +286,15 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 : 'text-gray-400 dark:text-gray-500 hover:bg-black/[0.07] dark:hover:bg-white/[0.08] hover:text-gray-600 dark:hover:text-gray-300'
             }`}
           >
-            <svg viewBox="0 0 18 4" width="18" height="4" fill="currentColor">
+            <svg viewBox="0 0 4 18" width="4" height="18" fill="currentColor">
               <circle cx="2" cy="2" r="1.6"/>
-              <circle cx="9" cy="2" r="1.6"/>
-              <circle cx="16" cy="2" r="1.6"/>
+              <circle cx="2" cy="9" r="1.6"/>
+              <circle cx="2" cy="16" r="1.6"/>
             </svg>
           </button>
-          {/* 展开的操作按钮 */}
+        </div>
+        {/* 展开的操作按钮 */}
+        <div className="flex items-center gap-2 flex-wrap">
           {showGameActions && (
             <>
               <button
