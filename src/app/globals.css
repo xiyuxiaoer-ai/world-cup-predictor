@@ -314,6 +314,13 @@ body {
   background-color: #1D4ED8;
 }
 
+/* ── 导航进度条 ── */
+@keyframes nav-progress {
+  0%   { width: 0%; opacity: 1; }
+  60%  { width: 85%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
 /* ── 骨架屏扫光 ── */
 @keyframes shimmer {
   from { background-position: -200% 0; }

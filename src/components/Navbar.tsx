@@ -16,11 +16,26 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   const pathname = usePathname()
   const router = useRouter()
   const [unread, setUnread] = useState(0)
+  const [navigating, setNavigating] = useState(false)
+  const [navTarget, setNavTarget] = useState<string | null>(null)
   const supabaseRef = useRef(createClient())
   const pathnameRef = useRef(pathname)
 
   // Keep pathnameRef current so async callbacks can read the latest value
   useEffect(() => { pathnameRef.current = pathname }, [pathname])
+
+  // Eager prefetch all nav routes on mount
+  useEffect(() => {
+    navLinks.forEach(link => router.prefetch(link.href))
+    router.prefetch('/chat')
+    router.prefetch('/profile')
+  }, [router])
+
+  // When pathname changes, navigation is done — clear loading state
+  useEffect(() => {
+    setNavigating(false)
+    setNavTarget(null)
+  }, [pathname])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -64,8 +79,19 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
     if (pathname === '/chat') setUnread(0)
   }, [pathname])
 
+  const isActive = (href: string) => navTarget ? navTarget === href : pathname === href
+
   return (
     <nav className="sticky top-0 z-50 glass-nav">
+      {/* 顶部进度条：点击导航后立即出现，页面加载完自动消失 */}
+      {navigating && (
+        <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden">
+          <div
+            className="h-full bg-amber-400 dark:bg-blue-400 rounded-full"
+            style={{ animation: 'nav-progress 1.2s cubic-bezier(0.1,0.6,0.5,1) forwards' }}
+          />
+        </div>
+      )}
       <div className="max-w-6xl mx-auto px-3 h-12 flex items-center justify-between gap-1 overflow-hidden">
         <div className="flex items-center gap-1 shrink-0">
           <Link href="/" className="flex items-center font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale mr-0.5">
@@ -76,15 +102,16 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={() => { if (pathname !== link.href) { setNavigating(true); setNavTarget(link.href) } }}
                 className={`relative px-2 py-1 rounded-lg text-xs whitespace-nowrap font-medium tap-scale ${
-                  pathname === link.href
+                  isActive(link.href)
                     ? 'bg-amber-100/80 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 shadow-sm'
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5 transition-colors'
                 }`}
-                style={pathname === link.href ? { boxShadow: '0 0 12px rgba(245,158,11,0.15), inset 0 1px 0 rgba(255,255,255,0.6)' } : {}}
+                style={isActive(link.href) ? { boxShadow: '0 0 12px rgba(245,158,11,0.15), inset 0 1px 0 rgba(255,255,255,0.6)' } : {}}
               >
                 {link.label}
-                {pathname === link.href && (
+                {isActive(link.href) && (
                   <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-amber-500/60" />
                 )}
               </Link>
@@ -95,8 +122,9 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
           {/* Chat icon with unread badge */}
           <Link
             href="/chat"
+            onClick={() => { if (pathname !== '/chat') { setNavigating(true); setNavTarget('/chat') } }}
             className={`relative p-1 rounded-lg transition-colors tap-scale ${
-              pathname === '/chat'
+              isActive('/chat')
                 ? 'text-amber-600 bg-amber-100/80 dark:bg-amber-900/30'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5'
             }`}
