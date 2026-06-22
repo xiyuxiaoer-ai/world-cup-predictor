@@ -20,8 +20,8 @@ const WIKI_TITLE_OVERRIDES: Record<string, string> = {
 // (articles use non-free lead images that don't appear even with pilicense=any)
 const HARDCODED_PHOTOS: Record<string, string> = {
   'Zico':       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Zico_2012_3.jpg/500px-Zico_2012_3.jpg',
-  'Xavi':       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Xavi%2C_Persepolis_vs._Al_Sadd%2C_20190520_02_%28cropped%29.jpg/400px-Xavi%2C_Persepolis_vs._Al_Sadd%2C_20190520_02_%28cropped%29.jpg',
-  'Sadio Mané': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Esteghlal_F.C._v_Al_Nassr_FC%2C_3_March_2025%2C_Sadio_Man%C3%A9_%28cropped%29.jpg/400px-Esteghlal_F.C._v_Al_Nassr_FC%2C_3_March_2025%2C_Sadio_Man%C3%A9_%28cropped%29.jpg',
+  'Xavi':       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Xavi%2C_Persepolis_vs._Al_Sadd%2C_20190520_02_%28cropped%29.jpg/330px-Xavi%2C_Persepolis_vs._Al_Sadd%2C_20190520_02_%28cropped%29.jpg',
+  'Sadio Mané': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Esteghlal_F.C._v_Al_Nassr_FC%2C_3_March_2025%2C_Sadio_Man%C3%A9_%28cropped%29.jpg/330px-Esteghlal_F.C._v_Al_Nassr_FC%2C_3_March_2025%2C_Sadio_Man%C3%A9_%28cropped%29.jpg',
   'Luis Díaz':  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/FC_RB_Salzburg_gegen_FC_Bayern_M%C3%BCnchen_%282026-01-06_Testspiel%29_40_%28Luiz_D%C3%ADaz%29.jpg/400px-FC_RB_Salzburg_gegen_FC_Bayern_M%C3%BCnchen_%282026-01-06_Testspiel%29_40_%28Luiz_D%C3%ADaz%29.jpg',
 }
 
