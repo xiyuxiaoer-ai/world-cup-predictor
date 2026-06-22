@@ -411,7 +411,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                           onClick={() => setFinishedExpanded(p => !p)}
                           className="w-full flex items-center gap-2 py-2 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                         >
-                          <span className={`transition-transform duration-200 ${finishedExpanded ? 'rotate-90' : ''}`}>▶</span>
+                          <svg viewBox="0 0 6 10" width="6" height="10" fill="currentColor" className={`transition-transform duration-200 shrink-0 ${finishedExpanded ? 'rotate-90' : ''}`}><path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
                           <span>已结束 {finished.length} 场</span>
                           <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
                         </button>

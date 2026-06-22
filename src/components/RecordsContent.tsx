@@ -2,6 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import GroupModal from './GroupModal'
+
+function IconPin() {
+  return (
+    <svg viewBox="0 0 10 13" fill="none" style={{ width: 9, height: 11, flexShrink: 0, display: 'inline-block', verticalAlign: 'middle', marginBottom: 1 }}>
+      <path d="M5 0.5C2.79 0.5 1 2.29 1 4.5C1 7.75 5 12.5 5 12.5C5 12.5 9 7.75 9 4.5C9 2.29 7.21 0.5 5 0.5Z" fill="currentColor" opacity="0.85"/>
+      <circle cx="5" cy="4.5" r="1.5" fill="white" opacity="0.88"/>
+    </svg>
+  )
+}
 import dynamic from 'next/dynamic'
 import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
@@ -193,7 +202,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                       >
                         {STAGE_LABELS[match.stage]} {group}
                       </button>
-                      {venue && <button type="button" onClick={() => setMapMatch({ homeTla: match.home_tla, awayTla: match.away_tla, homeTeam: homeName, awayTeam: awayName, venue })} className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-amber-500 transition-colors">📍 {venue.city} · {venue.stadium}</button>}
+                      {venue && <button type="button" onClick={() => setMapMatch({ homeTla: match.home_tla, awayTla: match.away_tla, homeTeam: homeName, awayTeam: awayName, venue })} className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-amber-500 transition-colors"><IconPin /> {venue.city} · {venue.stadium}</button>}
                     </div>
                     <span className="shrink-0 text-right">
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
