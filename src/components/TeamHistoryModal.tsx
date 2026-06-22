@@ -370,6 +370,12 @@ export default function TeamHistoryModal({
                     <div className="flex flex-col items-center gap-3 p-10 text-center">
                       <span className="text-4xl">🌐</span>
                       <p className="text-sm text-gray-500 dark:text-gray-400">暂无该球队的历史资料</p>
+                      <button
+                        onClick={() => setLegendError(false)}
+                        className="mt-1 px-4 py-1.5 rounded-full text-[12px] font-medium text-amber-600 dark:text-amber-400 border border-amber-300/60 dark:border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-900/20 active:scale-95 transition-all"
+                      >
+                        重新加载
+                      </button>
                     </div>
                   )
                   : legendData
