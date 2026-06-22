@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
 import { getFlagUrl } from '@/lib/flags'
 
-const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
+const GEO_URL = '/api/geo'
 
 // ─── Icons: filled + stroke combo, max design quality ────────────────────────
 

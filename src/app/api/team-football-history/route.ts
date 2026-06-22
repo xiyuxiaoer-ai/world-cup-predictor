@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 
+function proxyImg(url: string | null | undefined): string | null {
+  if (!url) return null
+  return `/api/img?url=${encodeURIComponent(url)}`
+}
+
 const WIKI_ZH = 'https://zh.wikipedia.org/w/api.php'
 const UA = 'WorldCupPredictor/1.0 (zhou-qiaofeng@sysj.co.jp)'
 
@@ -167,7 +172,7 @@ export async function GET(request: Request) {
     }
 
     const fullText: string = page.extract ?? ''
-    const teamImageUrl: string | undefined = page.thumbnail?.source
+    const teamImageUrl: string | null = proxyImg(page.thumbnail?.source)
 
     // 2. Parse sections
     const sections = parseExtract(fullText)
@@ -190,7 +195,7 @@ export async function GET(request: Request) {
         const imgData = await imgResp.json()
         const imgPages: any[] = Object.values(imgData?.query?.pages ?? {})
         for (const p of imgPages) {
-          if (p.thumbnail?.source) playerImages[p.title] = p.thumbnail.source
+          if (p.thumbnail?.source) playerImages[p.title] = proxyImg(p.thumbnail.source)!
         }
       } catch {
         // Images are optional – continue without them
@@ -207,9 +212,8 @@ export async function GET(request: Request) {
           const d2Pages: any[] = Object.values(d2Data?.query?.pages ?? {})
           for (const p of d2Pages) {
             if (p.thumbnail?.source) {
-              // Map back to original player name
               const origName = p.title.replace(/（足球运动员）$/, '')
-              playerImages[origName] = p.thumbnail.source
+              playerImages[origName] = proxyImg(p.thumbnail.source)!
             }
           }
         } catch { /* ignore */ }

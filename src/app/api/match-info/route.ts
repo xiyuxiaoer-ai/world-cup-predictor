@@ -11,6 +11,11 @@ function haversineKm(lon1: number, lat1: number, lon2: number, lat2: number): nu
   return R * 2 * Math.asin(Math.sqrt(a))
 }
 
+function proxyImg(url: string | null | undefined): string | null {
+  if (!url) return null
+  return `/api/img?url=${encodeURIComponent(url)}`
+}
+
 async function fetchStadiumImage(wikiTitle: string): Promise<string | null> {
   try {
     const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=900`
@@ -20,7 +25,7 @@ async function fetchStadiumImage(wikiTitle: string): Promise<string | null> {
     })
     if (!res.ok) return null
     const pages = Object.values((await res.json()).query?.pages ?? {}) as any[]
-    return pages[0]?.thumbnail?.source ?? null
+    return proxyImg(pages[0]?.thumbnail?.source ?? null)
   } catch { return null }
 }
 
