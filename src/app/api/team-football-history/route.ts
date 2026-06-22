@@ -61,9 +61,18 @@ async function fetchWikipediaImages(names: string[]): Promise<Record<string, str
   return result
 }
 
+// Some data sources use alternate TLA codes — map to canonical TEAM_LEGENDS key
+const TLA_ALIASES: Record<string, string> = {
+  URY: 'URU',  // Uruguay: football-data.org uses URY, our data uses URU
+  KOR: 'KOR',
+  PRK: 'PRK',
+}
+
 export async function GET(request: Request) {
+  try {
   const { searchParams } = new URL(request.url)
-  const tla = searchParams.get('tla')?.toUpperCase()
+  const rawTla = searchParams.get('tla')?.toUpperCase() ?? ''
+  const tla = TLA_ALIASES[rawTla] ?? rawTla
   if (!tla) return NextResponse.json({ error: 'Missing tla' }, { status: 400 })
 
   const legend = TEAM_LEGENDS[tla]
@@ -107,4 +116,8 @@ export async function GET(request: Request) {
     { intro: legend.intro, worldCupRecord: legend.worldCupRecord, goal2026: legend.goal2026, players },
     { headers: { 'Cache-Control': 'no-store' } }
   )
+  } catch (err) {
+    console.error('[team-football-history] unexpected error:', err)
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+  }
 }
