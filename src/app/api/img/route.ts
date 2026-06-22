@@ -2,10 +2,16 @@
 // upload.wikimedia.org is blocked in China; this route fetches and streams images server-side.
 
 const ALLOWED_HOSTS = [
+  // Wikimedia / Wikipedia
   'upload.wikimedia.org',
   'commons.wikimedia.org',
   'en.wikipedia.org',
   'zh.wikipedia.org',
+  // Baidu Baike image CDN — fallback source for player photos
+  'bkimg.cdn.bcebos.com',   // primary Baidu Baike CDN
+  'bcebos.com',             // matches *.bcebos.com
+  'baidu.com',              // matches gss0/gss1/gss2/hiphotos/imgsrc.baidu.com
+  'bdstatic.com',           // Baidu static CDN
 ]
 
 export async function GET(request: Request) {

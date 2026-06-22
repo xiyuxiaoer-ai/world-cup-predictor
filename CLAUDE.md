@@ -19,6 +19,7 @@
 ## 缓存 / 性能相关
 - 用户提到手机端和电脑端显示不一致、手机看不到更新 → 调用 `/mobile-vs-desktop`
 - 设计新 API 的缓存策略、讨论 Cache-Control 如何设置 → 调用 `/reduce-deploy-delay`
+- 中国用户看不到图片、新增图片来源（维基/百度/其他CDN）、修改 `/api/img` → 先调用 `/china-image-proxy`
 
 ## React 状态相关
 - 遇到"点击没反应"、"数据不刷新"、"error 状态卡住"、"useEffect 不触发" 等问题 → 调用 `/react-state-pitfalls`
