@@ -279,7 +279,7 @@ const TEAM_BASE: Record<string, { city: string; facility: string }> = {
   ENG: { city: '达拉斯, 德克萨斯州', facility: '英足总达拉斯营地' },
   POR: { city: '堪萨斯城, 密苏里州', facility: '堪萨斯城训练营' },
   NED: { city: '巴尔的摩, 马里兰州', facility: '荷兰足协东岸营地' },
-  MAR: { capital: '', city: '费城, 宾夕法尼亚州', facility: '费城周边训练基地' },
+  MAR: { city: '费城, 宾夕法尼亚州', facility: '费城周边训练基地' },
   SEN: { city: '迈阿密, 佛罗里达州', facility: '迈阿密球场训练基地' },
   JPN: { city: '西雅图, 华盛顿州', facility: '西雅图索恩斯训练中心' },
   KOR: { city: '西雅图, 华盛顿州', facility: '西雅图联合营地' },
