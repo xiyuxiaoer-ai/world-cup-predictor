@@ -1,23 +1,80 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-const TLA_TO_SECTION: Record<string, number> = {
-  CZE: 2,  MEX: 3,  RSA: 4,  KOR: 5,
-  BIH: 7,  CAN: 8,  QAT: 9,  SUI: 10,
-  BRA: 12, HAI: 13, MAR: 14, SCO: 15,
-  AUS: 17, PAR: 18, TUR: 19, USA: 20,
-  CUW: 22, ECU: 23, GER: 24, CIV: 25,
-  JPN: 27, NED: 28, SWE: 29, TUN: 30,
-  BEL: 32, EGY: 33, IRN: 34, NZL: 35,
-  CPV: 37, KSA: 38, ESP: 39, URU: 40,
-  FRA: 42, IRQ: 43, NOR: 44, SEN: 45,
-  ALG: 47, ARG: 48, AUT: 49, JOR: 50,
-  COL: 52, COD: 53, POR: 54, UZB: 55,
-  CRO: 57, ENG: 58, GHA: 59, PAN: 60,
+// Country name aliases for Wikipedia section matching (includes alternate spellings)
+const TLA_TO_COUNTRY: Record<string, string[]> = {
+  ALG: ['Algeria'],
+  ARG: ['Argentina'],
+  AUS: ['Australia'],
+  AUT: ['Austria'],
+  BEL: ['Belgium'],
+  BIH: ['Bosnia and Herzegovina'],
+  BRA: ['Brazil'],
+  CAN: ['Canada'],
+  CIV: ['Ivory Coast', "Côte d'Ivoire"],
+  COD: ['DR Congo', 'Democratic Republic of the Congo', 'Congo DR'],
+  COL: ['Colombia'],
+  CPV: ['Cape Verde', 'Cabo Verde'],
+  CRO: ['Croatia'],
+  CUW: ['Curaçao'],
+  CZE: ['Czech Republic', 'Czechia'],
+  ECU: ['Ecuador'],
+  EGY: ['Egypt'],
+  ENG: ['England'],
+  ESP: ['Spain'],
+  FRA: ['France'],
+  GER: ['Germany'],
+  GHA: ['Ghana'],
+  HAI: ['Haiti'],
+  IRN: ['Iran'],
+  IRQ: ['Iraq'],
+  JOR: ['Jordan'],
+  JPN: ['Japan'],
+  KOR: ['South Korea'],
+  KSA: ['Saudi Arabia'],
+  MAR: ['Morocco'],
+  MEX: ['Mexico'],
+  NED: ['Netherlands'],
+  NOR: ['Norway'],
+  NZL: ['New Zealand'],
+  PAN: ['Panama'],
+  PAR: ['Paraguay'],
+  POR: ['Portugal'],
+  QAT: ['Qatar'],
+  RSA: ['South Africa'],
+  SCO: ['Scotland'],
+  SEN: ['Senegal'],
+  SUI: ['Switzerland'],
+  SWE: ['Sweden'],
+  TUN: ['Tunisia'],
+  TUR: ['Turkey', 'Türkiye'],
+  URU: ['Uruguay'],
+  USA: ['United States'],
+  UZB: ['Uzbekistan'],
 }
 
 const POSITION_MAP: Record<string, string> = {
   GK: 'GK', DF: 'DEF', MF: 'MID', FW: 'FWD',
+}
+
+// Dynamically find the correct section index for a team from Wikipedia
+async function findSectionIndex(tla: string): Promise<number | null> {
+  const names = TLA_TO_COUNTRY[tla]
+  if (!names) return null
+
+  try {
+    const res = await fetch(
+      'https://en.wikipedia.org/w/api.php?action=parse&page=2026_FIFA_World_Cup_squads&format=json&prop=sections&disablelimitreport=1',
+      { headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' }, next: { revalidate: 3600 } }
+    )
+    if (!res.ok) return null
+    const sections: any[] = (await res.json()).parse?.sections ?? []
+    const nameSet = new Set(names.map(n => n.toLowerCase()))
+    for (const s of sections) {
+      if (nameSet.has((s.line as string).toLowerCase())) return parseInt(s.index)
+    }
+  } catch { /* ignore */ }
+  return null
 }
 
 function findTemplateEnd(text: string, start: number): number {
@@ -48,13 +105,9 @@ function getParam(body: string, key: string): string {
   return val.trim()
 }
 
-// [[Paris Saint-Germain|PSG]] → display: "Paris Saint-Germain"  wikiTitle: "Paris Saint-Germain"
-// [[Lionel Messi]]           → display: "Lionel Messi"          wikiTitle: "Lionel Messi"
-// plain text                 → display: "text"                  wikiTitle: null
 function parseLink(str: string): { display: string; wikiTitle: string | null } {
   const m = str.match(/^\[\[([^\]|]+)(?:\|([^\]]+))?\]\]$/)
   if (m) return { display: m[1], wikiTitle: m[1] }
-  // strip any remaining [[ ]] and return as plain
   const display = str.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1').replace(/\[|\]/g, '').trim()
   return { display, wikiTitle: null }
 }
@@ -127,17 +180,13 @@ function parseSquad(wikitext: string, tla: string): PlayerRow[] {
   return players
 }
 
-// Batch-query WikiData for zh-hans (Simplified Chinese) labels
-// Uses enwiki titles as lookup keys → returns map: English title → Simplified Chinese name
 async function fetchZhNames(titles: string[]): Promise<Map<string, string>> {
   const map = new Map<string, string>()
   if (titles.length === 0) return map
 
-  // WikiData API supports up to 50 titles per request
   for (let i = 0; i < titles.length; i += 50) {
     const batch = titles.slice(i, i + 50)
     const titlesParam = batch.map(t => encodeURIComponent(t)).join('|')
-    // Request: look up by English Wikipedia title, get zh-hans / zh / zh-cn labels + enwiki sitelink
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles=${titlesParam}&props=labels%7Csitelinks&sitefilter=enwiki&languages=zh-hans%7Czh%7Czh-cn&format=json&redirects=yes`
 
     try {
@@ -150,14 +199,12 @@ async function fetchZhNames(titles: string[]): Promise<Map<string, string>> {
 
       for (const entity of Object.values(json.entities || {}) as any[]) {
         if (entity.missing !== undefined) continue
-        // Priority: zh-hans > zh > zh-cn (all simplified or close to it)
         const zhName =
           entity.labels?.['zh-hans']?.value ||
           entity.labels?.['zh-cn']?.value ||
           entity.labels?.['zh']?.value
         if (!zhName) continue
 
-        // Map the canonical English Wikipedia title to the Chinese name
         const enTitle = entity.sitelinks?.enwiki?.title
         if (enTitle) map.set(enTitle, zhName)
       }
@@ -188,8 +235,8 @@ export async function GET(request: Request) {
     return NextResponse.json(dbData, { headers: { 'Cache-Control': 'no-store' } })
   }
 
-  // 2. Fetch from Wikipedia
-  const sectionIdx = TLA_TO_SECTION[tla]
+  // 2. Dynamic section lookup from Wikipedia
+  const sectionIdx = await findSectionIndex(tla)
   if (!sectionIdx) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
   try {
@@ -207,14 +254,13 @@ export async function GET(request: Request) {
     const players = parseSquad(wikitext, tla)
     if (players.length === 0) return NextResponse.json([], { headers: { 'Cache-Control': 'no-store' } })
 
-    // 3. Batch-fetch Chinese names from Wikipedia zh interwiki
+    // 3. Batch-fetch Chinese names from WikiData
     const wikiTitles = players
       .map(p => p._wikiTitle)
       .filter((t): t is string => !!t)
 
     const zhMap = await fetchZhNames(wikiTitles)
 
-    // Apply Chinese names
     for (const p of players) {
       if (p._wikiTitle && zhMap.has(p._wikiTitle)) {
         p.player_name_zh = zhMap.get(p._wikiTitle)!

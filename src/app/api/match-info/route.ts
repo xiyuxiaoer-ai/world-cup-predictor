@@ -21,7 +21,7 @@ async function fetchStadiumImage(wikiTitle: string): Promise<string | null> {
     const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageimages&format=json&pithumbsize=900`
     const res = await fetch(url, {
       headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' },
-      next: { revalidate: 86400 },
+      cache: 'no-store',
     })
     if (!res.ok) return null
     const pages = Object.values((await res.json()).query?.pages ?? {}) as any[]
@@ -125,6 +125,6 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     { stadiumInfo: stadiumMeta ? { capacity: stadiumMeta.capacity, opened: stadiumMeta.opened, image } : null, weather, homeWiki, awayWiki, homeLogistics, awayLogistics },
-    { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' } }
+    { headers: { 'Cache-Control': 'no-store' } }
   )
 }
