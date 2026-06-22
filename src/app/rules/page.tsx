@@ -198,27 +198,30 @@ export default async function RulesPage() {
           </div>
         ))}
 
-        <div className="bg-white dark:bg-gray-800 border border-red-100 dark:border-red-900/30 rounded-2xl p-5 space-y-3 shadow-sm relative isolate overflow-visible">
-          <h2 className="font-bold text-base text-gray-900 dark:text-gray-100 flex items-center gap-2"><IconWarning /> 漏猜惩罚</h2>
-          <div className="space-y-2">
-            {[
-              { stage: '小组赛漏猜', pts: '-1分' },
-              { stage: '32强 / 16强漏猜', pts: '-2分' },
-              { stage: '8强及以后漏猜', pts: '-4分' },
-            ].map(r => (
-              <div key={r.stage} className="flex justify-between items-center">
-                <span className="text-sm text-gray-700 dark:text-gray-200">{r.stage}</span>
-                <span className="text-sm font-bold text-red-700 bg-white/90 dark:bg-gray-800/90 px-1.5 py-0.5 rounded">{r.pts}</span>
-              </div>
-            ))}
+        <div className="bg-white dark:bg-gray-800 border border-red-100 dark:border-red-900/30 rounded-2xl p-5 shadow-sm overflow-hidden">
+          <div className="space-y-3">
+            <h2 className="font-bold text-base text-gray-900 dark:text-gray-100 flex items-center gap-2"><IconWarning /> 漏猜惩罚</h2>
+            <div className="space-y-2">
+              {[
+                { stage: '小组赛漏猜', pts: '-1分' },
+                { stage: '32强 / 16强漏猜', pts: '-2分' },
+                { stage: '8强及以后漏猜', pts: '-4分' },
+              ].map(r => (
+                <div key={r.stage} className="flex justify-between items-center">
+                  <span className="text-sm text-gray-700 dark:text-gray-200">{r.stage}</span>
+                  <span className="text-sm font-bold text-red-700 dark:text-red-400">{r.pts}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-800 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
           </div>
-          <p className="text-xs text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-gray-800 pt-3">比赛开赛前1小时锁定，锁定后无法提交竞猜</p>
-          {/* 踢球效果：腿（静止）+ 足球（旋转+漂浮） */}
-          <div className="absolute -bottom-6 -right-2 pointer-events-none"
-               style={{ zIndex: -1, width: 180, position: 'absolute' }}>
-            <img src="/tq3.png" alt="" style={{ width: 180, height: 'auto', display: 'block', opacity: 0.72 }} />
-            <div className="animate-ball-float" style={{ position: 'absolute', top: -16, right: 2, opacity: 0.72 }}>
-              <img src="/tq2.png" alt="" className="animate-ball-spin" style={{ width: 46, height: 'auto' }} />
+          {/* 踢球效果：在文字下方，不遮挡内容 */}
+          <div className="flex justify-end -mb-5 -mr-5 mt-2 pointer-events-none">
+            <div className="relative">
+              <img src="/tq3.png" alt="" style={{ width: 160, height: 'auto', opacity: 0.65 }} />
+              <div className="animate-ball-float" style={{ position: 'absolute', top: -14, right: 4, opacity: 0.65 }}>
+                <img src="/tq2.png" alt="" className="animate-ball-spin" style={{ width: 42, height: 'auto' }} />
+              </div>
             </div>
           </div>
         </div>

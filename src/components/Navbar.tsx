@@ -68,11 +68,8 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
     <nav className="sticky top-0 z-50 glass-nav">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2 overflow-hidden">
         <div className="flex items-center gap-3 overflow-x-auto scrollbar-none min-w-0">
-          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale">
-            {/* light 模式用深色版，dark 模式用浅色版 */}
-            <img src="/wc2026-light.png" alt="FIFA World Cup 26" className="h-8 w-auto dark:hidden" style={{ imageRendering: 'crisp-edges' }} />
-            <img src="/wc2026-dark.png" alt="FIFA World Cup 26" className="h-8 w-auto hidden dark:block" style={{ imageRendering: 'crisp-edges' }} />
-            <span className="hidden sm:block text-sm">世界杯竞猜</span>
+          <Link href="/" className="flex items-center gap-1.5 font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale">
+            <span className="text-sm">世界杯竞猜</span>
           </Link>
           <div className="flex items-center gap-0.5">
             {navLinks.map(link => (
