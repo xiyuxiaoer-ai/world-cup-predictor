@@ -1,5 +1,5 @@
 ---
-description: 推送到 GitHub 后 Vercel 部署的必要条件和常见坑，每次改动前必读
+description: 【自动触发】git push 或"推送/部署/上线"前必读——Vercel 部署必要条件、Next.js 16 API 写法、React 19 类型坑、推送前检查清单
 ---
 
 # Vercel 部署规则（本项目专用）

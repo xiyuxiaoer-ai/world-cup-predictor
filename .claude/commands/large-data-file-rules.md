@@ -1,5 +1,5 @@
 ---
-description: 创建大型硬编码数据文件（如 team-legends.ts）的规范，避免 TypeScript 错误和数据混乱
+description: 【自动触发】修改 team-legends.ts 或其他大型数据文件前——nameEn拼写/重复key/国籍错误检查，数据质量标准
 ---
 
 # 大型数据文件规范

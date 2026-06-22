@@ -1,5 +1,5 @@
 ---
-description: React 状态管理常见坑：错误状态卡住、数据缓存、重试机制
+description: 【自动触发】遇到"点击没反应/数据不刷新/error卡住/useEffect不触发"时——React状态常见坑与重试机制最佳实践
 ---
 
 # React 状态常见坑

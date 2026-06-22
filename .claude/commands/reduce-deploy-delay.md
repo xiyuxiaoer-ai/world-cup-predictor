@@ -1,5 +1,5 @@
 ---
-description: 减少从推送到用户看到变化的延迟时间的方法
+description: 【自动触发】讨论API缓存策略/Cache-Control设置/stale-while-revalidate时——如何减少部署延迟，URL版本号缓存破坏方法
 ---
 
 # 减少部署延迟
