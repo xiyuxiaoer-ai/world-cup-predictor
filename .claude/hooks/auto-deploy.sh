@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Auto-commit and push after each Claude response
-git add -u 2>/dev/null
-git add .claude/ 2>/dev/null
+# Auto-commit and push after each Claude response.
+# Stages tracked modifications + new files in src/public + .claude config.
+
+git add -u                      2>/dev/null   # tracked modified/deleted
+git add src/ public/ sql/       2>/dev/null   # new source & asset files
+git add .claude/                2>/dev/null   # config / skills changes
 
 STAGED=$(git diff --cached --name-only 2>/dev/null)
 [ -z "$STAGED" ] && exit 0
