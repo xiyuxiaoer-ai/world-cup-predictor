@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import GroupModal from './GroupModal'
 import type { GameWithRole, Match, Prediction } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
@@ -15,6 +16,8 @@ import ChampionEggModal from './ChampionEggModal'
 import ChampionPredictModal from './ChampionPredictModal'
 import { calculateChampionBonus } from '@/lib/championBonus'
 import { MATCH_VENUES } from '@/lib/venues'
+
+const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
 function IconPin() {
   return (
@@ -53,6 +56,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [groupModal, setGroupModal] = useState<{ stage: string; group_name: string | null; label: string } | null>(null)
   const [showEggModal, setShowEggModal] = useState(false)
   const [showPredictModal, setShowPredictModal] = useState(false)
+  const [mapMatch, setMapMatch] = useState<Match | null>(null)
   const [eggBonus, setEggBonus] = useState(0)
 
   const selectedGame = games.find(g => g.id === selectedGameId)
@@ -219,10 +223,14 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </div>
         </div>
         {venue && (
-          <div className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500 -mt-0.5">
+          <button
+            type="button"
+            onClick={() => setMapMatch(match)}
+            className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500 -mt-0.5 hover:text-amber-500 transition-colors"
+          >
             <IconPin />
             <span>{venue.city} · {venue.stadium}</span>
-          </div>
+          </button>
         )}
         <div className="text-xs border-t border-black/[0.06] dark:border-white/10 pt-2">
           {pred ? (
@@ -490,6 +498,16 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <ChampionPredictModal
           onClose={() => setShowPredictModal(false)}
           onSuccess={() => { setShowPredictModal(false); sessionStorage.setItem('egg_dismissed', '1') }}
+        />
+      )}
+      {mapMatch && MATCH_VENUES[(mapMatch as any).api_match_id] && (
+        <StadiumMapModal
+          homeTla={(mapMatch as any).home_tla!}
+          awayTla={(mapMatch as any).away_tla!}
+          homeTeam={getTeamDisplay((mapMatch as any).home_tla, mapMatch.home_team)}
+          awayTeam={getTeamDisplay((mapMatch as any).away_tla, mapMatch.away_team)}
+          venue={MATCH_VENUES[(mapMatch as any).api_match_id]}
+          onClose={() => setMapMatch(null)}
         />
       )}
     </div>
