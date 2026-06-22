@@ -294,47 +294,45 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </button>
         </div>
         {/* 展开的操作按钮 */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {showGameActions && (
-            <>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
-              >
-                + 创建
-              </button>
-              <button
-                onClick={() => setShowJoinModal(true)}
-                className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
-              >
-                + 加入
-              </button>
-              <button
-                onClick={copyGameCode}
-                title="复制 Game 码邀请朋友"
-                className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg font-mono transition-all tap-scale"
-              >
-                {copied ? '✓ 已复制' : `码: ${selectedGameId.slice(0, 8)}`}
-              </button>
-            </>
-          )}
-          {isAdmin && !confirmDeleteGame && (
+        {showGameActions && (
+          <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setConfirmDeleteGame(true)}
-              disabled={deletingGame}
-              className="text-xs text-red-500/50 hover:text-red-500 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+              onClick={() => setShowCreateModal(true)}
+              className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
             >
-              {deletingGame ? '删除中...' : '删除 Game'}
+              + 创建
             </button>
-          )}
-          {isAdmin && confirmDeleteGame && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-red-500">确定删除「{selectedGame?.name}」？</span>
-              <button onClick={handleDeleteGame} className="text-xs text-red-500 border border-red-400/50 px-2 py-1 rounded-lg">确定</button>
-              <button onClick={() => setConfirmDeleteGame(false)} className="text-xs text-zinc-400 border border-zinc-700 px-2 py-1 rounded-lg">取消</button>
-            </div>
-          )}
-        </div>
+            <button
+              onClick={() => setShowJoinModal(true)}
+              className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
+            >
+              + 加入
+            </button>
+            <button
+              onClick={copyGameCode}
+              title="复制 Game 码邀请朋友"
+              className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg font-mono transition-all tap-scale"
+            >
+              {copied ? '✓ 已复制' : `码: ${selectedGameId.slice(0, 8)}`}
+            </button>
+            {isAdmin && !confirmDeleteGame && (
+              <button
+                onClick={() => setConfirmDeleteGame(true)}
+                disabled={deletingGame}
+                className="text-xs text-red-500/50 hover:text-red-500 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {deletingGame ? '删除中...' : '删除 Game'}
+              </button>
+            )}
+            {isAdmin && confirmDeleteGame && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-red-500">确定删除「{selectedGame?.name}」？</span>
+                <button onClick={handleDeleteGame} className="text-xs text-red-500 border border-red-400/50 px-2 py-1 rounded-lg">确定</button>
+                <button onClick={() => setConfirmDeleteGame(false)} className="text-xs text-zinc-400 border border-zinc-700 px-2 py-1 rounded-lg">取消</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {loading ? (
