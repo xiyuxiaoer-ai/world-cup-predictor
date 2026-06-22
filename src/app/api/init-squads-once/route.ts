@@ -119,6 +119,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: !insertError,
+    tableCreated,
     createResults,
     teams: teams.length,
     players: rows.length,
