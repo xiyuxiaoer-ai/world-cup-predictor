@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-// Wikipedia section index for each team on "2026 FIFA World Cup squads"
 const TLA_TO_SECTION: Record<string, number> = {
   CZE: 2,  MEX: 3,  RSA: 4,  KOR: 5,
   BIH: 7,  CAN: 8,  QAT: 9,  SUI: 10,
@@ -21,7 +20,6 @@ const POSITION_MAP: Record<string, string> = {
   GK: 'GK', DF: 'DEF', MF: 'MID', FW: 'FWD',
 }
 
-// Find the full extent of a {{ }} template starting at `start`
 function findTemplateEnd(text: string, start: number): number {
   let depth = 0, i = start
   while (i < text.length) {
@@ -32,7 +30,6 @@ function findTemplateEnd(text: string, start: number): number {
   return text.length
 }
 
-// Extract a named param value from template body, respecting nested [[ ]] and {{ }}
 function getParam(body: string, key: string): string {
   const needle = `|${key}=`
   const idx = body.indexOf(needle)
@@ -43,7 +40,7 @@ function getParam(body: string, key: string): string {
     const c = body[i]
     if (c === '[' && body[i + 1] === '[') { linkDepth++; val += '[['; i += 2; continue }
     if (c === ']' && body[i + 1] === ']') { linkDepth--; val += ']]'; i += 2; continue }
-    if (c === '{' && body[i + 1] === '{') { tmplDepth++; i += 2; continue }  // skip nested templates
+    if (c === '{' && body[i + 1] === '{') { tmplDepth++; i += 2; continue }
     if (c === '}' && body[i + 1] === '}') { tmplDepth--; i += 2; continue }
     if (c === '|' && linkDepth === 0 && tmplDepth === 0) break
     val += c; i++
@@ -51,19 +48,32 @@ function getParam(body: string, key: string): string {
   return val.trim()
 }
 
-// [[Paris Saint-Germain F.C.|PSG]] → Paris Saint-Germain F.C.   [[Lionel Messi]] → Lionel Messi
-function cleanLink(str: string): string {
-  return str
-    .replace(/\[\[([^\]|]+)\|[^\]]+\]\]/g, '$1')
-    .replace(/\[\[([^\]]+)\]\]/g, '$1')
-    .trim()
+// [[Paris Saint-Germain|PSG]] → display: "Paris Saint-Germain"  wikiTitle: "Paris Saint-Germain"
+// [[Lionel Messi]]           → display: "Lionel Messi"          wikiTitle: "Lionel Messi"
+// plain text                 → display: "text"                  wikiTitle: null
+function parseLink(str: string): { display: string; wikiTitle: string | null } {
+  const m = str.match(/^\[\[([^\]|]+)(?:\|([^\]]+))?\]\]$/)
+  if (m) return { display: m[1], wikiTitle: m[1] }
+  // strip any remaining [[ ]] and return as plain
+  const display = str.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1').replace(/\[|\]/g, '').trim()
+  return { display, wikiTitle: null }
 }
 
-function parseSquad(wikitext: string, tla: string): any[] {
-  const players: any[] = []
+interface PlayerRow {
+  tla: string
+  shirt_number: number | null
+  position: string
+  player_name: string
+  player_name_zh: string | null
+  club: string | null
+  _wikiTitle?: string | null
+}
 
-  const prefixes = ['{{nat fs g player|', '{{Nat fs g player|', '{{nat fs player|']
-  for (const prefix of prefixes) {
+function parseSquad(wikitext: string, tla: string): PlayerRow[] {
+  const players: PlayerRow[] = []
+
+  const playerPrefixes = ['{{nat fs g player|', '{{Nat fs g player|', '{{nat fs player|']
+  for (const prefix of playerPrefixes) {
     let pos = 0
     while (true) {
       const start = wikitext.indexOf(prefix, pos)
@@ -71,8 +81,10 @@ function parseSquad(wikitext: string, tla: string): any[] {
       const end = findTemplateEnd(wikitext, start)
       const body = wikitext.slice(start + prefix.length, end - 2)
 
-      const name = cleanLink(getParam(body, 'name'))
-      const club = cleanLink(getParam(body, 'club'))
+      const nameRaw = getParam(body, 'name')
+      const clubRaw = getParam(body, 'club')
+      const { display: name, wikiTitle } = parseLink(nameRaw)
+      const { display: club } = parseLink(clubRaw)
       const posStr = getParam(body, 'pos')
       const noStr = getParam(body, 'no')
 
@@ -84,13 +96,13 @@ function parseSquad(wikitext: string, tla: string): any[] {
           player_name: name,
           player_name_zh: null,
           club: club || null,
+          _wikiTitle: wikiTitle,
         })
       }
       pos = end
     }
   }
 
-  // Coach
   const coachPrefixes = ['{{nat fs g coach|', '{{Nat fs g coach|', '{{nat fs coach|']
   for (const prefix of coachPrefixes) {
     let pos = 0
@@ -99,15 +111,70 @@ function parseSquad(wikitext: string, tla: string): any[] {
       if (start === -1) break
       const end = findTemplateEnd(wikitext, start)
       const body = wikitext.slice(start + prefix.length, end - 2)
-      const name = cleanLink(getParam(body, 'name'))
+      const nameRaw = getParam(body, 'name')
+      const { display: name, wikiTitle } = parseLink(nameRaw)
       if (name) {
-        players.unshift({ tla, shirt_number: null, position: 'HEAD_COACH', player_name: name, player_name_zh: null, club: null })
+        players.unshift({
+          tla, shirt_number: null, position: 'HEAD_COACH',
+          player_name: name, player_name_zh: null, club: null,
+          _wikiTitle: wikiTitle,
+        })
       }
       pos = end
     }
   }
 
   return players
+}
+
+// Batch-query Wikipedia zh (Chinese) interwiki for a list of page titles
+// Returns a map: English title → Chinese name
+async function fetchZhNames(titles: string[]): Promise<Map<string, string>> {
+  const map = new Map<string, string>()
+  if (titles.length === 0) return map
+
+  // Wikipedia API allows up to 50 titles per request
+  for (let i = 0; i < titles.length; i += 50) {
+    const batch = titles.slice(i, i + 50)
+    const titlesParam = batch.map(t => encodeURIComponent(t)).join('|')
+    const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${titlesParam}&prop=langlinks&lllang=zh&format=json&redirects=1`
+
+    try {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': 'WorldCupPredictor/1.0 (educational project)' },
+        next: { revalidate: 86400 },
+      })
+      if (!res.ok) continue
+      const json = await res.json()
+
+      // Build redirect map: normalized/redirected title → canonical title
+      const redirectMap = new Map<string, string>()
+      for (const r of json.query?.redirects || []) {
+        redirectMap.set(r.from.toLowerCase(), r.to)
+      }
+      for (const r of json.query?.normalized || []) {
+        redirectMap.set(r.from.toLowerCase(), r.to)
+      }
+
+      for (const page of Object.values(json.query?.pages || {}) as any[]) {
+        const zhLink = page.langlinks?.find((l: any) => l.lang === 'zh')
+        if (zhLink) {
+          const zhName = zhLink['*']
+          // Map both canonical and original titles to zh name
+          map.set(page.title, zhName)
+          // Also map each original batch title that redirected to this page
+          for (const [from, to] of redirectMap) {
+            if (to === page.title) {
+              const orig = batch.find(t => t.toLowerCase() === from)
+              if (orig) map.set(orig, zhName)
+            }
+          }
+        }
+      }
+    } catch { /* silently skip failed batches */ }
+  }
+
+  return map
 }
 
 export async function GET(request: Request) {
@@ -120,7 +187,7 @@ export async function GET(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // 1. Try DB first (fast path)
+  // 1. Try DB first
   const { data: dbData } = await admin
     .from('team_squads')
     .select('shirt_number, position, player_name, player_name_zh, club')
@@ -131,7 +198,7 @@ export async function GET(request: Request) {
     return NextResponse.json(dbData)
   }
 
-  // 2. Fallback: fetch from Wikipedia
+  // 2. Fetch from Wikipedia
   const sectionIdx = TLA_TO_SECTION[tla]
   if (!sectionIdx) return NextResponse.json([])
 
@@ -150,11 +217,26 @@ export async function GET(request: Request) {
     const players = parseSquad(wikitext, tla)
     if (players.length === 0) return NextResponse.json([])
 
-    // 3. Cache to DB so next request is instant
-    admin.from('team_squads').insert(players).then(() => {})
+    // 3. Batch-fetch Chinese names from Wikipedia zh interwiki
+    const wikiTitles = players
+      .map(p => p._wikiTitle)
+      .filter((t): t is string => !!t)
+
+    const zhMap = await fetchZhNames(wikiTitles)
+
+    // Apply Chinese names
+    for (const p of players) {
+      if (p._wikiTitle && zhMap.has(p._wikiTitle)) {
+        p.player_name_zh = zhMap.get(p._wikiTitle)!
+      }
+    }
+
+    // 4. Cache to DB
+    const rows = players.map(({ _wikiTitle: _, ...p }) => p)
+    admin.from('team_squads').insert(rows).then(() => {})
 
     return NextResponse.json(
-      players.map(({ tla: _tla, ...p }) => p),
+      rows.map(({ tla: _tla, ...p }) => p),
       { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } }
     )
   } catch {
