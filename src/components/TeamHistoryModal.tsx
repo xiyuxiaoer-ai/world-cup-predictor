@@ -33,14 +33,16 @@ export default function TeamHistoryModal({
   tla: string
   teamName: string
   onClose: () => void
-  defaultTab?: 'history' | 'squad'
+  defaultTab?: 'history' | 'squad' | 'news'
 }) {
   const [mounted, setMounted] = useState(false)
-  const [tab, setTab] = useState<'history' | 'squad'>(defaultTab)
+  const [tab, setTab] = useState<'history' | 'squad' | 'news'>(defaultTab)
   const [historyData, setHistoryData] = useState<{ wc: any[]; friendly: any[] } | null>(null)
   const [squadData, setSquadData] = useState<any[] | null>(null)
+  const [newsData, setNewsData] = useState<any[] | null>(null)
   const [historyLoading, setHistoryLoading] = useState(false)
   const [squadLoading, setSquadLoading] = useState(false)
+  const [newsLoading, setNewsLoading] = useState(false)
   const flagUrl = getFlagUrl(tla)
   const displayName = getTeamDisplay(tla, teamName)
 
@@ -60,6 +62,15 @@ export default function TeamHistoryModal({
       .then(r => r.json())
       .then(d => { setSquadData(Array.isArray(d) ? d : []); setSquadLoading(false) })
   }, [tab, tla, squadData])
+
+  useEffect(() => {
+    if (tab !== 'news' || newsData !== null) return
+    setNewsLoading(true)
+    fetch(`/api/team-news?name=${encodeURIComponent(getTeamDisplay(tla, teamName))}`)
+      .then(r => r.json())
+      .then(d => { setNewsData(Array.isArray(d) ? d : []); setNewsLoading(false) })
+      .catch(() => { setNewsData([]); setNewsLoading(false) })
+  }, [tab, tla, teamName, newsData])
 
   if (!mounted) return null
 
@@ -83,26 +94,19 @@ export default function TeamHistoryModal({
 
         {/* Tabs */}
         <div className="flex border-b border-white/40 dark:border-white/10">
-          <button
-            onClick={() => setTab('history')}
-            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-              tab === 'history'
-                ? 'text-amber-500 border-b-2 border-amber-500'
-                : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
-          >
-            历史战绩
-          </button>
-          <button
-            onClick={() => setTab('squad')}
-            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-              tab === 'squad'
-                ? 'text-amber-500 border-b-2 border-amber-500'
-                : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
-            }`}
-          >
-            世界杯名单
-          </button>
+          {(['history', 'squad', 'news'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+                tab === t
+                  ? 'text-amber-500 border-b-2 border-amber-500'
+                  : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
+              }`}
+            >
+              {t === 'history' ? '历史战绩' : t === 'squad' ? '世界杯名单' : '最新动态'}
+            </button>
+          ))}
         </div>
 
         {/* Body */}
@@ -125,6 +129,16 @@ export default function TeamHistoryModal({
               <div className="p-6 text-center text-gray-400 text-sm">暂无名单数据</div>
             ) : (
               <SquadList squad={squadData} />
+            )
+          )}
+
+          {tab === 'news' && (
+            newsLoading ? (
+              <div className="p-6 text-center text-gray-400 text-sm">加载中...</div>
+            ) : !newsData || newsData.length === 0 ? (
+              <div className="p-6 text-center text-gray-400 text-sm">暂无新闻</div>
+            ) : (
+              <NewsList items={newsData} />
             )
           )}
         </div>
@@ -178,6 +192,49 @@ function Section({ title, matches, tla, isWC }: { title: string; matches: any[];
           })}
         </div>
       )}
+    </div>
+  )
+}
+
+function timeAgo(dateStr: string): string {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return ''
+  const diff = Date.now() - d.getTime()
+  const h = Math.floor(diff / 3_600_000)
+  if (h < 1) return '刚刚'
+  if (h < 24) return `${h}小时前`
+  const days = Math.floor(h / 24)
+  if (days < 7) return `${days}天前`
+  return d.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+}
+
+function NewsList({ items }: { items: any[] }) {
+  return (
+    <div className="divide-y divide-white/30 dark:divide-white/10">
+      {items.map((item, idx) => (
+        <a
+          key={idx}
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col gap-1 px-5 py-3 hover:bg-white/20 dark:hover:bg-white/5 transition-colors tap-scale"
+        >
+          <span className="text-sm text-gray-800 dark:text-gray-100 leading-snug line-clamp-2">
+            {item.title}
+          </span>
+          <div className="flex items-center gap-2 text-[11px] text-gray-400 dark:text-gray-500">
+            {item.source && (
+              <span className="font-medium text-gray-500 dark:text-gray-400 truncate max-w-[120px]">
+                {item.source}
+              </span>
+            )}
+            {item.source && item.pubDate && <span>·</span>}
+            {item.pubDate && <span>{timeAgo(item.pubDate)}</span>}
+            <span className="ml-auto shrink-0">↗</span>
+          </div>
+        </a>
+      ))}
     </div>
   )
 }
