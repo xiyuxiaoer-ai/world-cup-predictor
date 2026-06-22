@@ -54,10 +54,10 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
             <button key={f} onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-all tap-scale ${
                 filter === f
-                  ? 'bg-amber-500 dark:text-white text-gray-900 shadow-sm'
+                  ? 'bg-amber-500 text-white shadow-sm'
                   : 'glass text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
-              style={filter === f ? { boxShadow: '0 0 12px rgba(245,158,11,0.3)' } : {}}
+              style={filter === f ? { boxShadow: '0 0 12px rgba(59,130,246,0.35)' } : {}}
             >
               {f === 'all' ? '全部' : f === 'finished' ? '已结束' : '待开赛'}
             </button>

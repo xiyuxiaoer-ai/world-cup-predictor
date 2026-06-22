@@ -253,79 +253,52 @@ body {
 }
 .tap-scale:active { transform: scale(0.95); }
 
-/* ── 主按钮：亮色=温暖琥珀纯色 / 暗色=蓝色 ── */
+/* ── 主按钮：清爽蓝色（亮色/暗色通用） ── */
 .btn-gold-primary {
-  background: #D98C0A;
+  background: #3B82F6;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.24),
-    0 3px 10px rgba(217,140,10,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 3px 12px rgba(59,130,246,0.32),
     0 1px 2px rgba(0,0,0,0.12);
   color: white;
   transition: background 0.14s ease, box-shadow 0.14s ease,
               transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
 }
 .btn-gold-primary:hover:not(:disabled) {
-  background: #E89C14;
+  background: #4D90FA;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.24),
-    0 5px 16px rgba(217,140,10,0.40),
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 5px 18px rgba(59,130,246,0.46),
     0 1px 2px rgba(0,0,0,0.12);
   transform: translateY(-1px);
 }
 .btn-gold-primary:active:not(:disabled) {
-  background: #C47C00;
+  background: #2563EB;
   transform: translateY(0) scale(0.99);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 3px rgba(0,0,0,0.14);
 }
 .btn-gold-primary:disabled { opacity: 0.50; cursor: not-allowed; }
 
-@media (prefers-color-scheme: dark) {
-  .btn-gold-primary {
-    background: #3B82F6;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.14),
-      0 3px 12px rgba(59,130,246,0.40),
-      0 1px 2px rgba(0,0,0,0.20);
-  }
-  .btn-gold-primary:hover:not(:disabled) {
-    background: #4D90FA;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.14),
-      0 5px 18px rgba(59,130,246,0.54),
-      0 1px 2px rgba(0,0,0,0.20);
-  }
-  .btn-gold-primary:active:not(:disabled) {
-    background: #2563EB;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 1px 3px rgba(0,0,0,0.25);
-  }
-}
-
-/* ── 琥珀辉光（主要按钮） ── */
+/* ── 蓝色辉光（主要按钮，全模式通用） ── */
 .glow-amber {
   transition: box-shadow 0.3s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .glow-amber:hover {
-  box-shadow: 0 0 24px rgba(245, 158, 11, 0.42), 0 4px 16px rgba(245, 158, 11, 0.22);
+  box-shadow: 0 0 24px rgba(59, 130, 246, 0.40), 0 4px 16px rgba(59, 130, 246, 0.22);
   transform: translateY(-1px);
 }
 .glow-amber:active { transform: scale(0.97) translateY(0); }
 
-/* ── Dark 模式：所有交互按钮统一切换到蓝色 ── */
-@media (prefers-color-scheme: dark) {
-  :is(button, a, [type="submit"]).bg-amber-500 {
-    background-color: #3B82F6;
-  }
-  :is(button, a, [type="submit"]).hover\:bg-amber-400:hover,
-  :is(button, a, [type="submit"]).hover\:bg-amber-600:hover {
-    background-color: #2563EB;
-  }
-  :is(button, a, [type="submit"]).active\:bg-amber-600:active {
-    background-color: #1D4ED8;
-  }
-  /* 辉光效果同步改蓝色 */
-  :is(button, a).glow-amber:hover {
-    box-shadow: 0 0 24px rgba(59, 130, 246, 0.45), 0 4px 16px rgba(59, 130, 246, 0.25);
-  }
+/* ── 全模式：所有 bg-amber-500 交互按钮统一切换到蓝色 ── */
+:is(button, a, [type="submit"]).bg-amber-500 {
+  background-color: #3B82F6;
+}
+:is(button, a, [type="submit"]).hover\:bg-amber-400:hover,
+:is(button, a, [type="submit"]).hover\:bg-amber-600:hover {
+  background-color: #2563EB;
+}
+:is(button, a, [type="submit"]).active\:bg-amber-600:active {
+  background-color: #1D4ED8;
 }
 
 /* ── 骨架屏扫光 ── */

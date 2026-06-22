@@ -149,7 +149,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
         <button
           onClick={() => setShowInviteModal(true)}
           className="text-sm text-amber-600 glass px-3 py-2 rounded-lg font-medium glow-amber tap-scale"
-          style={{ boxShadow: '0 0 0 1px rgba(245,158,11,0.25)' }}
+          style={{ boxShadow: '0 0 0 1px rgba(59,130,246,0.25)' }}
         >
           + 邀请成员
         </button>
