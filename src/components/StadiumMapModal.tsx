@@ -429,7 +429,7 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
     /* Overlay */
     <div
       className="fixed inset-0 z-[200] flex items-end md:items-center justify-center md:p-6"
-      style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
+      style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(20px)' }}
       onClick={onClose}
     >
       {/* Sheet */}
@@ -439,7 +439,6 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
           maxHeight: '93vh',
           background: 'linear-gradient(158deg, rgba(12,22,50,0.97) 0%, rgba(6,10,28,0.99) 100%)',
           backdropFilter: 'blur(64px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(64px) saturate(1.8)',
           border: '1px solid rgba(255,255,255,0.12)',
           boxShadow: '0 0 0 1px rgba(255,255,255,0.05) inset, 0 1px 0 rgba(255,255,255,0.25) inset, 0 64px 128px rgba(0,0,0,0.75)',
         }}
