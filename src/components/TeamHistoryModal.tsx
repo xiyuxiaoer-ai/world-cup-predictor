@@ -294,7 +294,6 @@ export default function TeamHistoryModal({
             animate-sheet-in
             shadow-2xl shadow-black/30
           "
-          style={{ WebkitBackdropFilter: 'blur(36px) saturate(220%)', backdropFilter: 'blur(36px) saturate(220%)' }}
           onClick={e => e.stopPropagation()}
         >
           {/* Drag handle (mobile) */}
