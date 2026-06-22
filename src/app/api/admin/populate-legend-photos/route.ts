@@ -6,10 +6,31 @@ export const maxDuration = 300
 
 const UA = 'WorldCupPredictor/1.0'
 
-async function batchWikiImages(names: string[]): Promise<Record<string, string>> {
+// nameEn in team-legends.ts → exact Wikipedia article title
+// Needed when Wikipedia has a disambiguation page or the name differs slightly
+const WIKI_TITLE_OVERRIDES: Record<string, string> = {
+  'Raúl':               'Raúl (footballer)',
+  'Luis Diaz':          'Luis Díaz (footballer, born 1997)',
+  'Chris Wood':         'Chris Wood (New Zealand footballer)',
+  'Mahmoud Hassan':     'Trezeguet',            // Egyptian winger, Wikipedia title is his nickname
+  'Marcelo Etcheverry': 'Marco Etcheverry',     // correct first name on Wikipedia
+  'Emmanuel Sanon':     'Emmanuel Sanon',
+  'Abdulla Khasanov':   'Abdulla Khasanov',
+}
+
+async function batchWikiImages(
+  // nameEn → wiki title to query; returns nameEn → image URL
+  nameToWiki: Record<string, string>
+): Promise<Record<string, string>> {
   const result: Record<string, string> = {}
-  for (let i = 0; i < names.length; i += 50) {
-    const chunk = names.slice(i, i + 50)
+  // Reverse map: wiki title → original nameEn (for result attribution)
+  const wikiToName: Record<string, string> = {}
+  for (const [name, wiki] of Object.entries(nameToWiki)) wikiToName[wiki] = name
+
+  const wikiTitles = Object.values(nameToWiki)
+
+  for (let i = 0; i < wikiTitles.length; i += 50) {
+    const chunk = wikiTitles.slice(i, i + 50)
     try {
       const url =
         `https://en.wikipedia.org/w/api.php?action=query` +
@@ -28,12 +49,16 @@ async function batchWikiImages(names: string[]): Promise<Record<string, string>>
       const rdMap: Record<string, string> = {}
       for (const r of (data?.query?.redirects ?? []) as any[]) rdMap[r.from] = r.to
 
-      for (const name of chunk) {
-        const norm = normMap[name] ?? name
+      for (const wikiTitle of chunk) {
+        const norm = normMap[wikiTitle] ?? wikiTitle
         const rd1 = rdMap[norm] ?? norm
         const rd2 = rdMap[rd1] ?? rd1
-        const img = pageImages[rd2] ?? pageImages[rd1] ?? pageImages[norm] ?? pageImages[name]
-        if (img) result[name] = img
+        const img = pageImages[rd2] ?? pageImages[rd1] ?? pageImages[norm] ?? pageImages[wikiTitle]
+        if (img) {
+          // Map back to original nameEn
+          const originalName = wikiToName[wikiTitle] ?? wikiTitle
+          result[originalName] = img
+        }
       }
     } catch { /* skip chunk on network error */ }
   }
@@ -65,10 +90,14 @@ export async function GET() {
 
       send({ type: 'start', total: allPlayers.length })
 
-      // Batch Wikipedia fetch (50 per request)
+      // Build nameEn → wiki title map (apply overrides for disambiguation)
       const nameEnList = allPlayers.map(p => p.nameEn)
+      const nameToWiki: Record<string, string> = {}
+      for (const name of nameEnList) {
+        nameToWiki[name] = WIKI_TITLE_OVERRIDES[name] ?? name
+      }
       send({ type: 'fetching', msg: `Wikipedia批量查询 ${nameEnList.length} 位球星...` })
-      const wikiImages = await batchWikiImages(nameEnList)
+      const wikiImages = await batchWikiImages(nameToWiki)
       send({ type: 'wiki_done', found: Object.keys(wikiImages).length, total: nameEnList.length })
 
       // Upsert to Supabase
