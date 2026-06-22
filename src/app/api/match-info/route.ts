@@ -115,7 +115,7 @@ export async function GET(request: Request) {
   )
 
   const [image, weather, homeWiki, awayWiki, homeLogistics, awayLogistics] = await Promise.all([
-    stadiumMeta ? fetchStadiumImage(stadiumMeta.wikiTitle) : Promise.resolve(null),
+    stadiumMeta ? (stadiumMeta.photo ? Promise.resolve(proxyImg(stadiumMeta.photo)) : fetchStadiumImage(stadiumMeta.wikiTitle)) : Promise.resolve(null),
     fetchWeather(lat, lon, matchDate),
     homeTeam ? fetchCountrySummary(homeTeam) : Promise.resolve(null),
     awayTeam ? fetchCountrySummary(awayTeam) : Promise.resolve(null),

@@ -14,6 +14,8 @@ const ALLOWED_HOSTS = [
   'bdstatic.com',           // Baidu static CDN
   // football2026tips.com — Chinese WC data portal with player/stadium photos
   'football2026tips.com',
+  // Unsplash — stadium photos (6 of 16 venues use Unsplash CDN)
+  'images.unsplash.com',
 ]
 
 export async function GET(request: Request) {
