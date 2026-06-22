@@ -16,8 +16,17 @@ const STAGE_LABELS: Record<string, string> = {
   quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
 }
 
-const inputClass = "w-11 text-center bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-gray-700 transition-colors"
-const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-amber-500 transition-colors"
+function IconPin() {
+  return (
+    <svg viewBox="0 0 10 13" fill="none" style={{ width: 9, height: 11, flexShrink: 0, display: 'inline-block', verticalAlign: 'middle', marginBottom: 1 }}>
+      <path d="M5 0.5C2.79 0.5 1 2.29 1 4.5C1 7.75 5 12.5 5 12.5C5 12.5 9 7.75 9 4.5C9 2.29 7.21 0.5 5 0.5Z" fill="currentColor" opacity="0.85"/>
+      <circle cx="5" cy="4.5" r="1.5" fill="white" opacity="0.88"/>
+    </svg>
+  )
+}
+
+const inputClass = "w-11 text-center bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors"
+const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-400 transition-colors"
 
 export default function PredictionCard({
   match, gameIds, prediction, onSubmitted, onGroupClick,
@@ -86,7 +95,7 @@ export default function PredictionCard({
                 {STAGE_LABELS[match.stage]}{match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
               </button>
             </span>
-            {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors">📍 {venue.city} · {venue.stadium}</button>}
+            {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors"><IconPin /> {venue.city} · {venue.stadium}</button>}
           </div>
           <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-medium shrink-0 ml-2">✓ 已提交</span>
         </div>
@@ -132,10 +141,10 @@ export default function PredictionCard({
               {STAGE_LABELS[match.stage]}{match.group_name && ` ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`}
             </button>
           </span>
-          {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors">📍 {venue.city} · {venue.stadium}</button>}
+          {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors"><IconPin /> {venue.city} · {venue.stadium}</button>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          {isDouble && <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded font-semibold">🔥 双倍积分</span>}
+          {isDouble && <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-1.5 py-0.5 rounded font-semibold">双倍 ×2</span>}
           {isUrgent && <span className="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded-full animate-pulse font-medium">{minutesLeft < 60 ? `${minutesLeft}分钟后锁定` : '即将锁定'}</span>}
         </div>
       </div>

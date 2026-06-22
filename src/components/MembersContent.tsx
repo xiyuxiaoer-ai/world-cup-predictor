@@ -40,6 +40,12 @@ function IconTrophySm() {
   )
 }
 
+const RANK_CARD_STYLES = [
+  'bg-gradient-to-br from-amber-400/[0.14] to-transparent dark:from-amber-400/[0.09] border-l-[3px] border-amber-400/80 animate-gold-pulse',
+  'bg-gradient-to-br from-slate-300/[0.22] to-transparent dark:from-slate-500/[0.13] border-l-[3px] border-slate-400/70 dark:border-slate-500/70',
+  'bg-gradient-to-br from-orange-300/[0.15] to-transparent dark:from-amber-700/[0.11] border-l-[3px] border-orange-400/55 dark:border-amber-700/55',
+]
+
 const CARD_IMAGES = [
   '/cards/1.png', '/cards/2.png', '/cards/3.png', '/cards/4.png',
   '/cards/5.png', '/cards/6.png', '/cards/7.png', '/cards/8.png',
@@ -181,7 +187,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
               <div className={`card-flip-inner ${isFlipped ? 'flipped' : ''}`}>
 
               {/* 正面：成员信息（竖向排列） */}
-              <div className="card-face glass hover-lift rounded-2xl p-5 flex flex-col items-center gap-3 cursor-pointer">
+              <div className={`card-face glass hover-lift rounded-2xl p-5 flex flex-col items-center gap-3 cursor-pointer ${rank && rank <= 3 && points > 0 ? RANK_CARD_STYLES[rank - 1] : ''}`}>
                 <div className="relative">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />

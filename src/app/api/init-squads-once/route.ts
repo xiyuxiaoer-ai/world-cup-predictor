@@ -27,39 +27,15 @@ END $$;
 async function tryCreateTableViaPg(serviceRoleKey: string): Promise<{ ok: boolean; msg: string }> {
   const projectRef = 'hiatpshykhbbhdzbhgac'
   // Try Supabase Supavisor session pooler — accepts service_role key as password
+  // Try both old PgBouncer and new Supavisor pooler
   const configs = [
-    {
-      host: `aws-0-ap-northeast-1.pooler.supabase.com`,
-      port: 5432,
-      database: 'postgres',
-      user: `postgres.${projectRef}`,
-      password: serviceRoleKey,
-      ssl: { rejectUnauthorized: false },
-    },
-    {
-      host: `aws-0-ap-northeast-2.pooler.supabase.com`,
-      port: 5432,
-      database: 'postgres',
-      user: `postgres.${projectRef}`,
-      password: serviceRoleKey,
-      ssl: { rejectUnauthorized: false },
-    },
-    {
-      host: `aws-0-us-east-1.pooler.supabase.com`,
-      port: 5432,
-      database: 'postgres',
-      user: `postgres.${projectRef}`,
-      password: serviceRoleKey,
-      ssl: { rejectUnauthorized: false },
-    },
-    {
-      host: `db.${projectRef}.supabase.co`,
-      port: 5432,
-      database: 'postgres',
-      user: 'postgres',
-      password: serviceRoleKey,
-      ssl: { rejectUnauthorized: false },
-    },
+    // Old PgBouncer at project domain
+    { host: `${projectRef}.supabase.co`, port: 6543, database: 'postgres', user: 'postgres', password: serviceRoleKey, ssl: { rejectUnauthorized: false } },
+    // Direct connection
+    { host: `db.${projectRef}.supabase.co`, port: 5432, database: 'postgres', user: 'postgres', password: serviceRoleKey, ssl: { rejectUnauthorized: false } },
+    // New Supavisor session pooler
+    { host: `aws-0-ap-northeast-1.pooler.supabase.com`, port: 5432, database: 'postgres', user: `postgres.${projectRef}`, password: serviceRoleKey, ssl: { rejectUnauthorized: false } },
+    { host: `aws-0-us-east-1.pooler.supabase.com`, port: 5432, database: 'postgres', user: `postgres.${projectRef}`, password: serviceRoleKey, ssl: { rejectUnauthorized: false } },
   ]
 
   for (const config of configs) {
