@@ -206,7 +206,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pr-[30px]">{awayJa}</span>}
           </div>
         </div>
-        <div className="text-xs border-t border-gray-100 dark:border-gray-800 pt-2">
+        <div className="text-xs border-t border-black/[0.06] dark:border-white/10 pt-2">
           {pred ? (
             <div className="flex items-center justify-between gap-2">
               <span className="text-gray-500 dark:text-gray-400">
@@ -320,8 +320,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           {/* Top: Todo + Leaderboard */}
           <div className="grid grid-cols-1 gap-6">
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">待竞猜</h2>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="block w-[3px] h-4 rounded-full bg-amber-400" />
+                <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wide">待竞猜</h2>
               </div>
               {pendingMatches.length === 0 ? (
                 <p className="text-gray-400 dark:text-gray-500 text-sm">暂无待竞猜比赛 🎉</p>
@@ -345,7 +346,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               )}
             </div>
             <div>
-              <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-3">积分榜</h2>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="block w-[3px] h-4 rounded-full bg-amber-400" />
+                <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wide">积分榜</h2>
+              </div>
               <Leaderboard key={leaderboardKey} gameId={selectedGameId} />
             </div>
           </div>
@@ -353,7 +357,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           {/* Full Schedule */}
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">2026世界杯赛程安排</h2>
+              <div className="flex items-center gap-2">
+                <span className="block w-[3px] h-4 rounded-full bg-amber-400" />
+                <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wide">赛程安排</h2>
+              </div>
               <button
                 onClick={handleSync}
                 disabled={syncing}

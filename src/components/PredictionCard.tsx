@@ -184,7 +184,7 @@ export default function PredictionCard({
       {error && <p className="text-red-500 text-xs">{error}</p>}
 
       <button type="submit" disabled={loading}
-        className="w-full bg-amber-500 hover:bg-amber-400 active:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors shadow-sm">
+        className="w-full bg-gradient-to-br from-amber-400 to-amber-600 hover:from-amber-300 hover:to-amber-500 active:scale-[0.98] disabled:opacity-50 text-white text-sm font-bold py-3 rounded-xl transition-all shadow-md shadow-amber-200/60 dark:shadow-amber-900/40 tap-scale">
         {loading ? '提交中...' : '提交预测'}
       </button>
 
