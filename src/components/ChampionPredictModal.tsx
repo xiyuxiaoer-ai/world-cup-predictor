@@ -53,7 +53,7 @@ export default function ChampionPredictModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+      <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">🏆 猜世界杯冠军</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none p-1">✕</button>
@@ -63,7 +63,7 @@ export default function ChampionPredictModal({
           <p className="text-gray-400 text-sm text-center py-6">加载中...</p>
         ) : (
           <>
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl px-4 py-3 mb-4 flex items-center justify-between">
+            <div className="glass-sm rounded-xl px-4 py-3 mb-4 flex items-center justify-between" style={{ background: 'rgba(255,237,213,0.45)', borderColor: 'rgba(245,158,11,0.30)' }}>
               <div>
                 <p className="text-xs text-amber-600 dark:text-amber-400">现在猜可得</p>
                 <p className="text-xs text-amber-400/70 mt-0.5">{stageLabel}阶段</p>
@@ -88,7 +88,7 @@ export default function ChampionPredictModal({
             </div>
 
             {selectedTeam && (
-              <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl px-4 py-3 mb-4">
+              <div className="flex items-center gap-3 glass-sm rounded-xl px-4 py-3 mb-4">
                 {getFlagUrl(selectedTeam.tla) && (
                   <img src={getFlagUrl(selectedTeam.tla)!} alt="" className="w-8 h-5 object-cover rounded" />
                 )}

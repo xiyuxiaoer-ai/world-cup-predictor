@@ -64,11 +64,11 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
+        className="w-full max-w-xl glass rounded-2xl overflow-hidden animate-spring-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/40 dark:border-white/10">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               {homeFlagUrl && <img src={homeFlagUrl} alt={homeTeam} className="w-6 h-4 object-cover rounded-sm" />}
@@ -123,7 +123,7 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between px-5 py-3 border-t border-white/40 dark:border-white/10 bg-white/20 dark:bg-white/5">
           <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-amber-400 inline-block shrink-0" />

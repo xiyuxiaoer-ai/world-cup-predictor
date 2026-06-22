@@ -20,7 +20,7 @@ export default function InviteMemberModal({ gameId, onClose }: { gameId: string;
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-xl border border-gray-100 dark:border-gray-800 animate-float-up">
+      <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">邀请成员</h2>
         <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">输入对方注册时的用户名</p>
         <form onSubmit={handleInvite} className="space-y-4">

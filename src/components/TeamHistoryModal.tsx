@@ -63,11 +63,11 @@ export default function TeamHistoryModal({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+        className="w-full max-w-sm glass rounded-2xl overflow-hidden max-h-[80vh] flex flex-col animate-spring-in"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/40 dark:border-white/10">
           <div className="flex items-center gap-2.5">
             {flagUrl && <img src={flagUrl} alt="" className="w-8 h-6 object-cover rounded" />}
             <span className="font-semibold text-gray-900 dark:text-gray-100">{displayName}</span>
@@ -76,7 +76,7 @@ export default function TeamHistoryModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-100 dark:border-gray-800">
+        <div className="flex border-b border-white/40 dark:border-white/10">
           <button
             onClick={() => setTab('history')}
             className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
@@ -130,13 +130,13 @@ export default function TeamHistoryModal({
 function Section({ title, matches, tla, isWC }: { title: string; matches: any[]; tla: string; isWC: boolean }) {
   return (
     <div>
-      <div className="px-5 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+      <div className="px-5 py-2 bg-white/35 dark:bg-white/5 border-b border-white/40 dark:border-white/10 backdrop-blur-sm">
         <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</span>
       </div>
       {matches.length === 0 ? (
         <div className="px-5 py-3 text-xs text-gray-400 dark:text-gray-500">暂无记录</div>
       ) : (
-        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+        <div className="divide-y divide-white/30 dark:divide-white/10">
           {matches.map((m: any, idx: number) => {
             const isHome = m.home_tla?.toUpperCase() === tla
             const opponentTla = isHome ? m.away_tla : m.home_tla
@@ -189,12 +189,12 @@ function SquadList({ squad }: { squad: any[] }) {
     <div>
       {sections.map(pos => (
         <div key={pos}>
-          <div className="px-5 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+          <div className="px-5 py-2 bg-white/35 dark:bg-white/5 border-b border-white/40 dark:border-white/10 backdrop-blur-sm">
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {POSITION_LABELS[pos] || pos}
             </span>
           </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="divide-y divide-white/30 dark:divide-white/10">
             {grouped[pos].map((p: any, idx: number) => (
               <div key={idx} className="flex items-center gap-3 px-5 py-2.5">
                 {p.shirt_number != null ? (

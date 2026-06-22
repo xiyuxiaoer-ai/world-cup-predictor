@@ -110,11 +110,11 @@ export default function GroupModal({
   return (
     <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="relative w-full max-w-md glass rounded-2xl overflow-hidden max-h-[80vh] flex flex-col animate-spring-in" onClick={e => e.stopPropagation()}>
 
         {/* 猜分浮层 */}
         {predictingMatch && (
-          <div className="absolute inset-0 bg-white dark:bg-gray-900 z-10 flex flex-col rounded-2xl">
+          <div className="absolute inset-0 z-10 flex flex-col rounded-2xl" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
               <button onClick={() => { setPredictingMatch(null); setSaveError('') }} className="text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">← 返回</button>
               <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">猜比分</span>
@@ -169,13 +169,13 @@ export default function GroupModal({
         )}
 
         {/* 弹窗主内容 */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/40 dark:border-white/10">
           <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{label} · 全部比赛</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
         </div>
 
         {standings.length > 0 && (
-          <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
+          <div className="px-5 py-3 border-b border-white/40 dark:border-white/10 bg-white/30 dark:bg-white/5">
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-gray-400 dark:text-gray-500">
@@ -212,7 +212,7 @@ export default function GroupModal({
           </div>
         )}
 
-        <div className="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-gray-800">
+        <div className="overflow-y-auto flex-1 divide-y divide-white/30 dark:divide-white/10">
           {matches.map(m => {
             const homeTla = getTeamDisplay(m.home_tla, m.home_team)
             const awayTla = getTeamDisplay(m.away_tla, m.away_team)
