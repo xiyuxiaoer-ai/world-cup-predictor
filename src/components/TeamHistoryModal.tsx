@@ -59,7 +59,7 @@ export default function TeamHistoryModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
@@ -130,7 +130,7 @@ export default function TeamHistoryModal({
 function Section({ title, matches, tla, isWC }: { title: string; matches: any[]; tla: string; isWC: boolean }) {
   return (
     <div>
-      <div className="px-5 py-2 bg-black/5 dark:bg-white/8 border-b border-black/8 dark:border-white/10">
+      <div className="px-5 py-2 border-b border-gray-200/70 dark:border-white/10">
         <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</span>
       </div>
       {matches.length === 0 ? (
@@ -189,7 +189,7 @@ function SquadList({ squad }: { squad: any[] }) {
     <div>
       {sections.map(pos => (
         <div key={pos}>
-          <div className="px-5 py-2 bg-black/5 dark:bg-white/8 border-b border-black/8 dark:border-white/10">
+          <div className="px-5 py-2 border-b border-gray-200/70 dark:border-white/10">
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {POSITION_LABELS[pos] || pos}
             </span>

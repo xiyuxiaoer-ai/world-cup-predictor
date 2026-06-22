@@ -52,7 +52,7 @@ export default function ChampionPredictModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">🏆 猜世界杯冠军</h2>
