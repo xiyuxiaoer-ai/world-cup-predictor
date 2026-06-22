@@ -18,6 +18,8 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   const [unread, setUnread] = useState(0)
   const [navigating, setNavigating] = useState(false)
   const [navTarget, setNavTarget] = useState<string | null>(null)
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(null)
+  const navRef = useRef<HTMLDivElement>(null)
   const supabaseRef = useRef(createClient())
   const pathnameRef = useRef(pathname)
 
@@ -36,6 +38,22 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
     setNavigating(false)
     setNavTarget(null)
   }, [pathname])
+
+  // Measure & animate the sliding pill indicator
+  useEffect(() => {
+    const measure = () => {
+      const container = navRef.current
+      if (!container) return
+      const active = container.querySelector('[data-active="true"]') as HTMLElement | null
+      if (!active) { setPill(null); return }
+      const cr = container.getBoundingClientRect()
+      const er = active.getBoundingClientRect()
+      setPill({ left: er.left - cr.left, width: er.width })
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [pathname, navTarget])
 
   async function handleLogout() {
     const supabase = createClient()
@@ -99,49 +117,57 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
         </Link>
 
         {/* 五个功能键：移动端均分，桌面端紧凑靠左 */}
-        <div className="flex-1 sm:flex-none flex items-center justify-evenly sm:justify-start sm:gap-1 px-3 sm:px-0 sm:ml-4">
+        <div
+          ref={navRef}
+          className="relative flex-1 sm:flex-none flex items-center justify-evenly sm:justify-start sm:gap-1 px-3 sm:px-0 sm:ml-4"
+        >
+          {/* iOS 滑动 pill 指示器 — 随激活项弹性移动 */}
+          {pill && (
+            <span
+              aria-hidden
+              className="nav-pill-spring absolute inset-y-1 rounded-lg pointer-events-none"
+              style={{
+                left: pill.left,
+                width: pill.width,
+                background: 'rgba(59,130,246,0.09)',
+                border: '1.5px solid rgba(59,130,246,0.26)',
+                boxShadow: '0 0 14px rgba(59,130,246,0.10)',
+              }}
+            />
+          )}
+
           {navLinks.map(link => (
             <Link
               key={link.href}
               href={link.href}
+              data-active={isActive(link.href) ? 'true' : undefined}
               onClick={() => { if (pathname !== link.href) { setNavigating(true); setNavTarget(link.href) } }}
-              className={`relative px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium tap-scale transition-colors ${
+              className={`relative z-10 px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium tap-scale transition-colors duration-200 ${
                 isActive(link.href)
                   ? 'text-blue-600 dark:text-blue-300'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
               }`}
-              style={isActive(link.href) ? {
-                background: 'rgba(59,130,246,0.08)',
-                border: '1.5px solid rgba(59,130,246,0.30)',
-                boxShadow: '0 0 10px rgba(59,130,246,0.08)',
-              } : {}}
             >
               {link.label}
-              {isActive(link.href) && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-blue-400/70" />
-              )}
             </Link>
           ))}
 
           {/* Chat 图标，和其他四个等距 */}
           <Link
             href="/chat"
+            data-active={isActive('/chat') ? 'true' : undefined}
             onClick={() => { if (pathname !== '/chat') { setNavigating(true); setNavTarget('/chat') } }}
-            className={`relative p-1.5 rounded-lg transition-colors tap-scale ${
+            className={`relative z-10 p-1.5 rounded-lg transition-colors duration-200 tap-scale ${
               isActive('/chat')
                 ? 'text-blue-600 dark:text-blue-300'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
-            style={isActive('/chat') ? {
-              background: 'rgba(59,130,246,0.08)',
-              border: '1.5px solid rgba(59,130,246,0.30)',
-            } : {}}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             {unread > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none">
+              <span className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center px-0.5 leading-none animate-pop-in">
                 {unread > 99 ? '99+' : unread}
               </span>
             )}
