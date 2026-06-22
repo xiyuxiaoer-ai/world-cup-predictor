@@ -39,7 +39,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [groupModal, setGroupModal] = useState<{ stage: string; group_name: string | null; label: string } | null>(null)
-  const [mapMatch, setMapMatch] = useState<{ homeTla: string; awayTla: string; homeTeam: string; awayTeam: string; venue: { stadium: string; city: string; coordinates: [number, number] }; matchDate?: string } | null>(null)
+  const [mapMatch, setMapMatch] = useState<{ homeTla: string; awayTla: string; homeTeam: string; awayTeam: string; venue: { stadium: string; city: string; coordinates: [number, number] }; kickoffTime?: string } | null>(null)
   const [editingPredId, setEditingPredId] = useState<string | null>(null)
   const [editHome, setEditHome] = useState('')
   const [editAway, setEditAway] = useState('')
@@ -202,7 +202,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                       >
                         {STAGE_LABELS[match.stage]} {group}
                       </button>
-                      {venue && <button type="button" onClick={() => setMapMatch({ homeTla: match.home_tla, awayTla: match.away_tla, homeTeam: homeName, awayTeam: awayName, venue, matchDate: new Date(match.kickoff_time).toISOString().split('T')[0] })} className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-amber-500 transition-colors"><IconPin /> {venue.city} · {venue.stadium}</button>}
+                      {venue && <button type="button" onClick={() => setMapMatch({ homeTla: match.home_tla, awayTla: match.away_tla, homeTeam: homeName, awayTeam: awayName, venue, kickoffTime: match.kickoff_time })} className="shrink-0 text-gray-400 dark:text-gray-500 hover:text-amber-500 transition-colors"><IconPin /> {venue.city} · {venue.stadium}</button>}
                     </div>
                     <span className="shrink-0 text-right">
                       {kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}
@@ -362,7 +362,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
           homeTeam={mapMatch.homeTeam}
           awayTeam={mapMatch.awayTeam}
           venue={mapMatch.venue}
-          matchDate={mapMatch.matchDate}
+          kickoffTime={mapMatch.kickoffTime}
           onClose={() => setMapMatch(null)}
         />
       )}

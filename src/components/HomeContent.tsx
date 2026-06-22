@@ -507,7 +507,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           homeTeam={getTeamDisplay((mapMatch as any).home_tla, mapMatch.home_team)}
           awayTeam={getTeamDisplay((mapMatch as any).away_tla, mapMatch.away_team)}
           venue={MATCH_VENUES[(mapMatch as any).api_match_id]}
-          matchDate={new Date(mapMatch.kickoff_time).toISOString().split('T')[0]}
+          kickoffTime={mapMatch.kickoff_time}
           onClose={() => setMapMatch(null)}
         />
       )}

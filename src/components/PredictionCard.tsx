@@ -122,7 +122,7 @@ export default function PredictionCard({
           homeTeam={homeName}
           awayTeam={awayName}
           venue={venue}
-          matchDate={new Date(match.kickoff_time).toISOString().split('T')[0]}
+          kickoffTime={match.kickoff_time}
           onClose={() => setShowMap(false)}
         />
       )}
@@ -208,7 +208,7 @@ export default function PredictionCard({
           homeTeam={homeName}
           awayTeam={awayName}
           venue={venue}
-          matchDate={new Date(match.kickoff_time).toISOString().split('T')[0]}
+          kickoffTime={match.kickoff_time}
           onClose={() => setShowMap(false)}
         />
       )}
