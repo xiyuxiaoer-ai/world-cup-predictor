@@ -115,6 +115,6 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     { intro: legend.intro, worldCupRecord: legend.worldCupRecord, goal2026: legend.goal2026, players },
-    { headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' } }
+    { headers: { 'Cache-Control': 'no-store' } }
   )
 }

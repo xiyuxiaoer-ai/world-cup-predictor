@@ -264,7 +264,7 @@ export default function TeamHistoryModal({
   useEffect(() => {
     if (tab !== 'legend' || legendData !== null || legendError) return
     setLegendLoading(true)
-    fetch(`/api/team-football-history?tla=${tla}`)
+    fetch(`/api/team-football-history?tla=${tla}&_v=3`)
       .then(r => r.ok ? r.json() : Promise.reject(r.status))
       .then(d => { setLegendData(d); setLegendLoading(false) })
       .catch(() => { setLegendError(true); setLegendLoading(false) })
