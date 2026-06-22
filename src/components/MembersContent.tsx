@@ -5,6 +5,7 @@ import type { GameWithRole } from '@/types'
 import { useSelectedGame } from '@/hooks/useSelectedGame'
 import InviteMemberModal from './InviteMemberModal'
 import TeamHistoryModal from './TeamHistoryModal'
+import MemberProfileModal from './MemberProfileModal'
 import { getTeamDisplay, getFlagUrl } from '@/lib/flags'
 import { STAGE_LABELS } from '@/lib/championBonus'
 
@@ -63,6 +64,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
   const [cardImages, setCardImages] = useState<Record<string, string>>({})
   const [champPreds, setChampPreds] = useState<Record<string, any>>({})
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
+  const [profileUser, setProfileUser] = useState<{ profile: any; userId: string } | null>(null)
 
   function handleCardFlip(userId: string) {
     setFlippedCards(prev => {
@@ -188,11 +190,15 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
 
               {/* 正面：成员信息（竖向排列） */}
               <div className={`card-face glass hover-lift rounded-2xl p-5 flex flex-col items-center gap-3 cursor-pointer ${rank && rank <= 3 && points > 0 ? RANK_CARD_STYLES[rank - 1] : ''}`}>
-                <div className="relative">
+                {/* 头像：点击打开成员 profile，阻止冒泡避免同时翻牌 */}
+                <div
+                  className="relative tap-scale cursor-pointer"
+                  onClick={e => { e.stopPropagation(); setProfileUser({ profile, userId }) }}
+                >
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />
+                    <img src={profile.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover ring-2 ring-white/70 shadow-md" />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-200 dark:border-amber-800/30 flex items-center justify-center text-amber-600 text-2xl font-bold">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white/60 flex items-center justify-center text-white text-2xl font-bold shadow-md">
                       {initial}
                     </div>
                   )}
@@ -200,6 +206,8 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   {rank && rank <= 3 && points > 0 && (
                     <span className="absolute -top-1 -right-1"><MemberMedal rank={rank} /></span>
                   )}
+                  {/* 点击提示光晕 */}
+                  <span className="absolute inset-0 rounded-full ring-2 ring-blue-400/0 hover:ring-blue-400/40 transition-all duration-200" />
                 </div>
                 <div className="text-center w-full">
                   <div className="flex items-center justify-center gap-2">
@@ -271,6 +279,17 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
       )}
       {historyTeam && (
         <TeamHistoryModal tla={historyTeam.tla} teamName={historyTeam.name} onClose={() => setHistoryTeam(null)} />
+      )}
+      {profileUser && (
+        <MemberProfileModal
+          profile={profileUser.profile}
+          userId={profileUser.userId}
+          rank={getRank(profileUser.userId)}
+          points={getPoints(profileUser.userId)}
+          champPred={champPreds[profileUser.userId] ?? null}
+          currentUserId={currentUserId}
+          onClose={() => setProfileUser(null)}
+        />
       )}
     </div>
   )
