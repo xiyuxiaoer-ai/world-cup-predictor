@@ -157,18 +157,18 @@ body {
 
 /* 标准毛玻璃卡片 */
 .glass {
-  background: rgba(255, 255, 255, 0.52);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.60);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.10),
     0 4px 12px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.80);
+    inset 0 1px 0 rgba(255, 255, 255, 0.90);
 }
 @media (prefers-color-scheme: dark) {
   .glass {
-    background: rgba(25, 25, 30, 0.58);
+    background: rgba(28, 28, 34, 0.80);
     border-color: rgba(255, 255, 255, 0.12);
     box-shadow:
       0 12px 40px rgba(0, 0, 0, 0.55),
@@ -179,15 +179,15 @@ body {
 
 /* 较轻毛玻璃（次级面板） */
 .glass-sm {
-  background: rgba(255, 255, 255, 0.40);
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 @media (prefers-color-scheme: dark) {
   .glass-sm {
-    background: rgba(38, 38, 44, 0.58);
+    background: rgba(42, 42, 50, 0.72);
     border-color: rgba(255, 255, 255, 0.09);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }

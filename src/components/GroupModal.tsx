@@ -175,7 +175,7 @@ export default function GroupModal({
         </div>
 
         {standings.length > 0 && (
-          <div className="px-5 py-3 border-b border-white/40 dark:border-white/10 bg-white/30 dark:bg-white/5">
+          <div className="px-5 py-3 border-b border-black/8 dark:border-white/10 bg-black/4 dark:bg-white/5">
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-gray-400 dark:text-gray-500">
