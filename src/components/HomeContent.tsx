@@ -137,7 +137,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   const displayMatches = matches
 
-  function renderMatch(match: Match) {
+  function renderMatch(match: Match, idx = 0) {
     const pred = predictions[match.id]
     const isLocked = new Date(match.lock_time) <= now
     const kickoff = new Date(match.kickoff_time)
@@ -150,7 +150,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
     const group = match.group_name ? match.group_name.replace('GROUP_', '').replace('_', ' ') + '组' : ''
 
     return (
-      <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-3 space-y-2 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+      <div key={match.id}
+        className="glass hover-lift rounded-xl px-3 py-3 space-y-2 animate-stagger-in"
+        style={{ animationDelay: `${idx * 55}ms` }}
+      >
         <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
           <button
             type="button"
@@ -241,13 +244,13 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors shadow-sm"
+            className="bg-amber-500 hover:bg-amber-400 text-white px-6 py-2.5 rounded-lg font-semibold shadow-sm glow-amber tap-scale"
           >
             创建 Game
           </button>
           <button
             onClick={() => setShowJoinModal(true)}
-            className="border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-600 dark:text-gray-300 px-6 py-2.5 rounded-lg font-semibold transition-colors"
+            className="glass px-6 py-2.5 rounded-lg font-semibold text-gray-600 dark:text-gray-300 hover-lift tap-scale"
           >
             加入已有 Game
           </button>
@@ -265,7 +268,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-amber-500 transition-colors shadow-sm"
+          className="glass rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/40 transition-all"
         >
           {games.map(g => (
             <option key={g.id} value={g.id}>{g.name}</option>
@@ -274,20 +277,20 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 px-3 py-1.5 rounded-lg transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 glass px-3 py-1.5 rounded-lg tap-scale"
           >
             + 创建
           </button>
           <button
             onClick={() => setShowJoinModal(true)}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 px-3 py-1.5 rounded-lg transition-colors"
+            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 glass px-3 py-1.5 rounded-lg tap-scale"
           >
             + 加入
           </button>
           <button
             onClick={copyGameCode}
             title="复制 Game 码邀请朋友"
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-700 px-3 py-1.5 rounded-lg transition-colors font-mono bg-gray-50 dark:bg-gray-900"
+            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 glass px-3 py-1.5 rounded-lg font-mono tap-scale"
           >
             {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
           </button>
@@ -383,13 +386,13 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                         </button>
                         {finishedExpanded && (
                           <div className="space-y-2 mt-1">
-                            {finished.map(match => renderMatch(match))}
+                            {finished.map((match, i) => renderMatch(match, i))}
                           </div>
                         )}
                       </div>
                     )}
                     <div className="space-y-2">
-                      {upcoming.map(match => renderMatch(match))}
+                      {upcoming.map((match, i) => renderMatch(match, i))}
                     </div>
                   </>
                 )

@@ -75,7 +75,7 @@ export default function PredictionCard({
   if (done && prediction) {
     return (
       <>
-      <div className="bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700/40 rounded-2xl p-4 space-y-2 shadow-sm">
+      <div className="glass border-2 border-amber-300/40 dark:border-amber-600/30 rounded-2xl p-4 space-y-2" style={{ boxShadow: '0 0 0 1px rgba(245,158,11,0.08), 0 8px 32px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.65)' }}>
         <div className="flex justify-between items-start">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
             <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">
@@ -121,7 +121,7 @@ export default function PredictionCard({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow">
+    <form onSubmit={handleSubmit} className="glass hover-lift rounded-2xl p-4 space-y-3">
       <div className="flex justify-between items-start gap-1">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 min-w-0">
           <span className={`text-xs shrink-0 ${isNearUnpredicted ? 'text-red-500 animate-pulse font-medium' : 'text-gray-500 dark:text-gray-400'}`}>

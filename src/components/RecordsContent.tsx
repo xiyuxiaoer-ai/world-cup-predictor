@@ -136,14 +136,18 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
         <select
           value={selectedGameId}
           onChange={e => setSelectedGameId(e.target.value)}
-          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:border-amber-500 shadow-sm"
+          className="glass rounded-lg px-3 py-2 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400/40 transition-all"
         >
           {games.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </select>
         <div className="flex gap-1">
           {(['upcoming', 'finished', 'all'] as Filter[]).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${filter === f ? 'bg-amber-500 text-white' : 'text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm transition-all tap-scale ${
+                filter === f ? 'bg-amber-500 text-white shadow-sm' : 'glass text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+              style={filter === f ? { boxShadow: '0 0 12px rgba(245,158,11,0.3)' } : {}}
+            >
               {f === 'finished' ? '已结束' : f === 'upcoming' ? '待开赛' : '全部'}
             </button>
           ))}
@@ -156,7 +160,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
         <p className="text-gray-500 dark:text-gray-400 text-sm">暂无比赛</p>
       ) : (
         <div className="space-y-4">
-          {filtered.map(match => {
+          {filtered.map((match, matchIdx) => {
             const kickoff = new Date(match.kickoff_time)
             const group = match.group_name
               ? `· ${match.group_name.replace('GROUP_', '').replace('_', ' ')}组`
@@ -173,7 +177,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             const venue = MATCH_VENUES[match.api_match_id]
 
             return (
-              <div key={match.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+              <div key={match.id} className="glass hover-lift rounded-2xl overflow-hidden animate-stagger-in" style={{ animationDelay: `${matchIdx * 55}ms` }}>
                 {/* Match Header */}
                 <div className="px-4 py-3 space-y-2">
                   <div className="flex justify-between items-start gap-2 text-xs text-gray-500 dark:text-gray-400">

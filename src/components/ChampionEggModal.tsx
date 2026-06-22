@@ -11,7 +11,7 @@ export default function ChampionEggModal({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+      <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <div className="flex items-start justify-between mb-4">
           <div className="text-4xl">🏆</div>
           <button onClick={onDismiss} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none p-1">✕</button>
@@ -20,7 +20,7 @@ export default function ChampionEggModal({
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           猜对本届世界杯冠军，可获得额外积分。越早猜积分越高！
         </p>
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl px-4 py-3 mb-5 text-center">
+        <div className="glass-sm rounded-xl px-4 py-3 mb-5 text-center" style={{ background: 'rgba(255,237,213,0.5)', border: '0.5px solid rgba(245,158,11,0.25)' }}>
           <p className="text-xs text-amber-600 dark:text-amber-400 mb-0.5">现在猜可得</p>
           <p className="text-3xl font-bold text-amber-500">+{currentBonus} 分</p>
           <p className="text-xs text-amber-500/70 mt-0.5">每天递减，越晚越少</p>

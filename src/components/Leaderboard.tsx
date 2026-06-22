@@ -6,9 +6,9 @@ import { getTeamDisplay } from '@/lib/flags'
 
 const MEDALS = ['🥇', '🥈', '🥉']
 const RANK_STYLES = [
-  'bg-amber-50 dark:bg-amber-900/20 border-amber-300 animate-gold-pulse',
-  'bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600',
-  'bg-orange-50/50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800/30',
+  'bg-amber-400/10 dark:bg-amber-400/10 border-amber-400/60 animate-gold-pulse',
+  'bg-white/30 dark:bg-white/5 border-gray-300/60 dark:border-gray-500/40',
+  'bg-orange-400/8 dark:bg-orange-400/8 border-orange-300/50 dark:border-orange-700/30',
 ]
 
 const STAGE_LABELS: Record<string, string> = {
@@ -54,11 +54,11 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm">
+      <div className="glass rounded-xl overflow-hidden animate-spring-in">
         {sorted.length === 0 ? (
           <div className="p-4 text-gray-400 dark:text-gray-500 text-sm">暂无积分数据</div>
         ) : (
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
             {sorted.map((entry, i) => {
               const rank = getRank(i)
               const hasPoints = entry.total_points > 0
@@ -69,7 +69,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                 <button
                   key={entry.user_id}
                   onClick={() => openBreakdown(entry)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 border-l-2 transition-all hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer text-left ${rankStyle}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 border-l-2 transition-all hover:bg-white/40 dark:hover:bg-white/5 cursor-pointer text-left ${rankStyle}`}
                 >
                   <span className="w-6 text-center shrink-0">
                     {isTop3 && hasPoints
@@ -113,11 +113,11 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
           onClick={() => setSelected(null)}
         >
           <div
-            className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col"
+            className="w-full max-w-md glass rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col animate-spring-in"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-black/[0.05] dark:border-white/[0.05]">
               <div className="flex items-center gap-2.5">
                 {selected.avatar_url ? (
                   <img src={selected.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-amber-300" />
@@ -143,7 +143,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
               ) : breakdown.length === 0 ? (
                 <div className="p-6 text-center text-gray-400 text-sm">暂无积分记录</div>
               ) : (
-                <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                <div className="divide-y divide-black/[0.04] dark:divide-white/[0.04]">
                   {breakdown.map((item: any, idx: number) => {
                     const m = item.match
                     if (!m) return null

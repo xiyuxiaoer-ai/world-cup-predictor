@@ -65,10 +65,10 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   }, [pathname])
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <nav className="sticky top-0 z-50 glass-nav">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2 overflow-hidden">
         <div className="flex items-center gap-3 overflow-x-auto scrollbar-none min-w-0">
-          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 shrink-0">
+          <Link href="/" className="flex items-center gap-2 font-bold text-gray-900 dark:text-gray-100 shrink-0 tap-scale">
             <span className="text-xl">⚽</span>
             <span className="hidden sm:block text-sm">世界杯竞猜</span>
           </Link>
@@ -77,13 +77,17 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors font-medium ${
+                className={`relative px-3 py-1.5 rounded-lg text-sm whitespace-nowrap font-medium tap-scale ${
                   pathname === link.href
-                    ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-amber-100/80 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5 transition-colors'
                 }`}
+                style={pathname === link.href ? { boxShadow: '0 0 12px rgba(245,158,11,0.15), inset 0 1px 0 rgba(255,255,255,0.6)' } : {}}
               >
                 {link.label}
+                {pathname === link.href && (
+                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full bg-amber-500/60" />
+                )}
               </Link>
             ))}
           </div>
@@ -92,10 +96,10 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
           {/* Chat icon with unread badge */}
           <Link
             href="/chat"
-            className={`relative p-1.5 rounded-lg transition-colors ${
+            className={`relative p-1.5 rounded-lg transition-colors tap-scale ${
               pathname === '/chat'
-                ? 'text-amber-600 bg-amber-50 dark:bg-amber-900/20'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'text-amber-600 bg-amber-100/80 dark:bg-amber-900/30'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/60 dark:hover:bg-white/5'
             }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -108,17 +112,17 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
             )}
           </Link>
 
-          <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors">
+          <Link href="/profile" className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors tap-scale">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover border border-gray-200 dark:border-gray-700" />
+              <img src={avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover border border-white/50 shadow-sm" />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800/30 flex items-center justify-center text-amber-600 text-xs font-bold">
+              <div className="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200/60 dark:border-amber-800/30 flex items-center justify-center text-amber-600 text-xs font-bold shadow-sm">
                 {username?.[0]?.toUpperCase() ?? '?'}
               </div>
             )}
             <span className="hidden sm:block">{username}</span>
           </Link>
-          <button onClick={handleLogout} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+          <button onClick={handleLogout} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors tap-scale">
             退出
           </button>
         </div>

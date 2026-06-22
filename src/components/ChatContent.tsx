@@ -221,7 +221,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
     <div className="flex h-full overflow-hidden">
 
       {/* ——— Sidebar ——— */}
-      <div className={`${showSidebar ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800`}>
+      <div className={`${showSidebar ? 'flex' : 'hidden'} md:flex flex-col w-full md:w-64 shrink-0 border-r border-black/[0.06] dark:border-white/[0.06] glass-nav`}>
 
         {/* Game selector */}
         <div className="p-3 border-b border-gray-200 dark:border-gray-700">
@@ -310,7 +310,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
         {selectedConvId && selectedConv ? (
           <>
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
+            <div className="flex items-center gap-3 px-4 py-3 glass-nav shrink-0">
               <button
                 className="md:hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none"
                 onClick={() => setShowSidebar(true)}
@@ -368,7 +368,7 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
                           loading="lazy"
                         />
                       ) : (
-                        <div className={`px-3 py-2 rounded-2xl text-sm break-words ${isSelf ? 'bg-amber-500 text-white rounded-tr-sm' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-sm shadow-sm'}`}>
+                        <div className={`px-3 py-2 rounded-2xl text-sm break-words ${isSelf ? 'bg-amber-500 text-white rounded-tr-sm shadow-sm' : 'glass text-gray-900 dark:text-gray-100 rounded-tl-sm'}`}>
                           {msg.content}
                         </div>
                       )}
@@ -381,12 +381,12 @@ export default function ChatContent({ games, currentUser }: { games: GameWithRol
             </div>
 
             {/* Input bar */}
-            <div className="px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shrink-0 relative">
+            <div className="px-4 py-3 glass-nav shrink-0 relative">
               {/* Emoji / sticker picker panel */}
               {showEmoji && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowEmoji(false)} />
-                  <div className="absolute bottom-full mb-2 left-4 right-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-xl z-20">
+                  <div className="absolute bottom-full mb-2 left-4 right-4 glass rounded-2xl shadow-xl z-20">
                     {/* Tabs */}
                     <div className="flex border-b border-gray-200 dark:border-gray-700">
                       <button

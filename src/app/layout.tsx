@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh" className={`${geist.variable} h-full`}>
-      <body className="min-h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased">
+      <body className="min-h-full text-gray-900 dark:text-gray-100 antialiased">
         <ScrollToTop />
         <PresenceProvider>
           {children}

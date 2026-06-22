@@ -19,7 +19,7 @@ export default function JoinGameModal({ onJoined, onClose }: { onJoined: (game: 
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-xl border border-gray-100 dark:border-gray-800 animate-float-up">
+      <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">加入 Game</h2>
         <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">输入管理员分享的 Game 码（8位）</p>
         <form onSubmit={handleJoin} className="space-y-4">
