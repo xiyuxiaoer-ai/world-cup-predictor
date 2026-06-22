@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { TEAM_LEGENDS } from '@/lib/team-legends'
 
-const UA = 'WorldCupPredictor/1.0 (zhou-qiaofeng@sysj.co.jp)'
+const UA = 'WorldCupPredictor/1.0'
 
 function proxyImg(url: string | null | undefined): string | null {
   if (!url) return null
