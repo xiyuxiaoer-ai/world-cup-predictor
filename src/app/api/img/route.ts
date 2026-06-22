@@ -16,12 +16,6 @@ const ALLOWED_HOSTS = [
   'football2026tips.com',
   // Unsplash — stadium photos (6 of 16 venues use Unsplash CDN)
   'images.unsplash.com',
-  // Bing Image Search CDN — fallback for legend player photos
-  'th.bing.com',
-  'tse1.mm.bing.net',
-  'tse2.mm.bing.net',
-  'tse3.mm.bing.net',
-  'tse4.mm.bing.net',
 ]
 
 export async function GET(request: Request) {

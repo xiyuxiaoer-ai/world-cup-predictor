@@ -114,8 +114,19 @@ export async function GET(request: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
+  // Fetch stadium photo from Supabase (pre-populated), fall back to hardcoded → Wikipedia
+  async function getStadiumImage(): Promise<string | null> {
+    if (!stadiumMeta) return null
+    if (stadium) {
+      const { data } = await admin.from('stadiums').select('photo_url').eq('name_zh', stadium).maybeSingle()
+      if (data?.photo_url) return proxyImg(data.photo_url)
+    }
+    if (stadiumMeta.photo) return proxyImg(stadiumMeta.photo)
+    return fetchStadiumImage(stadiumMeta.wikiTitle)
+  }
+
   const [image, weather, homeWiki, awayWiki, homeLogistics, awayLogistics] = await Promise.all([
-    stadiumMeta ? (stadiumMeta.photo ? Promise.resolve(proxyImg(stadiumMeta.photo)) : fetchStadiumImage(stadiumMeta.wikiTitle)) : Promise.resolve(null),
+    getStadiumImage(),
     fetchWeather(lat, lon, matchDate),
     homeTeam ? fetchCountrySummary(homeTeam) : Promise.resolve(null),
     awayTeam ? fetchCountrySummary(awayTeam) : Promise.resolve(null),

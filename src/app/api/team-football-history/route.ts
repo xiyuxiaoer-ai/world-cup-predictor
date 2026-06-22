@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { TEAM_LEGENDS } from '@/lib/team-legends'
 
 const UA = 'WorldCupPredictor/1.0'
@@ -21,13 +22,11 @@ async function fetchWikipediaImages(names: string[]): Promise<Record<string, str
         `&prop=pageimages&format=json&pithumbsize=400&redirects=1`
       const res = await fetch(url, {
         headers: { 'User-Agent': UA },
-        // no-store so every deployment gets fresh images (avoids stale Next.js data-cache)
         cache: 'no-store',
       })
       if (!res.ok) continue
       const data = await res.json()
 
-      // page title → image URL
       const pageImages: Record<string, string> = {}
       for (const page of Object.values(data?.query?.pages ?? {}) as any[]) {
         if (page.thumbnail?.source) {
@@ -35,23 +34,20 @@ async function fetchWikipediaImages(names: string[]): Promise<Record<string, str
         }
       }
 
-      // normalization: input title → normalized title
       const normMap: Record<string, string> = {}
       for (const n of (data?.query?.normalized ?? []) as any[]) {
         normMap[n.from as string] = n.to as string
       }
 
-      // redirect: pre-redirect → post-redirect
       const rdMap: Record<string, string> = {}
       for (const r of (data?.query?.redirects ?? []) as any[]) {
         rdMap[r.from as string] = r.to as string
       }
 
-      // For each input name: follow normalization then redirect to find the page image
       for (const name of chunk) {
         const norm = normMap[name] ?? name
         const rd1 = rdMap[norm] ?? norm
-        const rd2 = rdMap[rd1] ?? rd1  // double redirect
+        const rd2 = rdMap[rd1] ?? rd1
         const img =
           pageImages[rd2] ?? pageImages[rd1] ?? pageImages[norm] ?? pageImages[name]
         if (img) result[name] = img
@@ -63,30 +59,6 @@ async function fetchWikipediaImages(names: string[]): Promise<Record<string, str
   return result
 }
 
-async function fetchBingImage(name: string): Promise<string | null> {
-  try {
-    const res = await fetch(
-      `https://cn.bing.com/images/search?q=${encodeURIComponent(name)}&mkt=zh-CN&count=1`,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-        },
-        cache: 'no-store',
-        signal: AbortSignal.timeout(8000),
-      }
-    )
-    if (!res.ok) return null
-    const html = await res.text()
-    // Prefer turl (Bing's own CDN, stable domain) over murl (third-party, unpredictable)
-    const turlM = html.match(/"turl":"(https?:\/\/[^"]+)"/)
-    if (turlM) return proxyImg(decodeURIComponent(turlM[1]))
-    return null
-  } catch {
-    return null
-  }
-}
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const tla = searchParams.get('tla')?.toUpperCase()
@@ -95,27 +67,36 @@ export async function GET(request: Request) {
   const legend = TEAM_LEGENDS[tla]
   if (!legend) return NextResponse.json({ error: 'No legend data for this team' }, { status: 404 })
 
-  // Batch-fetch player images from English Wikipedia
-  const nameEnList = legend.players.map(p => p.nameEn)
-  const wikiImages = await fetchWikipediaImages(nameEnList)
-
-  // For players still missing images, try Baidu Baike in parallel
-  const players = await Promise.all(
-    legend.players.map(async p => {
-      let imageUrl = wikiImages[p.nameEn] ?? null
-      if (!imageUrl) {
-        imageUrl = await fetchBingImage(p.name)
-      }
-      return {
-        name: p.name,
-        nameEn: p.nameEn,
-        era: p.era,
-        desc: p.desc,
-        imageUrl,
-        baiduUrl: `https://baike.baidu.com/search/word?word=${encodeURIComponent(p.name)}`,
-      }
-    })
+  const admin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+
+  const nameEnList = legend.players.map(p => p.nameEn)
+
+  // 1. Try Supabase first (pre-populated, always works for Chinese users)
+  const { data: dbPhotos } = await admin
+    .from('legend_photos')
+    .select('name_en, photo_url')
+    .in('name_en', nameEnList)
+
+  const dbPhotoMap: Record<string, string> = {}
+  for (const row of dbPhotos ?? []) {
+    dbPhotoMap[row.name_en] = proxyImg(row.photo_url)!
+  }
+
+  // 2. For any still missing, fall back to Wikipedia API
+  const missing = nameEnList.filter(n => !dbPhotoMap[n])
+  const wikiImages = await fetchWikipediaImages(missing)
+
+  const players = legend.players.map(p => ({
+    name: p.name,
+    nameEn: p.nameEn,
+    era: p.era,
+    desc: p.desc,
+    imageUrl: dbPhotoMap[p.nameEn] ?? wikiImages[p.nameEn] ?? null,
+    baiduUrl: `https://baike.baidu.com/search/word?word=${encodeURIComponent(p.name)}`,
+  }))
 
   return NextResponse.json(
     { intro: legend.intro, worldCupRecord: legend.worldCupRecord, goal2026: legend.goal2026, players },
