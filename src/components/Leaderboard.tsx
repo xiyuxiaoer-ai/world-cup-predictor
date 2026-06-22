@@ -215,7 +215,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
         </div>
       )}
 
-      {profileEntry && currentUserId && (
+      {profileEntry && (
         <MemberProfileModal
           profile={{
             display_name: profileEntry.display_name,
@@ -227,7 +227,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
           rank={sorted.findIndex(e => e.user_id === profileEntry.user_id) + 1 || null}
           points={profileEntry.total_points}
           champPred={null}
-          currentUserId={currentUserId}
+          currentUserId={currentUserId ?? ''}
           onClose={() => setProfileEntry(null)}
         />
       )}
