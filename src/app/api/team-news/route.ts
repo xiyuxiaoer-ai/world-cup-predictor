@@ -73,7 +73,11 @@ export async function GET(request: Request) {
     'thepaper.cn',
   ]
   const siteFilter = SITES.map(s => `site:${s}`).join(' OR ')
-  const query = encodeURIComponent(`${name} 足球 (${siteFilter})`)
+
+  // 只取最近 30 天的新闻
+  const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  const afterDate = monthAgo.toISOString().slice(0, 10) // YYYY-MM-DD
+  const query = encodeURIComponent(`${name} 足球 (${siteFilter}) after:${afterDate}`)
   const url = `https://news.google.com/rss/search?q=${query}&hl=zh-CN&gl=CN&ceid=CN:zh-Hans`
 
   try {
@@ -95,7 +99,21 @@ export async function GET(request: Request) {
       items.map(item => resolveGoogleRedirect(item.link).then(link => ({ ...item, link })))
     )
 
-    return NextResponse.json(resolved, {
+    // 二次过滤：移除 30 天前的条目，并按最新排在最前
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
+    const filtered = resolved
+      .filter(item => {
+        if (!item.pubDate) return true
+        const t = new Date(item.pubDate).getTime()
+        return isNaN(t) || t >= cutoff
+      })
+      .sort((a, b) => {
+        const ta = a.pubDate ? new Date(a.pubDate).getTime() : 0
+        const tb = b.pubDate ? new Date(b.pubDate).getTime() : 0
+        return tb - ta
+      })
+
+    return NextResponse.json(filtered, {
       headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600' },
     })
   } catch {
