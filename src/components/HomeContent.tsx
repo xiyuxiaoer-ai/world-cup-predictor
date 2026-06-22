@@ -277,20 +277,20 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 glass px-3 py-1.5 rounded-lg tap-scale"
+            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
           >
             + 创建
           </button>
           <button
             onClick={() => setShowJoinModal(true)}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 glass px-3 py-1.5 rounded-lg tap-scale"
+            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
           >
             + 加入
           </button>
           <button
             onClick={copyGameCode}
             title="复制 Game 码邀请朋友"
-            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 glass px-3 py-1.5 rounded-lg font-mono tap-scale"
+            className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg font-mono transition-all tap-scale"
           >
             {copied ? '已复制 ✓' : `码: ${selectedGameId.slice(0, 8)}`}
           </button>
