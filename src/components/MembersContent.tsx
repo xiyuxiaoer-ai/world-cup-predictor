@@ -8,6 +8,38 @@ import TeamHistoryModal from './TeamHistoryModal'
 import { getTeamDisplay, getFlagUrl } from '@/lib/flags'
 import { STAGE_LABELS } from '@/lib/championBonus'
 
+function MemberMedal({ rank }: { rank: number }) {
+  if (rank === 1) return (
+    <div className="w-5 h-5 rounded-full flex items-center justify-center"
+      style={{ background: 'linear-gradient(145deg,#FFE55C 0%,#F5A623 52%,#D4810A 100%)', boxShadow: '0 1px 4px rgba(245,166,35,0.6), inset 0 1px 0 rgba(255,255,255,0.5)' }}>
+      <span className="text-[9px] font-black leading-none" style={{ color: '#7A4600' }}>1</span>
+    </div>
+  )
+  if (rank === 2) return (
+    <div className="w-5 h-5 rounded-full flex items-center justify-center"
+      style={{ background: 'linear-gradient(145deg,#E8EAF0 0%,#B0BAC8 52%,#8090A0 100%)', boxShadow: '0 1px 4px rgba(128,144,160,0.5), inset 0 1px 0 rgba(255,255,255,0.6)' }}>
+      <span className="text-[9px] font-black leading-none" style={{ color: '#3A4A5A' }}>2</span>
+    </div>
+  )
+  if (rank === 3) return (
+    <div className="w-5 h-5 rounded-full flex items-center justify-center"
+      style={{ background: 'linear-gradient(145deg,#E8A468 0%,#C47838 52%,#9A5C1E 100%)', boxShadow: '0 1px 4px rgba(160,92,30,0.5), inset 0 1px 0 rgba(255,255,255,0.35)' }}>
+      <span className="text-[9px] font-black leading-none" style={{ color: '#4A2000' }}>3</span>
+    </div>
+  )
+  return null
+}
+
+function IconTrophySm() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" style={{ width: 14, height: 14, flexShrink: 0 }}>
+      <path d="M6 2h8v6a4 4 0 01-8 0V2z" fill="#FCD34D" stroke="#D97706" strokeWidth="1.2"/>
+      <path d="M3.5 4H6M14 4h2.5" stroke="#D97706" strokeWidth="1.6" strokeLinecap="round"/>
+      <path d="M10 12v3M7.5 15h5" stroke="#D97706" strokeWidth="1.6" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 const CARD_IMAGES = [
   '/cards/1.png', '/cards/2.png', '/cards/3.png', '/cards/4.png',
   '/cards/5.png', '/cards/6.png', '/cards/7.png', '/cards/8.png',
@@ -100,9 +132,6 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
     return idx >= 0 ? idx + 1 : null
   }
 
-  const MEDALS = ['🥇', '🥈', '🥉']
-
-
   if (!selectedGameId) return <p className="text-gray-500 dark:text-gray-400">你还没有加入任何 Game</p>
 
   return (
@@ -163,17 +192,13 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                   )}
                   {/* 奖牌：右上角 */}
                   {rank && rank <= 3 && points > 0 && (
-                    <span className="absolute -top-1 -right-1 text-base leading-none">{MEDALS[rank - 1]}</span>
-                  )}
-                  {/* 管理员王冠：左上角 */}
-                  {m.role === 'admin' && (
-                    <span className="absolute -top-1 -left-1 text-base leading-none">👑</span>
+                    <span className="absolute -top-1 -right-1"><MemberMedal rank={rank} /></span>
                   )}
                 </div>
                 <div className="text-center w-full">
                   <div className="flex items-center justify-center gap-2">
                     <span className="font-semibold truncate">{profile?.display_name || profile?.username}</span>
-                    <span className={`text-sm font-bold shrink-0 ${points > 0 ? 'text-amber-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                    <span className={`text-sm font-bold shrink-0 ${points > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'}`}>
                       {points}分
                     </span>
                   </div>
@@ -192,9 +217,9 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                             className="text-xs text-gray-600 dark:text-gray-300 truncate flex items-center gap-1 hover:text-amber-500 transition-colors"
                             onClick={e => { e.stopPropagation(); setHistoryTeam({ tla: cp.predicted_team_tla, name: cp.predicted_team }) }}
                           >
-                            🏆{flagUrl && <img src={flagUrl} alt="" className="inline w-4 h-3 object-cover rounded-sm" />}{teamName}
+                            <IconTrophySm />{flagUrl && <img src={flagUrl} alt="" className="inline w-4 h-3 object-cover rounded-sm" />}{teamName}
                           </button>
-                          <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-500' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-400'}`}>
+                          <span className={`text-xs font-bold shrink-0 ${cp.is_correct === true ? 'text-amber-600 dark:text-amber-400' : cp.is_correct === false ? 'text-gray-400' : 'text-amber-600 dark:text-amber-400'}`}>
                             +{cp.bonus_points}
                           </span>
                         </div>
@@ -202,7 +227,7 @@ export default function MembersContent({ games, currentUserId }: { games: GameWi
                     }
                     return (
                       <div className="mt-2 pt-2 border-t border-black/[0.05] dark:border-white/[0.05] w-full flex items-center gap-1">
-                        <span className="text-xs text-gray-400 dark:text-gray-500">🏆 彩蛋未猜</span>
+                        <IconTrophySm /><span className="text-xs text-gray-400 dark:text-gray-500">彩蛋未猜</span>
                       </div>
                     )
                   })()}
