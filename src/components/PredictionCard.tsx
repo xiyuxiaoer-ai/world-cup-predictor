@@ -25,7 +25,7 @@ function IconPin() {
   )
 }
 
-const inputClass = "w-11 text-center bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors"
+const inputClass = "w-11 text-center text-base bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors"
 const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-400 transition-colors"
 
 export default function PredictionCard({
@@ -55,10 +55,12 @@ export default function PredictionCard({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setError(''); setLoading(true)
+    const h = parseInt(homeScore), a = parseInt(awayScore)
+    if (isNaN(h) || isNaN(a) || h < 0 || a < 0) { setError('请输入有效比分'); setLoading(false); return }
     const body = {
       match_id: match.id,
-      pred_home_score: parseInt(homeScore),
-      pred_away_score: parseInt(awayScore),
+      pred_home_score: h,
+      pred_away_score: a,
       pred_et_winner: showExtraFields ? etWinner || null : null,
       pred_penalty_winner: showExtraFields ? penaltyWinner || null : null,
     }
@@ -159,9 +161,9 @@ export default function PredictionCard({
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <input type="number" min="0" max="20" value={homeScore} onChange={e => setHomeScore(e.target.value)} required className={inputClass} />
+          <input type="text" inputMode="numeric" pattern="[0-9]*" value={homeScore} onChange={e => setHomeScore(e.target.value)} required className={inputClass} />
           <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
-          <input type="number" min="0" max="20" value={awayScore} onChange={e => setAwayScore(e.target.value)} required className={inputClass} />
+          <input type="text" inputMode="numeric" pattern="[0-9]*" value={awayScore} onChange={e => setAwayScore(e.target.value)} required className={inputClass} />
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-start">
           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
