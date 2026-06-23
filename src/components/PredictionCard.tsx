@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, memo } from 'react'
 import dynamic from 'next/dynamic'
 import type { Match, Prediction } from '@/types'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
@@ -28,7 +28,7 @@ function IconPin() {
 const inputClass = "w-11 text-center text-base bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors"
 const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-400 transition-colors"
 
-export default function PredictionCard({
+function PredictionCard({
   match, gameIds, prediction, onSubmitted, onGroupClick,
 }: {
   match: Match; gameIds: string[]; prediction?: Prediction; onSubmitted: (pred: Prediction) => void; onGroupClick?: () => void
@@ -231,3 +231,14 @@ export default function PredictionCard({
     </form>
   )
 }
+
+export default memo(PredictionCard, (prev, next) => {
+  if (prev.match.id !== next.match.id) return false
+  if (prev.match.status !== next.match.status) return false
+  if (prev.match.home_score_90 !== next.match.home_score_90) return false
+  if (prev.match.away_score_90 !== next.match.away_score_90) return false
+  if (prev.prediction?.id !== next.prediction?.id) return false
+  if (prev.gameIds.length !== next.gameIds.length) return false
+  if (!prev.gameIds.every((id, i) => id === next.gameIds[i])) return false
+  return true
+})
