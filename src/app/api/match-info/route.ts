@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { STADIUM_INFO } from '@/lib/stadiums'
 import { MATCH_VENUES } from '@/lib/venues'
 
@@ -72,7 +72,7 @@ interface Logistics { prevCity: string; prevStadium: string; distanceKm: number;
 
 async function fetchTeamLogistics(
   tla: string, kickoffTime: string, venueLon: number, venueLat: number,
-  admin: ReturnType<typeof createClient>
+  admin: SupabaseClient<any>
 ): Promise<Logistics | null> {
   try {
     const { data } = await admin
