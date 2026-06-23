@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import type { Match, Prediction } from '@/types'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
@@ -33,18 +33,28 @@ export default function PredictionCard({
 }: {
   match: Match; gameIds: string[]; prediction?: Prediction; onSubmitted: (pred: Prediction) => void; onGroupClick?: () => void
 }) {
-  const [homeScore, setHomeScore] = useState(prediction?.pred_home_score?.toString() ?? '')
-  const [awayScore, setAwayScore] = useState(prediction?.pred_away_score?.toString() ?? '')
+  const homeRef = useRef<HTMLInputElement>(null)
+  const awayRef = useRef<HTMLInputElement>(null)
+  const [isDraw, setIsDraw] = useState(
+    prediction?.pred_home_score !== undefined &&
+    prediction?.pred_away_score !== undefined &&
+    prediction.pred_home_score === prediction.pred_away_score
+  )
   const [etWinner, setEtWinner] = useState(prediction?.pred_et_winner ?? '')
   const [penaltyWinner, setPenaltyWinner] = useState(prediction?.pred_penalty_winner ?? '')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [done, setDone] = useState(!!prediction)
+
+  function handleScoreInput() {
+    const h = homeRef.current?.value ?? ''
+    const a = awayRef.current?.value ?? ''
+    setIsDraw(h !== '' && a !== '' && h === a)
+  }
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [showMap, setShowMap] = useState(false)
 
   const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
-  const isDraw = homeScore !== '' && awayScore !== '' && homeScore === awayScore
   const showExtraFields = isKnockout && isDraw
   const showPenalty = showExtraFields && etWinner === 'draw'
   const now = new Date()
@@ -55,7 +65,8 @@ export default function PredictionCard({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setError(''); setLoading(true)
-    const h = parseInt(homeScore), a = parseInt(awayScore)
+    const h = parseInt(homeRef.current?.value ?? '')
+    const a = parseInt(awayRef.current?.value ?? '')
     if (isNaN(h) || isNaN(a) || h < 0 || a < 0) { setError('请输入有效比分'); setLoading(false); return }
     const body = {
       match_id: match.id,
@@ -161,9 +172,9 @@ export default function PredictionCard({
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <input type="text" inputMode="numeric" pattern="[0-9]*" value={homeScore} onChange={e => setHomeScore(e.target.value)} required className={inputClass} />
+          <input ref={homeRef} type="text" inputMode="numeric" pattern="[0-9]*" defaultValue={prediction?.pred_home_score?.toString() ?? ''} onInput={handleScoreInput} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} className={inputClass} />
           <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
-          <input type="text" inputMode="numeric" pattern="[0-9]*" value={awayScore} onChange={e => setAwayScore(e.target.value)} required className={inputClass} />
+          <input ref={awayRef} type="text" inputMode="numeric" pattern="[0-9]*" defaultValue={prediction?.pred_away_score?.toString() ?? ''} onInput={handleScoreInput} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} className={inputClass} />
         </div>
         <div className="flex items-center gap-1.5 flex-1 justify-start">
           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
