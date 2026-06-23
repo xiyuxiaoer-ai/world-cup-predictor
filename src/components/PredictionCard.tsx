@@ -41,15 +41,15 @@ const ScoreInputs = memo(function ScoreInputs({
 }) {
   return (
     <div className="flex items-center gap-1 shrink-0">
-      <input ref={homeRef} type="number" min="0" max="20"
+      <input ref={homeRef} type="text" inputMode="numeric" pattern="[0-9]*"
         defaultValue={defaultHome} onInput={onInput}
-        onWheel={e => e.currentTarget.blur()}
-        autoComplete="off" className={inputClass} />
+        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
+        className={inputClass} />
       <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
-      <input ref={awayRef} type="number" min="0" max="20"
+      <input ref={awayRef} type="text" inputMode="numeric" pattern="[0-9]*"
         defaultValue={defaultAway} onInput={onInput}
-        onWheel={e => e.currentTarget.blur()}
-        autoComplete="off" className={inputClass} />
+        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
+        className={inputClass} />
     </div>
   )
 }, (prev, next) => prev.defaultHome === next.defaultHome && prev.defaultAway === next.defaultAway)
