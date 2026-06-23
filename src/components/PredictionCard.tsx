@@ -28,6 +28,32 @@ function IconPin() {
 const inputClass = "w-11 text-center text-base bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors"
 const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-400 transition-colors"
 
+// 独立 memo 子组件：只要 defaultValue 不变，DOM 节点永远不被 React 碰到
+// 防止父组件重渲染时 iOS Safari 跳焦点
+const ScoreInputs = memo(function ScoreInputs({
+  homeRef, awayRef, defaultHome, defaultAway, onInput,
+}: {
+  homeRef: React.RefObject<HTMLInputElement | null>
+  awayRef: React.RefObject<HTMLInputElement | null>
+  defaultHome: string
+  defaultAway: string
+  onInput: () => void
+}) {
+  return (
+    <div className="flex items-center gap-1 shrink-0">
+      <input ref={homeRef} type="text" inputMode="numeric" pattern="[0-9]*"
+        defaultValue={defaultHome} onInput={onInput}
+        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
+        className={inputClass} />
+      <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
+      <input ref={awayRef} type="text" inputMode="numeric" pattern="[0-9]*"
+        defaultValue={defaultAway} onInput={onInput}
+        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
+        className={inputClass} />
+    </div>
+  )
+}, (prev, next) => prev.defaultHome === next.defaultHome && prev.defaultAway === next.defaultAway)
+
 function PredictionCard({
   match, gameIds, prediction, onSubmitted, onGroupClick,
 }: {
@@ -171,11 +197,12 @@ function PredictionCard({
           <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
         </div>
-        <div className="flex items-center gap-1 shrink-0">
-          <input ref={homeRef} type="text" inputMode="numeric" pattern="[0-9]*" defaultValue={prediction?.pred_home_score?.toString() ?? ''} onInput={handleScoreInput} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} className={inputClass} />
-          <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
-          <input ref={awayRef} type="text" inputMode="numeric" pattern="[0-9]*" defaultValue={prediction?.pred_away_score?.toString() ?? ''} onInput={handleScoreInput} autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} className={inputClass} />
-        </div>
+        <ScoreInputs
+          homeRef={homeRef} awayRef={awayRef}
+          defaultHome={prediction?.pred_home_score?.toString() ?? ''}
+          defaultAway={prediction?.pred_away_score?.toString() ?? ''}
+          onInput={handleScoreInput}
+        />
         <div className="flex items-center gap-1.5 flex-1 justify-start">
           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
           <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
