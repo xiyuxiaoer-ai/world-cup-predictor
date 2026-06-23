@@ -25,7 +25,7 @@ function IconPin() {
   )
 }
 
-const inputClass = "w-11 text-center text-base bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors"
+const inputClass = "w-11 text-center text-base bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg py-1.5 text-gray-900 dark:text-gray-100 font-bold focus:outline-none focus:border-blue-400 focus:bg-white dark:focus:bg-gray-700 transition-colors [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 const selectClass = "w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1.5 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-400 transition-colors"
 
 // 独立 memo 子组件：只要 defaultValue 不变，DOM 节点永远不被 React 碰到
@@ -39,28 +39,17 @@ const ScoreInputs = memo(function ScoreInputs({
   defaultAway: string
   onInput: () => void
 }) {
-  // tabIndex={-1}：把两个 input 从 iOS 键盘导航序列里摘除，防止弹键盘时 iOS 扫描相邻元素构建 Prev/Next 工具栏而跳焦点
-  // onPointerDown：touch 时阻止浏览器默认焦点行为，改由手动 focus，确保聚焦到正确的格子
-  const focusOn = (ref: React.RefObject<HTMLInputElement | null>) =>
-    (e: React.PointerEvent) => {
-      if (e.pointerType === 'touch') {
-        e.preventDefault()
-        ref.current?.focus()
-      }
-    }
   return (
     <div className="flex items-center gap-1 shrink-0">
-      <input ref={homeRef} type="text" inputMode="numeric" pattern="[0-9]*"
+      <input ref={homeRef} type="number" min="0" max="20"
         defaultValue={defaultHome} onInput={onInput}
-        tabIndex={-1} onPointerDown={focusOn(homeRef)}
-        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
-        className={inputClass} />
+        onWheel={e => e.currentTarget.blur()}
+        autoComplete="off" className={inputClass} />
       <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
-      <input ref={awayRef} type="text" inputMode="numeric" pattern="[0-9]*"
+      <input ref={awayRef} type="number" min="0" max="20"
         defaultValue={defaultAway} onInput={onInput}
-        tabIndex={-1} onPointerDown={focusOn(awayRef)}
-        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
-        className={inputClass} />
+        onWheel={e => e.currentTarget.blur()}
+        autoComplete="off" className={inputClass} />
     </div>
   )
 }, (prev, next) => prev.defaultHome === next.defaultHome && prev.defaultAway === next.defaultAway)
