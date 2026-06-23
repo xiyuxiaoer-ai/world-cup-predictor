@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import GroupModal from './GroupModal'
 import type { GameWithRole, Match, Prediction } from '@/types'
@@ -417,6 +418,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 <span>{syncing ? '更新中...' : '手动更新'}</span>
               </button>
               {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
+              <Link href="/bracket" className="ml-auto flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
+                <span>🏆</span><span>赛程表</span>
+              </Link>
             </div>
             <div className="space-y-2">
               {displayMatches.length === 0 && (
