@@ -14,7 +14,10 @@ function GdLabel({ gd }: { gd: number }) {
   return <span className={color}>{gd > 0 ? `+${gd}` : gd}</span>
 }
 
-export default function ThirdPlaceModal({ onClose }: { onClose: () => void }) {
+export default function ThirdPlaceModal({ onClose, onGroupClick }: {
+  onClose: () => void
+  onGroupClick?: (groupName: string, label: string) => void
+}) {
   const [data, setData] = useState<ThirdEntry[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -80,7 +83,17 @@ export default function ThirdPlaceModal({ onClose }: { onClose: () => void }) {
                             : <span className="w-5 h-3.5 shrink-0" />
                           }
                           <span className="font-medium text-gray-800 dark:text-gray-200">{name}</span>
-                          <span className="text-gray-400 dark:text-gray-600">{row.group}组</span>
+                          {onGroupClick ? (
+                            <button
+                              type="button"
+                              onClick={() => onGroupClick(`GROUP_${row.group}`, `小组赛 ${row.group}组`)}
+                              className="text-gray-400 dark:text-gray-500 underline decoration-dotted hover:text-amber-500 transition-colors"
+                            >
+                              {row.group}组
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 dark:text-gray-600">{row.group}组</span>
+                          )}
                         </div>
                       </td>
                       {/* 积分 */}

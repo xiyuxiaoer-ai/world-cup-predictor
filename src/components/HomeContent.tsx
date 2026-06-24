@@ -472,7 +472,14 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         </>
       )}
 
-      {showThirdPlace && <ThirdPlaceModal onClose={() => setShowThirdPlace(false)} />}
+      {showThirdPlace && (
+        <ThirdPlaceModal
+          onClose={() => setShowThirdPlace(false)}
+          onGroupClick={(groupName, label) => {
+            setGroupModal({ stage: 'group', group_name: groupName, label })
+          }}
+        />
+      )}
 
       {showCreateModal && (
         <CreateGameModal onCreated={handleGameCreated} onClose={() => setShowCreateModal(false)} />
