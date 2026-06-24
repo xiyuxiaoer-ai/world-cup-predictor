@@ -17,6 +17,7 @@ import ChampionEggModal from './ChampionEggModal'
 import ChampionPredictModal from './ChampionPredictModal'
 import { calculateChampionBonus } from '@/lib/championBonus'
 import { MATCH_VENUES } from '@/lib/venues'
+import ThirdPlaceModal from './ThirdPlaceModal'
 
 const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
@@ -45,6 +46,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const [matches, setMatches] = useState<Match[]>([])
   const [predictions, setPredictions] = useState<Record<string, Prediction>>({})
   const [loading, setLoading] = useState(false)
+  const [showThirdPlace, setShowThirdPlace] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -420,9 +422,17 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 <span>{syncing ? '更新中...' : '手动更新'}</span>
               </button>
               {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
-              <Link href="/bracket" className="ml-auto flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
-                <span>🏆</span><span>淘汰赛赛程</span>
-              </Link>
+              <div className="ml-auto flex items-center gap-3">
+                <button
+                  onClick={() => setShowThirdPlace(true)}
+                  className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
+                >
+                  <span>📊</span><span>第三名推算</span>
+                </button>
+                <Link href="/bracket" className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
+                  <span>🏆</span><span>淘汰赛赛程</span>
+                </Link>
+              </div>
             </div>
             <div className="space-y-2">
               {displayMatches.length === 0 && (
@@ -461,6 +471,8 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           </div>
         </>
       )}
+
+      {showThirdPlace && <ThirdPlaceModal onClose={() => setShowThirdPlace(false)} />}
 
       {showCreateModal && (
         <CreateGameModal onCreated={handleGameCreated} onClose={() => setShowCreateModal(false)} />
