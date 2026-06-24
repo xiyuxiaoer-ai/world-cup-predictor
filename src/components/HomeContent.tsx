@@ -188,9 +188,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               <button
                 type="button"
                 onClick={() => setMapMatch(match)}
-                className="flex items-center gap-0.5 hover:text-amber-500 transition-colors truncate min-w-0"
+                className="flex items-center gap-0.5 hover:text-amber-500 transition-colors min-w-0 overflow-hidden"
               >
-                <IconPin />
+                <span className="shrink-0"><IconPin /></span>
                 <span className="truncate">{venue.city} · {venue.stadium}</span>
               </button>
             )}
