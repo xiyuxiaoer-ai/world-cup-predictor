@@ -3,15 +3,54 @@
 import { useEffect, useState } from 'react'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
+type FourthEntry = {
+  team: string; tla: string | null
+  pts: number; gf: number; ga: number; gd: number
+  vsTeam: string | null; vsTla: string | null
+}
+
 type ThirdEntry = {
   group: string; team: string; tla: string | null
   pts: number; gf: number; ga: number; gd: number
   played: number; remaining: number
+  vsTeam: string | null; vsTla: string | null
+  fourth: FourthEntry | null
 }
 
-function GdLabel({ gd }: { gd: number }) {
+function Flag({ tla }: { tla: string | null | undefined }) {
+  const url = getFlagUrl(tla)
+  return url
+    ? <img src={url} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />
+    : <span className="w-5 h-3.5 shrink-0" />
+}
+
+function GdBadge({ gd }: { gd: number }) {
   const color = gd > 0 ? 'text-green-600 dark:text-green-400' : gd < 0 ? 'text-red-500 dark:text-red-400' : 'text-gray-400'
   return <span className={color}>{gd > 0 ? `+${gd}` : gd}</span>
+}
+
+function TeamCell({ team, tla, onGroupClick, group }: {
+  team: string; tla: string | null
+  group: string; onGroupClick?: (g: string, l: string) => void
+}) {
+  const name = getTeamDisplay(tla, team)
+  return (
+    <div className="flex items-center gap-1.5 min-w-0">
+      <Flag tla={tla} />
+      <span className="font-medium text-gray-800 dark:text-gray-200 truncate">{name}</span>
+      {onGroupClick ? (
+        <button
+          type="button"
+          onClick={() => onGroupClick(`GROUP_${group}`, `小组赛 ${group}组`)}
+          className="text-[10px] text-gray-400 dark:text-gray-500 underline decoration-dotted hover:text-amber-500 transition-colors shrink-0"
+        >
+          {group}组
+        </button>
+      ) : (
+        <span className="text-[10px] text-gray-400 dark:text-gray-600 shrink-0">{group}组</span>
+      )}
+    </div>
+  )
 }
 
 export default function ThirdPlaceModal({ onClose, onGroupClick }: {
@@ -32,13 +71,14 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full sm:max-w-lg bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-black/[0.06] dark:border-white/10 shrink-0">
           <div>
             <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">第三名晋级推算</h2>
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">12组各取第3，积分最高8支晋级 · 排名1–8可出线</p>
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">12组各取第3，积分最高8支晋级 · 点组别可查看剩余赛程</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg leading-none px-1">✕</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg px-1">✕</button>
         </div>
 
         {/* Table */}
@@ -46,76 +86,103 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
           {loading ? (
             <div className="text-sm text-gray-400 p-6 text-center">加载中...</div>
           ) : (
-            <table className="w-full text-xs">
+            <table className="w-full text-xs border-collapse">
               <thead>
-                <tr className="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50">
+                <tr className="text-[10px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800/50 sticky top-0">
                   <th className="px-3 py-2 text-left w-7">#</th>
                   <th className="px-2 py-2 text-left">球队</th>
                   <th className="px-2 py-2 text-center">积分</th>
                   <th className="px-2 py-2 text-center">净胜</th>
                   <th className="px-2 py-2 text-center">进球</th>
-                  <th className="px-2 py-2 text-right pr-3">剩余</th>
+                  <th className="px-2 py-2 text-right pr-3">最后一场</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((row, i) => {
                   const inTop8 = i < 8
-                  const flagUrl = getFlagUrl(row.tla)
-                  const name = getTeamDisplay(row.tla, row.team)
-                  const rowBg = inTop8
-                    ? 'bg-green-50/60 dark:bg-green-900/10'
-                    : 'bg-red-50/40 dark:bg-red-900/10'
+                  const showDivider = i === 8
 
                   return (
-                    <tr key={row.group} className={`border-b border-black/[0.04] dark:border-white/[0.05] ${rowBg}`}>
-                      {/* 排名 */}
-                      <td className="px-3 py-2.5">
-                        <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold
-                          ${inTop8 ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
-                          {i + 1}
-                        </span>
-                      </td>
-                      {/* 球队 */}
-                      <td className="px-2 py-2.5">
-                        <div className="flex items-center gap-1.5">
-                          {flagUrl
-                            ? <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />
-                            : <span className="w-5 h-3.5 shrink-0" />
-                          }
-                          <span className="font-medium text-gray-800 dark:text-gray-200">{name}</span>
-                          {onGroupClick ? (
-                            <button
-                              type="button"
-                              onClick={() => onGroupClick(`GROUP_${row.group}`, `小组赛 ${row.group}组`)}
-                              className="text-gray-400 dark:text-gray-500 underline decoration-dotted hover:text-amber-500 transition-colors"
-                            >
-                              {row.group}组
-                            </button>
+                    <>
+                      {/* 晋级线分隔 */}
+                      {showDivider && (
+                        <tr key="divider">
+                          <td colSpan={6} className="px-3 py-1">
+                            <div className="flex items-center gap-2 text-[10px] text-gray-400 dark:text-gray-500">
+                              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                              <span className="shrink-0">── 晋级线 ──</span>
+                              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+
+                      {/* 第3名主行 */}
+                      <tr key={row.group} className={`border-b border-black/[0.04] dark:border-white/[0.05] ${inTop8 ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-red-50/30 dark:bg-red-900/[0.07]'}`}>
+                        <td className="px-3 py-2.5">
+                          <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold
+                            ${inTop8 ? 'bg-green-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                            {i + 1}
+                          </span>
+                        </td>
+                        <td className="px-2 py-2.5">
+                          <TeamCell team={row.team} tla={row.tla} group={row.group} onGroupClick={onGroupClick} />
+                        </td>
+                        <td className="px-2 py-2.5 text-center font-bold text-gray-800 dark:text-gray-200">{row.pts}</td>
+                        <td className="px-2 py-2.5 text-center"><GdBadge gd={row.gd} /></td>
+                        <td className="px-2 py-2.5 text-center text-gray-600 dark:text-gray-400">{row.gf}</td>
+                        <td className="px-2 py-2.5 pr-3 text-right">
+                          {row.remaining > 0 && row.vsTeam ? (
+                            <div className="flex flex-col items-end gap-0.5">
+                              <div className="flex items-center gap-1">
+                                <Flag tla={row.vsTla} />
+                                <span className="text-gray-500 dark:text-gray-400 text-[10px]">{getTeamDisplay(row.vsTla, row.vsTeam)}</span>
+                              </div>
+                              <span className="text-[9px] text-gray-400 leading-tight">
+                                赢→<span className="text-green-600 dark:text-green-400 font-medium">{row.pts + 3}</span>
+                                {' '}平→<span className="text-amber-500 font-medium">{row.pts + 1}</span>
+                                {' '}负→<span className="text-gray-400">{row.pts}</span>
+                              </span>
+                            </div>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-600">{row.group}组</span>
+                            <span className="text-[10px] text-gray-300 dark:text-gray-600">已完赛</span>
                           )}
-                        </div>
-                      </td>
-                      {/* 积分 */}
-                      <td className="px-2 py-2.5 text-center font-bold text-gray-800 dark:text-gray-200">{row.pts}</td>
-                      {/* 净胜球 */}
-                      <td className="px-2 py-2.5 text-center"><GdLabel gd={row.gd} /></td>
-                      {/* 进球 */}
-                      <td className="px-2 py-2.5 text-center text-gray-600 dark:text-gray-400">{row.gf}</td>
-                      {/* 剩余场次 + 场景 */}
-                      <td className="px-2 py-2.5 pr-3 text-right">
-                        {row.remaining > 0 ? (
-                          <div className="flex flex-col items-end gap-0.5">
-                            <span className="text-[10px] text-amber-500 font-medium">剩{row.remaining}场</span>
-                            <span className="text-[9px] text-gray-400 dark:text-gray-500 leading-tight">
-                              赢→{row.pts + 3}pt · 平→{row.pts + 1}pt
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-[10px] text-gray-300 dark:text-gray-600">已完赛</span>
-                        )}
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+
+                      {/* 第4名子行：仅当有可能追上时显示 */}
+                      {row.fourth && (
+                        <tr key={`${row.group}-4th`} className="border-b border-black/[0.04] dark:border-white/[0.05] bg-amber-50/40 dark:bg-amber-900/[0.06]">
+                          <td className="px-3 py-2">
+                            <span className="text-amber-400 text-xs pl-1">⚠</span>
+                          </td>
+                          <td className="px-2 py-2">
+                            <div className="flex items-center gap-1.5 min-w-0 pl-1 opacity-80">
+                              <Flag tla={row.fourth.tla} />
+                              <span className="text-gray-600 dark:text-gray-400 truncate">{getTeamDisplay(row.fourth.tla, row.fourth.team)}</span>
+                              <span className="text-[10px] text-amber-500 shrink-0">可追上</span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 text-center text-gray-500 dark:text-gray-500">{row.fourth.pts}</td>
+                          <td className="px-2 py-2 text-center"><GdBadge gd={row.fourth.gd} /></td>
+                          <td className="px-2 py-2 text-center text-gray-500 dark:text-gray-500">{row.fourth.gf}</td>
+                          <td className="px-2 py-2 pr-3 text-right">
+                            {row.fourth.vsTeam ? (
+                              <div className="flex flex-col items-end gap-0.5">
+                                <div className="flex items-center gap-1">
+                                  <Flag tla={row.fourth.vsTla} />
+                                  <span className="text-gray-500 dark:text-gray-400 text-[10px]">{getTeamDisplay(row.fourth.vsTla, row.fourth.vsTeam)}</span>
+                                </div>
+                                <span className="text-[9px] text-gray-400 leading-tight">
+                                  赢→<span className="text-amber-500 font-medium">{row.fourth.pts + 3}</span>
+                                  {' '}平→{row.fourth.pts + 1}
+                                </span>
+                              </div>
+                            ) : null}
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   )
                 })}
               </tbody>
@@ -123,10 +190,10 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
           )}
         </div>
 
-        {/* Footer 说明 */}
+        {/* Footer */}
         <div className="px-4 py-2.5 border-t border-black/[0.04] dark:border-white/[0.05] shrink-0">
           <p className="text-[10px] text-gray-400 dark:text-gray-500">
-            ⚠ 基于已完成比赛实时计算 · 净胜球相同时进球数多者优先 · 小组赛结束后以官方公布为准
+            ⚠标记表示该组第4名赢球后可能超越第3名 · 净胜球相同时进球数多者优先 · 以官方公布为准
           </p>
         </div>
       </div>
