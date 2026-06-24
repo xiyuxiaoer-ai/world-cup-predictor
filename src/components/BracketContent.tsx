@@ -33,22 +33,26 @@ function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchD
 }
 
 // 把 "E1" / "最佳第三(A/B/C...)" 这类标签 → 真实队名（如果积分榜已知）
-function resolveLabel(raw: string, standings: Record<string, { team: string; tla: string | null }[]>): string {
+function resolveLabel(raw: string, standings: Record<string, { team: string; tla: string | null }[]>): { label: string; tla: string | null } {
   // 普通名次，如 "E1" "A2"
   const simple = raw.match(/^([A-L])([12])$/)
   if (simple) {
     const groupKey = `GROUP_${simple[1]}`
     const pos = Number(simple[2]) - 1
-    return standings[groupKey]?.[pos]?.team ?? `${simple[1]}组第${simple[2]}名`
+    const entry = standings[groupKey]?.[pos]
+    if (entry) return { label: entry.team, tla: entry.tla }
+    return { label: `${simple[1]}组第${simple[2]}名`, tla: null }
   }
   // 已经是"X组第Y名"格式的转换
   const chinese = raw.match(/^([A-L])组第([12])名$/)
   if (chinese) {
     const groupKey = `GROUP_${chinese[1]}`
     const pos = Number(chinese[2]) - 1
-    return standings[groupKey]?.[pos]?.team ?? raw
+    const entry = standings[groupKey]?.[pos]
+    if (entry) return { label: entry.team, tla: entry.tla }
+    return { label: raw, tla: null }
   }
-  return raw
+  return { label: raw, tla: null }
 }
 
 function buildSlots(
@@ -59,19 +63,19 @@ function buildSlots(
 ) {
   return matchNums.map(num => {
     const match = byMatchNum.get(num) ?? null
-    let homeLabel = '待定'
-    let awayLabel = '待定'
+    let homeLabel = '待定', awayLabel = '待定'
+    let homeTla: string | null = null, awayTla: string | null = null
     if (isR32) {
       const entry = Object.entries(R32_SLOTS).find(([, s]) => s.matchNum === num)
       if (entry) {
         const apiId = Number(entry[0])
-        const rawHome = getSlotLabel(apiId, true)
-        const rawAway = getSlotLabel(apiId, false)
-        homeLabel = resolveLabel(rawHome, standings)
-        awayLabel = resolveLabel(rawAway, standings)
+        const h = resolveLabel(getSlotLabel(apiId, true), standings)
+        const a = resolveLabel(getSlotLabel(apiId, false), standings)
+        homeLabel = h.label; homeTla = h.tla
+        awayLabel = a.label; awayTla = a.tla
       }
     }
-    return { match, homeLabel, awayLabel }
+    return { match, homeLabel, awayLabel, homeTla, awayTla }
   })
 }
 

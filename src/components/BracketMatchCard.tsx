@@ -1,4 +1,4 @@
-import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
+import { getFlagUrl, getTeamDisplay, getTeamZh } from '@/lib/flags'
 
 export type BracketMatchData = {
   id: string
@@ -18,7 +18,9 @@ type Props = {
   match: BracketMatchData | null
   homeLabel?: string
   awayLabel?: string
-  roundColor?: string              // 轮次背景色，如 'bg-blue-100 dark:bg-blue-900/30'
+  homeTla?: string | null
+  awayTla?: string | null
+  roundColor?: string
 }
 
 function TeamRow({ name, tla, score, isWinner, isLoser, label }: {
@@ -52,19 +54,30 @@ function TeamRow({ name, tla, score, isWinner, isLoser, label }: {
   )
 }
 
-export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定', roundColor = '' }: Props) {
+function LabelRow({ label, tla }: { label: string; tla?: string | null }) {
+  const flagUrl = tla ? getFlagUrl(tla) : null
+  const display = tla ? (getTeamZh(tla) ?? label) : label
+  const isKnown = !!tla
+  return (
+    <div className="px-2 py-[5px] flex items-center gap-1.5">
+      {flagUrl
+        ? <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />
+        : <span className="w-5 h-3.5 shrink-0" />
+      }
+      <span className={`text-[11px] truncate leading-tight ${isKnown ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
+        {display}
+      </span>
+    </div>
+  )
+}
+
+export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定', homeTla, awayTla, roundColor = '' }: Props) {
   if (!match) {
     return (
       <div className={`w-[130px] rounded-lg border border-dashed border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 ${roundColor}`}>
-        <div className="px-2 py-[5px] flex items-center gap-1.5">
-          <span className="w-5 h-3.5 shrink-0" />
-          <span className="text-[11px] text-gray-300 dark:text-gray-600 truncate">{homeLabel}</span>
-        </div>
+        <LabelRow label={homeLabel} tla={homeTla} />
         <div className="h-px bg-gray-100 dark:bg-gray-800" />
-        <div className="px-2 py-[5px] flex items-center gap-1.5">
-          <span className="w-5 h-3.5 shrink-0" />
-          <span className="text-[11px] text-gray-300 dark:text-gray-600 truncate">{awayLabel}</span>
-        </div>
+        <LabelRow label={awayLabel} tla={awayTla} />
       </div>
     )
   }

@@ -108,6 +108,11 @@ const TLA_TO_JA: Record<string, string> = {
   NZL: 'ニュージーランド', FIJ: 'フィジー',
 }
 
+export function getTeamZh(tla: string | null | undefined): string | null {
+  if (!tla) return null
+  return TLA_TO_ZH[tla.toUpperCase()] ?? null
+}
+
 export function getTeamJa(tla: string | null | undefined): string | null {
   if (!tla) return null
   return TLA_TO_JA[tla.toUpperCase()] ?? null
