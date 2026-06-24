@@ -123,8 +123,17 @@ export default function BracketContent() {
           </div>
 
           {/* 决赛 */}
-          <div className="flex flex-col items-center" style={{ gap: 8 }}>
-            <span className="text-[10px] font-bold text-red-500 tracking-wide">决赛</span>
+          <div className="flex flex-col items-center" style={{ gap: 10 }}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
+                <div className="h-px w-5 bg-gradient-to-r from-transparent to-amber-400 dark:to-amber-500" />
+                <span className="text-base font-black tracking-[0.25em] bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent drop-shadow-sm">
+                  决赛
+                </span>
+                <div className="h-px w-5 bg-gradient-to-l from-transparent to-amber-400 dark:to-amber-500" />
+              </div>
+              <span className="text-[9px] tracking-widest text-amber-500/60 dark:text-amber-400/50 font-medium">FINAL</span>
+            </div>
             <BracketMatchCard match={finalMatch} homeLabel="待定" awayLabel="待定" roundColor="bg-red-50 dark:bg-red-900/20" />
           </div>
 
