@@ -171,19 +171,31 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         className="glass hover-lift rounded-xl px-3 py-3 space-y-2 animate-stagger-in"
         style={{ animationDelay: `${Math.min(idx * 40, 180)}ms` }}
       >
-        <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
-          <button
-            type="button"
-            onClick={() => setGroupModal({
-              stage: match.stage,
-              group_name: match.group_name ?? null,
-              label: `${STAGE_LABELS[match.stage]}${group ? ' ' + group : ''}`,
-            })}
-            className="underline decoration-dotted hover:text-amber-500 transition-colors"
-          >
-            {STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}
-          </button>
-          <span>
+        <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500 gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <button
+              type="button"
+              onClick={() => setGroupModal({
+                stage: match.stage,
+                group_name: match.group_name ?? null,
+                label: `${STAGE_LABELS[match.stage]}${group ? ' ' + group : ''}`,
+              })}
+              className="underline decoration-dotted hover:text-amber-500 transition-colors shrink-0"
+            >
+              {STAGE_LABELS[match.stage]}{group ? ` · ${group}` : ''}
+            </button>
+            {venue && (
+              <button
+                type="button"
+                onClick={() => setMapMatch(match)}
+                className="flex items-center gap-0.5 hover:text-amber-500 transition-colors truncate min-w-0"
+              >
+                <IconPin />
+                <span className="truncate">{venue.city} · {venue.stadium}</span>
+              </button>
+            )}
+          </div>
+          <span className="shrink-0">
             {match.status === 'finished'
               ? '已结束'
               : `${kickoff.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })} ${kickoff.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}`
@@ -223,16 +235,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pr-[30px]">{awayJa}</span>}
           </div>
         </div>
-        {venue && (
-          <button
-            type="button"
-            onClick={() => setMapMatch(match)}
-            className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500 -mt-0.5 hover:text-amber-500 transition-colors"
-          >
-            <IconPin />
-            <span>{venue.city} · {venue.stadium}</span>
-          </button>
-        )}
         <div className="text-xs border-t border-black/[0.06] dark:border-white/10 pt-2">
           {pred ? (
             <div className="flex items-center justify-between gap-2">
