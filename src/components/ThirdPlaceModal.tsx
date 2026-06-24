@@ -150,38 +150,6 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
                         </td>
                       </tr>
 
-                      {/* 第4名子行：仅当有可能追上时显示 */}
-                      {row.fourth && (
-                        <tr key={`${row.group}-4th`} className="border-b border-black/[0.04] dark:border-white/[0.05] bg-amber-50/40 dark:bg-amber-900/[0.06]">
-                          <td className="px-3 py-2">
-                            <span className="text-amber-400 text-xs pl-1">⚠</span>
-                          </td>
-                          <td className="px-2 py-2">
-                            <div className="flex items-center gap-1.5 min-w-0 pl-1 opacity-80">
-                              <Flag tla={row.fourth.tla} />
-                              <span className="text-gray-600 dark:text-gray-400 truncate">{getTeamDisplay(row.fourth.tla, row.fourth.team)}</span>
-                              <span className="text-[10px] text-amber-500 shrink-0">可追上</span>
-                            </div>
-                          </td>
-                          <td className="px-2 py-2 text-center text-gray-500 dark:text-gray-500">{row.fourth.pts}</td>
-                          <td className="px-2 py-2 text-center"><GdBadge gd={row.fourth.gd} /></td>
-                          <td className="px-2 py-2 text-center text-gray-500 dark:text-gray-500">{row.fourth.gf}</td>
-                          <td className="px-2 py-2 pr-3 text-right">
-                            {row.fourth.vsTeam ? (
-                              <div className="flex flex-col items-end gap-0.5">
-                                <div className="flex items-center gap-1">
-                                  <Flag tla={row.fourth.vsTla} />
-                                  <span className="text-gray-500 dark:text-gray-400 text-[10px]">{getTeamDisplay(row.fourth.vsTla, row.fourth.vsTeam)}</span>
-                                </div>
-                                <span className="text-[9px] text-gray-400 leading-tight">
-                                  赢→<span className="text-amber-500 font-medium">{row.fourth.pts + 3}</span>
-                                  {' '}平→{row.fourth.pts + 1}
-                                </span>
-                              </div>
-                            ) : null}
-                          </td>
-                        </tr>
-                      )}
                     </>
                   )
                 })}
