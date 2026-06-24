@@ -23,13 +23,17 @@ type Props = {
   roundColor?: string
 }
 
-function TeamRow({ name, tla, score, isWinner, isLoser, label }: {
-  name: string; tla: string | null; score: number | null
+function TeamRow({ name, tla, slotTla, score, isWinner, isLoser, label }: {
+  name: string; tla: string | null; slotTla?: string | null; score: number | null
   isWinner: boolean; isLoser: boolean; label: string
 }) {
   const isTbd = name === 'TBD' || !name
-  const flagUrl = !isTbd && tla ? getFlagUrl(tla) : null
-  const display = isTbd ? label : getTeamDisplay(tla, name)
+  // 当 DB 里是 TBD 但积分榜已知时，用 slotTla 显示国旗和中文名
+  const effectiveTla = isTbd ? (slotTla ?? null) : tla
+  const flagUrl = effectiveTla ? getFlagUrl(effectiveTla) : null
+  const display = isTbd
+    ? (slotTla ? (getTeamZh(slotTla) ?? label) : label)
+    : getTeamDisplay(tla, name)
 
   return (
     <div className={`flex items-center gap-1.5 px-2 py-[5px] ${isWinner ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}>
@@ -38,7 +42,7 @@ function TeamRow({ name, tla, score, isWinner, isLoser, label }: {
         : <span className="w-5 h-3.5 shrink-0" />
       }
       <span className={`text-[11px] flex-1 truncate leading-tight
-        ${isTbd ? 'text-gray-400 dark:text-gray-500' :
+        ${isTbd && !slotTla ? 'text-gray-400 dark:text-gray-500' :
           isLoser ? 'text-gray-400 dark:text-gray-500 line-through' :
           isWinner ? 'font-bold text-gray-900 dark:text-gray-100' :
           'text-gray-700 dark:text-gray-300'}`}>
@@ -96,14 +100,14 @@ export default function BracketMatchCard({ match, homeLabel = '待定', awayLabe
         <span className="text-[10px] text-gray-400 dark:text-gray-500">{dateStr}</span>
       </div>
       <TeamRow
-        name={match.home_team} tla={match.home_tla}
+        name={match.home_team} tla={match.home_tla} slotTla={homeTla}
         score={finished ? h : null}
         isWinner={homeWin} isLoser={awayWin}
         label={homeLabel}
       />
       <div className="h-px bg-gray-100 dark:bg-gray-800" />
       <TeamRow
-        name={match.away_team} tla={match.away_tla}
+        name={match.away_team} tla={match.away_tla} slotTla={awayTla}
         score={finished ? a : null}
         isWinner={awayWin} isLoser={homeWin}
         label={awayLabel}
