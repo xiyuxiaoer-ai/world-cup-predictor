@@ -133,16 +133,9 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
                         <td className="px-2 py-2.5 text-center text-gray-600 dark:text-gray-400">{row.gf}</td>
                         <td className="px-2 py-2.5 pr-3 text-right">
                           {row.remaining > 0 && row.vsTeam ? (
-                            <div className="flex flex-col items-end gap-0.5">
-                              <div className="flex items-center gap-1">
-                                <Flag tla={row.vsTla} />
-                                <span className="text-gray-500 dark:text-gray-400 text-[10px]">{getTeamDisplay(row.vsTla, row.vsTeam)}</span>
-                              </div>
-                              <span className="text-[9px] text-gray-400 leading-tight">
-                                赢→<span className="text-green-600 dark:text-green-400 font-medium">{row.pts + 3}</span>
-                                {' '}平→<span className="text-amber-500 font-medium">{row.pts + 1}</span>
-                                {' '}负→<span className="text-gray-400">{row.pts}</span>
-                              </span>
+                            <div className="flex items-center justify-end gap-1">
+                              <Flag tla={row.vsTla} />
+                              <span className="text-gray-500 dark:text-gray-400 text-[10px]">{getTeamDisplay(row.vsTla, row.vsTeam)}</span>
                             </div>
                           ) : (
                             <span className="text-[10px] text-gray-300 dark:text-gray-600">已完赛</span>
