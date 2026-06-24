@@ -132,6 +132,9 @@ export default function BracketContent() {
       <div className="mb-4">
         <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程表</h1>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">左右滑动查看完整赛程 · 灰色为待定</p>
+        <p className="text-[11px] text-amber-600/70 dark:text-amber-400/60 mt-1">
+          ⚠ 32强对阵根据当前小组赛积分推算，小组赛结束前仅供参考，最终以官方公布为准
+        </p>
       </div>
 
       <div className="flex gap-3 mb-4 text-[10px] text-gray-500 dark:text-gray-400">
