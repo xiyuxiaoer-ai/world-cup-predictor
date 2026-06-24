@@ -43,9 +43,9 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
       {/* 连线区 */}
       {showConnector && (
         <div className="relative shrink-0" style={{ width: CONNECTOR_W, height: totalH }}>
-          {/* 上半截：从上卡片中心向右延伸，再向下到中点 */}
+          {/* 上半截：上卡片中心 → 水平延伸 → 垂直到中点 */}
           <div
-            className={`absolute border-t border-r ${lineColor}`}
+            className={`absolute border-t ${flip ? 'border-l' : 'border-r'} ${lineColor}`}
             style={{
               top: CARD_H / 2,
               [flip ? 'right' : 'left']: 0,
@@ -54,9 +54,9 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
               borderRadius: flip ? '4px 0 0 0' : '0 4px 0 0',
             }}
           />
-          {/* 下半截：从中点向下，到下卡片中心 */}
+          {/* 下半截：中点 → 垂直 → 下卡片中心 */}
           <div
-            className={`absolute border-b border-r ${lineColor}`}
+            className={`absolute border-b ${flip ? 'border-l' : 'border-r'} ${lineColor}`}
             style={{
               bottom: CARD_H / 2,
               [flip ? 'right' : 'left']: 0,
