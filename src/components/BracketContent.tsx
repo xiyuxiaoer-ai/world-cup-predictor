@@ -32,7 +32,31 @@ function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchD
   return map
 }
 
-function buildSlots(matchNums: number[], byMatchNum: Map<number, BracketMatchData>, isR32 = false) {
+// 把 "E1" / "最佳第三(A/B/C...)" 这类标签 → 真实队名（如果积分榜已知）
+function resolveLabel(raw: string, standings: Record<string, { team: string; tla: string | null }[]>): string {
+  // 普通名次，如 "E1" "A2"
+  const simple = raw.match(/^([A-L])([12])$/)
+  if (simple) {
+    const groupKey = `GROUP_${simple[1]}`
+    const pos = Number(simple[2]) - 1
+    return standings[groupKey]?.[pos]?.team ?? `${simple[1]}组第${simple[2]}名`
+  }
+  // 已经是"X组第Y名"格式的转换
+  const chinese = raw.match(/^([A-L])组第([12])名$/)
+  if (chinese) {
+    const groupKey = `GROUP_${chinese[1]}`
+    const pos = Number(chinese[2]) - 1
+    return standings[groupKey]?.[pos]?.team ?? raw
+  }
+  return raw
+}
+
+function buildSlots(
+  matchNums: number[],
+  byMatchNum: Map<number, BracketMatchData>,
+  standings: Record<string, { team: string; tla: string | null }[]>,
+  isR32 = false,
+) {
   return matchNums.map(num => {
     const match = byMatchNum.get(num) ?? null
     let homeLabel = '待定'
@@ -41,8 +65,10 @@ function buildSlots(matchNums: number[], byMatchNum: Map<number, BracketMatchDat
       const entry = Object.entries(R32_SLOTS).find(([, s]) => s.matchNum === num)
       if (entry) {
         const apiId = Number(entry[0])
-        homeLabel = getSlotLabel(apiId, true)
-        awayLabel = getSlotLabel(apiId, false)
+        const rawHome = getSlotLabel(apiId, true)
+        const rawAway = getSlotLabel(apiId, false)
+        homeLabel = resolveLabel(rawHome, standings)
+        awayLabel = resolveLabel(rawAway, standings)
       }
     }
     return { match, homeLabel, awayLabel }
@@ -61,14 +87,19 @@ const FINAL_NUM = 104
 
 export default function BracketContent() {
   const [matches, setMatches] = useState<BracketMatchData[]>([])
+  const [standings, setStandings] = useState<Record<string, { team: string; tla: string | null }[]>>({})
   const [loading, setLoading] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    fetch('/api/bracket-matches')
-      .then(r => r.json())
-      .then(data => { setMatches(data || []); setLoading(false) })
-      .catch(() => setLoading(false))
+    Promise.all([
+      fetch('/api/bracket-matches').then(r => r.json()),
+      fetch('/api/group-standings').then(r => r.json()),
+    ]).then(([bracketData, standingsData]) => {
+      setMatches(bracketData || [])
+      setStandings(standingsData || {})
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }, [])
 
   useEffect(() => {
@@ -82,14 +113,14 @@ export default function BracketContent() {
 
   const byNum = indexByMatchNum(matches)
 
-  const upperR32Slots = buildSlots(UPPER_R32, byNum, true)
-  const upperR16Slots = buildSlots(UPPER_R16, byNum)
-  const upperQFSlots  = buildSlots(UPPER_QF,  byNum)
-  const upperSFSlot   = buildSlots(UPPER_SF,  byNum)
-  const lowerR32Slots = buildSlots(LOWER_R32, byNum, true)
-  const lowerR16Slots = buildSlots(LOWER_R16, byNum)
-  const lowerQFSlots  = buildSlots(LOWER_QF,  byNum)
-  const lowerSFSlot   = buildSlots(LOWER_SF,  byNum)
+  const upperR32Slots = buildSlots(UPPER_R32, byNum, standings, true)
+  const upperR16Slots = buildSlots(UPPER_R16, byNum, standings)
+  const upperQFSlots  = buildSlots(UPPER_QF,  byNum, standings)
+  const upperSFSlot   = buildSlots(UPPER_SF,  byNum, standings)
+  const lowerR32Slots = buildSlots(LOWER_R32, byNum, standings, true)
+  const lowerR16Slots = buildSlots(LOWER_R16, byNum, standings)
+  const lowerQFSlots  = buildSlots(LOWER_QF,  byNum, standings)
+  const lowerSFSlot   = buildSlots(LOWER_SF,  byNum, standings)
   const finalMatch    = byNum.get(FINAL_NUM) ?? null
 
   return (
