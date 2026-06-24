@@ -15,9 +15,10 @@ export type BracketMatchData = {
 }
 
 type Props = {
-  match: BracketMatchData | null   // null = 占位（还没打到这轮）
-  homeLabel?: string               // TBD 时的槽位标签
+  match: BracketMatchData | null
+  homeLabel?: string
   awayLabel?: string
+  roundColor?: string              // 轮次背景色，如 'bg-blue-100 dark:bg-blue-900/30'
 }
 
 function TeamRow({ name, tla, score, isWinner, isLoser, label }: {
@@ -51,10 +52,10 @@ function TeamRow({ name, tla, score, isWinner, isLoser, label }: {
   )
 }
 
-export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定' }: Props) {
+export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定', roundColor = '' }: Props) {
   if (!match) {
     return (
-      <div className="w-[130px] rounded-lg border border-dashed border-gray-200 dark:border-gray-700 overflow-hidden shrink-0">
+      <div className={`w-[130px] rounded-lg border border-dashed border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 ${roundColor}`}>
         <div className="px-2 py-[5px] flex items-center gap-1.5">
           <span className="w-5 h-3.5 shrink-0" />
           <span className="text-[11px] text-gray-300 dark:text-gray-600 truncate">{homeLabel}</span>
@@ -77,7 +78,7 @@ export default function BracketMatchCard({ match, homeLabel = '待定', awayLabe
   const dateStr = new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
 
   return (
-    <div className="w-[130px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shrink-0 bg-white dark:bg-gray-900">
+    <div className={`w-[130px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shrink-0 bg-white dark:bg-gray-900 ${roundColor}`}>
       <div className="px-2 py-0.5 bg-gray-50 dark:bg-gray-800 border-b border-black/[0.04] dark:border-white/[0.06]">
         <span className="text-[10px] text-gray-400 dark:text-gray-500">{dateStr}</span>
       </div>

@@ -12,17 +12,18 @@ type SlotItem = {
 }
 
 type Props = {
-  slots: SlotItem[]         // 本轮所有卡片，两两一对进入下一轮
-  gap: number               // 同一对两张卡片之间的间距（px）
-  pairGap: number           // 不同对之间的间距（px）
-  showConnector: boolean    // 右侧是否画连线（决赛列不画）
-  flip?: boolean            // 下半区：连线画在左侧
+  slots: SlotItem[]
+  gap: number
+  pairGap: number
+  showConnector: boolean
+  flip?: boolean
+  roundColor?: string
 }
 
 // 一对卡片（2张）+ 右侧连线
-function MatchPair({ top, bottom, gap, showConnector, flip }: {
+function MatchPair({ top, bottom, gap, showConnector, flip, roundColor }: {
   top: SlotItem; bottom: SlotItem
-  gap: number; showConnector: boolean; flip: boolean
+  gap: number; showConnector: boolean; flip: boolean; roundColor?: string
 }) {
   // 连线从两张卡片中心延伸，在中点汇合
   // 总高 = CARD_H + gap + CARD_H
@@ -36,8 +37,8 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
     <div className="flex items-stretch" style={{ flexDirection: flip ? 'row-reverse' : 'row' }}>
       {/* 卡片列 */}
       <div className="flex flex-col" style={{ gap }}>
-        <BracketMatchCard match={top.match} homeLabel={top.homeLabel} awayLabel={top.awayLabel} />
-        <BracketMatchCard match={bottom.match} homeLabel={bottom.homeLabel} awayLabel={bottom.awayLabel} />
+        <BracketMatchCard match={top.match} homeLabel={top.homeLabel} awayLabel={top.awayLabel} roundColor={roundColor} />
+        <BracketMatchCard match={bottom.match} homeLabel={bottom.homeLabel} awayLabel={bottom.awayLabel} roundColor={roundColor} />
       </div>
 
       {/* 连线区 */}
@@ -71,8 +72,7 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
   )
 }
 
-export default function BracketColumn({ slots, gap, pairGap, showConnector, flip = false }: Props) {
-  // 每两个 slot 为一对
+export default function BracketColumn({ slots, gap, pairGap, showConnector, flip = false, roundColor }: Props) {
   const pairs: [SlotItem, SlotItem][] = []
   for (let i = 0; i < slots.length; i += 2) {
     pairs.push([slots[i], slots[i + 1] ?? { match: null, homeLabel: '待定', awayLabel: '待定' }])
@@ -87,6 +87,7 @@ export default function BracketColumn({ slots, gap, pairGap, showConnector, flip
           gap={gap}
           showConnector={showConnector}
           flip={flip}
+          roundColor={roundColor}
         />
       ))}
     </div>
