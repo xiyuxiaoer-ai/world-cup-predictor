@@ -114,11 +114,11 @@ export default function BracketContent() {
           <BracketColumn slots={upperR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16} showConnector flip={false} />
           <BracketColumn slots={upperQFSlots}  gap={GAP.qf}  pairGap={0}            showConnector flip={false} />
 
-          {/* 上半区 SF + 决赛入口线 */}
+          {/* 上半区 SF + 决赛入口线（水平线，不需要折角） */}
           <div className="flex items-center" style={{ gap: COL_GAP }}>
             <BracketMatchCard match={upperSFSlot[0]?.match ?? null} homeLabel="97胜者" awayLabel="98胜者" />
-            <div className="shrink-0" style={{ width: CONNECTOR_W, height: CARD_H }}>
-              <div className="h-1/2 border-b border-r border-gray-300 dark:border-gray-600 rounded-br" style={{ width: '100%' }} />
+            <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
+              <div className="w-full border-b border-gray-300 dark:border-gray-600" />
             </div>
           </div>
 
@@ -128,11 +128,11 @@ export default function BracketContent() {
             <BracketMatchCard match={finalMatch} homeLabel="101胜者" awayLabel="102胜者" />
           </div>
 
-          {/* 下半区 SF + 决赛入口线 */}
+          {/* 下半区 SF + 决赛入口线（水平线，不需要折角） */}
           <div className="flex items-center flex-row-reverse" style={{ gap: COL_GAP }}>
             <BracketMatchCard match={lowerSFSlot[0]?.match ?? null} homeLabel="99胜者" awayLabel="100胜者" />
-            <div className="shrink-0" style={{ width: CONNECTOR_W, height: CARD_H }}>
-              <div className="h-1/2 border-b border-l border-gray-300 dark:border-gray-600 rounded-bl" style={{ width: '100%' }} />
+            <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
+              <div className="w-full border-b border-gray-300 dark:border-gray-600" />
             </div>
           </div>
 
