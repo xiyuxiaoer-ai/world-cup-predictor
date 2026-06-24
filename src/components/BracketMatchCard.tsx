@@ -78,7 +78,7 @@ export default function BracketMatchCard({ match, homeLabel = '待定', awayLabe
   const dateStr = new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
 
   return (
-    <div className={`w-[130px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shrink-0 bg-white dark:bg-gray-900 ${roundColor}`}>
+    <div className={`w-[130px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shrink-0 ${roundColor || 'bg-white dark:bg-gray-900'}`}>
       <div className="px-2 py-0.5 bg-gray-50 dark:bg-gray-800 border-b border-black/[0.04] dark:border-white/[0.06]">
         <span className="text-[10px] text-gray-400 dark:text-gray-500">{dateStr}</span>
       </div>
