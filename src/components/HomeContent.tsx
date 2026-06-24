@@ -419,7 +419,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               </button>
               {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
               <Link href="/bracket" className="ml-auto flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
-                <span>🏆</span><span>赛程表</span>
+                <span>🏆</span><span>淘汰赛赛程</span>
               </Link>
             </div>
             <div className="space-y-2">
