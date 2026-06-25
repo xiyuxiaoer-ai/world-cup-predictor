@@ -233,7 +233,6 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
       <ThirdPlaceModal
         onClose={() => setShowThirdPlace(false)}
         onGroupClick={(groupName, label) => {
-          setShowThirdPlace(false)
           window.dispatchEvent(new CustomEvent('wcp-open-group', { detail: { groupName, label } }))
         }}
       />,
