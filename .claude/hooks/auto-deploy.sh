@@ -18,5 +18,7 @@ else
   MSG="auto: update ${COUNT} files (${FILES}...)"
 fi
 
-git commit -m "$MSG" 2>/dev/null && git push origin main 2>/dev/null
+git commit -m "$MSG" 2>/dev/null
+git pull --rebase origin main 2>/dev/null || true
+git push origin main 2>/dev/null
 exit 0
