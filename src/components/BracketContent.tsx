@@ -34,15 +34,14 @@ function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchD
 
 function resolveLabel(
   raw: string,
-  standings: Record<string, { team: string; tla: string | null }[]>,
-  completeGroups: Set<string>,
+  standings: Record<string, { team: string; tla: string | null; confirmed: boolean }[]>,
 ): { label: string; tla: string | null; confirmed: boolean } {
   const simple = raw.match(/^([A-L])([12])$/)
   if (simple) {
     const groupKey = `GROUP_${simple[1]}`
     const pos = Number(simple[2]) - 1
     const entry = standings[groupKey]?.[pos]
-    if (entry) return { label: entry.team, tla: entry.tla, confirmed: completeGroups.has(groupKey) }
+    if (entry) return { label: entry.team, tla: entry.tla, confirmed: entry.confirmed }
     return { label: `${simple[1]}组第${simple[2]}名`, tla: null, confirmed: false }
   }
   const chinese = raw.match(/^([A-L])组第([12])名$/)
@@ -50,7 +49,7 @@ function resolveLabel(
     const groupKey = `GROUP_${chinese[1]}`
     const pos = Number(chinese[2]) - 1
     const entry = standings[groupKey]?.[pos]
-    if (entry) return { label: entry.team, tla: entry.tla, confirmed: completeGroups.has(groupKey) }
+    if (entry) return { label: entry.team, tla: entry.tla, confirmed: entry.confirmed }
     return { label: raw, tla: null, confirmed: false }
   }
   return { label: raw, tla: null, confirmed: false }
@@ -59,8 +58,7 @@ function resolveLabel(
 function buildSlots(
   matchNums: number[],
   byMatchNum: Map<number, BracketMatchData>,
-  standings: Record<string, { team: string; tla: string | null }[]>,
-  completeGroups: Set<string>,
+  standings: Record<string, { team: string; tla: string | null; confirmed: boolean }[]>,
   isR32 = false,
 ) {
   return matchNums.map(num => {
@@ -72,8 +70,8 @@ function buildSlots(
       const entry = Object.entries(R32_SLOTS).find(([, s]) => s.matchNum === num)
       if (entry) {
         const apiId = Number(entry[0])
-        const h = resolveLabel(getSlotLabel(apiId, true), standings, completeGroups)
-        const a = resolveLabel(getSlotLabel(apiId, false), standings, completeGroups)
+        const h = resolveLabel(getSlotLabel(apiId, true), standings)
+        const a = resolveLabel(getSlotLabel(apiId, false), standings)
         homeLabel = h.label; homeTla = h.tla; homeConfirmed = h.confirmed
         awayLabel = a.label; awayTla = a.tla; awayConfirmed = a.confirmed
       }
@@ -103,8 +101,7 @@ const ROUND_TABS = [
 
 export default function BracketContent() {
   const [matches, setMatches] = useState<BracketMatchData[]>([])
-  const [standings, setStandings] = useState<Record<string, { team: string; tla: string | null }[]>>({})
-  const [completeGroups, setCompleteGroups] = useState<Set<string>>(new Set())
+  const [standings, setStandings] = useState<Record<string, { team: string; tla: string | null; confirmed: boolean }[]>>({})
   const [loading, setLoading] = useState(true)
   const [maxRound, setMaxRound] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -116,7 +113,6 @@ export default function BracketContent() {
     ]).then(([bracketData, standingsData]) => {
       setMatches(bracketData || [])
       setStandings(standingsData?.standings || {})
-      setCompleteGroups(new Set(standingsData?.complete || []))
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
@@ -132,14 +128,14 @@ export default function BracketContent() {
 
   const byNum = indexByMatchNum(matches)
 
-  const upperR32Slots = buildSlots(UPPER_R32, byNum, standings, completeGroups, true)
-  const upperR16Slots = buildSlots(UPPER_R16, byNum, standings, completeGroups)
-  const upperQFSlots  = buildSlots(UPPER_QF,  byNum, standings, completeGroups)
-  const upperSFSlot   = buildSlots(UPPER_SF,  byNum, standings, completeGroups)
-  const lowerR32Slots = buildSlots(LOWER_R32, byNum, standings, completeGroups, true)
-  const lowerR16Slots = buildSlots(LOWER_R16, byNum, standings, completeGroups)
-  const lowerQFSlots  = buildSlots(LOWER_QF,  byNum, standings, completeGroups)
-  const lowerSFSlot   = buildSlots(LOWER_SF,  byNum, standings, completeGroups)
+  const upperR32Slots = buildSlots(UPPER_R32, byNum, standings, true)
+  const upperR16Slots = buildSlots(UPPER_R16, byNum, standings)
+  const upperQFSlots  = buildSlots(UPPER_QF,  byNum, standings)
+  const upperSFSlot   = buildSlots(UPPER_SF,  byNum, standings)
+  const lowerR32Slots = buildSlots(LOWER_R32, byNum, standings, true)
+  const lowerR16Slots = buildSlots(LOWER_R16, byNum, standings)
+  const lowerQFSlots  = buildSlots(LOWER_QF,  byNum, standings)
+  const lowerSFSlot   = buildSlots(LOWER_SF,  byNum, standings)
   const finalMatch    = byNum.get(FINAL_NUM) ?? null
 
   const showR16 = maxRound >= 1
