@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import ThirdPlaceModal from './ThirdPlaceModal'
+
+const KNOCKOUT_START = new Date('2026-07-01T06:00:00')
 
 const navLinks = [
   { href: '/', label: '主页' },
@@ -17,6 +20,8 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   const router = useRouter()
   const [unread, setUnread] = useState(0)
   const [navigating, setNavigating] = useState(false)
+  const [showThirdPlace, setShowThirdPlace] = useState(false)
+  const knockoutStarted = new Date() >= KNOCKOUT_START
   const [navTarget, setNavTarget] = useState<string | null>(null)
   const [pill, setPill] = useState<{ left: number; width: number } | null>(null)
   const navRef = useRef<HTMLDivElement>(null)
@@ -193,6 +198,34 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
           </button>
         </div>
       </div>
+
+      {/* 子导航：小组第三排名 + 淘汰赛赛程 */}
+      <div className="border-t border-black/[0.04] dark:border-white/[0.04]">
+        <div className="max-w-6xl mx-auto px-4 h-8 flex items-center gap-4">
+          {!knockoutStarted && (
+            <button
+              onClick={() => setShowThirdPlace(true)}
+              className="text-[11px] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors tap-scale"
+            >
+              小组第三排名
+            </button>
+          )}
+          <Link
+            href="/bracket"
+            className={`text-[11px] transition-colors tap-scale ${
+              pathname === '/bracket'
+                ? 'text-amber-600 dark:text-amber-400 font-semibold'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+            }`}
+          >
+            淘汰赛赛程
+          </Link>
+        </div>
+      </div>
+
+      {showThirdPlace && (
+        <ThirdPlaceModal onClose={() => setShowThirdPlace(false)} />
+      )}
     </nav>
   )
 }

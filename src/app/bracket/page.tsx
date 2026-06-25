@@ -14,7 +14,7 @@ export default async function BracketPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
+      <main className="flex-1 w-full px-4 sm:px-8 py-6 max-w-screen-2xl mx-auto">
         <BracketContent />
       </main>
     </div>

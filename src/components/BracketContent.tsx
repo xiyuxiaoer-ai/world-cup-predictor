@@ -96,11 +96,21 @@ export default function BracketContent() {
   const [loading, setLoading] = useState(true)
   const [overview, setOverview] = useState(false)
   const [zoomLevel, setZoomLevel] = useState(1)
+  const [userOverride, setUserOverride] = useState(false)
   const naturalWRef = useRef(0)
 
   const outerRef = useRef<HTMLDivElement>(null)
   const bracketRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Auto-overview on mobile; respect manual toggle
+  useEffect(() => {
+    if (userOverride) return
+    const check = () => setOverview(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [userOverride])
 
   useEffect(() => {
     Promise.all([
@@ -229,9 +239,16 @@ export default function BracketContent() {
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
             32强 → 16强 → 8强 → 4强 → 决赛
           </p>
+          <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1.5">
+            <svg viewBox="0 0 14 14" width="11" height="11" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3"/>
+              <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            32强名单根据目前小组赛结果预测，以实际赛果为准
+          </p>
         </div>
         <button
-          onClick={() => setOverview(v => !v)}
+          onClick={() => { setUserOverride(true); setOverview(v => !v) }}
           className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all tap-scale
             ${overview
               ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300/50 dark:border-amber-500/30'
