@@ -193,8 +193,11 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                             {homeName} vs {awayName}
                           </div>
-                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-2">
+                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-2 flex-wrap">
                             <span>{STAGE_LABELS[m.stage]}{groupLabel}</span>
+                            {m.kickoff_time && (
+                              <span>{new Date(m.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })}</span>
+                            )}
                             {m.home_score_90 != null && (
                               <span className="text-gray-500 dark:text-gray-400 font-mono">
                                 结果 {m.home_score_90}–{m.away_score_90} · 猜 {item.pred_home_score}–{item.pred_away_score}

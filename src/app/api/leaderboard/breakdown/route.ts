@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     .eq('user_id', userId)
     .not('points_earned', 'is', null)
     .neq('points_earned', 0)
-    .order('points_earned', { ascending: false })
+    .order('kickoff_time', { ascending: false, referencedTable: 'matches' })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
