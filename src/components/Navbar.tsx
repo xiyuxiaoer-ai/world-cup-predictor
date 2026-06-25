@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { createPortal } from 'react-dom'
 import ThirdPlaceModal from './ThirdPlaceModal'
 
 const KNOCKOUT_START = new Date('2026-07-01T06:00:00')
@@ -21,7 +22,9 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   const [unread, setUnread] = useState(0)
   const [navigating, setNavigating] = useState(false)
   const [showThirdPlace, setShowThirdPlace] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const knockoutStarted = new Date() >= KNOCKOUT_START
+  useEffect(() => setMounted(true), [])
   const [navTarget, setNavTarget] = useState<string | null>(null)
   const [pill, setPill] = useState<{ left: number; width: number } | null>(null)
   const navRef = useRef<HTMLDivElement>(null)
@@ -223,9 +226,11 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
         </div>
       </div>
 
-      {showThirdPlace && (
-        <ThirdPlaceModal onClose={() => setShowThirdPlace(false)} />
-      )}
     </nav>
+
+    {mounted && showThirdPlace && createPortal(
+      <ThirdPlaceModal onClose={() => setShowThirdPlace(false)} />,
+      document.body
+    )}
   )
 }

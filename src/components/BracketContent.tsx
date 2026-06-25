@@ -1,23 +1,26 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { R32_SLOTS, LATER_ROUNDS, getSlotLabel } from '@/lib/bracketSlots'
-import BracketColumn, { CARD_H, CONNECTOR_W } from './BracketColumn'
 import BracketMatchCard, { type BracketMatchData } from './BracketMatchCard'
 
-const COL_GAP = CONNECTOR_W
+// ── Layout constants ──────────────────────────────────────────────────────────
+const VW = 80   // card width
+const VH = 45   // card height
+const VG = 8    // gap between cards in same round row
+const VR = 36   // vertical connector height between rounds
+const UNIT = VW + VG  // 88px per slot
 
-const GAP: Record<string, number> = {
-  r32: 6,
-  r16: 6 + CARD_H + 6,
-  qf: 6 + CARD_H + 6 + 6 + CARD_H + 6,
-}
-const PAIR_GAP: Record<string, number> = {
-  r32: 28,
-  r16: CARD_H + 6 + 28,
-  qf: (CARD_H + 6) * 3 + 28,
+// Total width = 8 R32 matches side-by-side
+const TOTAL_W = 8 * UNIT - VG  // 696px
+
+// Center X of match at round r (0=R32, 1=R16, 2=QF, 3=SF), position p
+function cx(r: number, p: number): number {
+  if (r === 0) return p * UNIT + VW / 2
+  return (cx(r - 1, p * 2) + cx(r - 1, p * 2 + 1)) / 2
 }
 
+// ── Data processing ───────────────────────────────────────────────────────────
 function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchData> {
   const map = new Map<number, BracketMatchData>()
   for (const m of matches) {
@@ -55,12 +58,19 @@ function resolveLabel(
   return { label: raw, tla: null, confirmed: false }
 }
 
+type Slot = {
+  match: BracketMatchData | null
+  homeLabel: string; awayLabel: string
+  homeTla?: string | null; awayTla?: string | null
+  homeConfirmed?: boolean; awayConfirmed?: boolean
+}
+
 function buildSlots(
   matchNums: number[],
   byMatchNum: Map<number, BracketMatchData>,
   standings: Record<string, { team: string; tla: string | null; confirmed: boolean }[]>,
   isR32 = false,
-) {
+): Slot[] {
   return matchNums.map(num => {
     const match = byMatchNum.get(num) ?? null
     let homeLabel = '待定', awayLabel = '待定'
@@ -90,27 +100,86 @@ const LOWER_QF  = [99, 100]
 const LOWER_SF  = [102]
 const FINAL_NUM = 104
 
+// ── Bracket sub-components ────────────────────────────────────────────────────
+
+function RoundRow({ round, slots }: { round: number; slots: Slot[] }) {
+  return (
+    <div className="relative shrink-0" style={{ width: TOTAL_W, height: VH }}>
+      {slots.map((s, i) => (
+        <div key={i} className="absolute top-0" style={{ left: cx(round, i) - VW / 2 }}>
+          <BracketMatchCard
+            match={s.match}
+            homeLabel={s.homeLabel} awayLabel={s.awayLabel}
+            homeTla={s.homeTla} awayTla={s.awayTla}
+            homeConfirmed={s.homeConfirmed} awayConfirmed={s.awayConfirmed}
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Converging connector: parentCount cards → parentCount/2 cards (e.g. R32→R16)
+function ConvergeRow({ parentRound, parentCount }: { parentRound: number; parentCount: number }) {
+  const segs: string[] = []
+  for (let j = 0; j < parentCount / 2; j++) {
+    const xl = cx(parentRound, j * 2)
+    const xr = cx(parentRound, j * 2 + 1)
+    const xm = cx(parentRound + 1, j)
+    const ym = VR / 2
+    // Two stems going down + horizontal bar + center drop
+    segs.push(`M${xl} 0V${ym}H${xr}V0 M${xm} ${ym}V${VR}`)
+  }
+  return (
+    <svg width={TOTAL_W} height={VR} className="shrink-0 overflow-visible text-gray-300/70 dark:text-gray-600/50">
+      <path d={segs.join(' ')} fill="none" stroke="currentColor" strokeWidth="1" />
+    </svg>
+  )
+}
+
+// Expanding connector: parentCount cards → parentCount*2 cards (e.g. lower SF→QF)
+function ExpandRow({ parentRound, childRound, parentCount }: {
+  parentRound: number; childRound: number; parentCount: number
+}) {
+  const segs: string[] = []
+  for (let j = 0; j < parentCount; j++) {
+    const xp = cx(parentRound, j)
+    const xl = cx(childRound, j * 2)
+    const xr = cx(childRound, j * 2 + 1)
+    const ym = VR / 2
+    // One stem going down, splitting into two branches
+    segs.push(`M${xp} 0V${ym}H${xl}V${VR} M${xp} ${ym}H${xr}V${VR}`)
+  }
+  return (
+    <svg width={TOTAL_W} height={VR} className="shrink-0 overflow-visible text-gray-300/70 dark:text-gray-600/50">
+      <path d={segs.join(' ')} fill="none" stroke="currentColor" strokeWidth="1" />
+    </svg>
+  )
+}
+
+// Straight vertical connector (SF ↔ Final)
+function StraightRow({ xPos }: { xPos: number }) {
+  return (
+    <svg width={TOTAL_W} height={VR} className="shrink-0 overflow-visible text-gray-300/70 dark:text-gray-600/50">
+      <line x1={xPos} y1={0} x2={xPos} y2={VR} stroke="currentColor" strokeWidth="1" />
+    </svg>
+  )
+}
+
+function RoundLabel({ label }: { label: string }) {
+  return (
+    <div className="shrink-0 flex items-center gap-1.5 mb-1 mt-1" style={{ width: TOTAL_W }}>
+      <span className="block w-[2px] h-3 rounded-full bg-gray-300/80 dark:bg-gray-600/60" />
+      <span className="text-[9px] font-semibold text-gray-400/80 dark:text-gray-500 tracking-widest uppercase">{label}</span>
+    </div>
+  )
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 export default function BracketContent() {
   const [matches, setMatches] = useState<BracketMatchData[]>([])
   const [standings, setStandings] = useState<Record<string, { team: string; tla: string | null; confirmed: boolean }[]>>({})
   const [loading, setLoading] = useState(true)
-  const [overview, setOverview] = useState(false)
-  const [zoomLevel, setZoomLevel] = useState(1)
-  const [userOverride, setUserOverride] = useState(false)
-  const naturalWRef = useRef(0)
-
-  const outerRef = useRef<HTMLDivElement>(null)
-  const bracketRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-
-  // Auto-overview on mobile; respect manual toggle
-  useEffect(() => {
-    if (userOverride) return
-    const check = () => setOverview(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [userOverride])
 
   useEffect(() => {
     Promise.all([
@@ -122,31 +191,6 @@ export default function BracketContent() {
       setLoading(false)
     }).catch(() => setLoading(false))
   }, [])
-
-  useEffect(() => {
-    if (!loading && scrollRef.current && !overview) {
-      const el = scrollRef.current
-      el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2
-    }
-  }, [loading, overview])
-
-  const applyZoom = useCallback(() => {
-    if (!outerRef.current || naturalWRef.current === 0) return
-    const ow = outerRef.current.clientWidth
-    setZoomLevel(Math.min(1, ow / naturalWRef.current))
-  }, [])
-
-  useEffect(() => {
-    if (!overview || loading) { setZoomLevel(1); naturalWRef.current = 0; return }
-    // Measure at zoom=1 (initial state), then apply scale
-    const t = setTimeout(() => {
-      if (!bracketRef.current || !outerRef.current) return
-      naturalWRef.current = bracketRef.current.scrollWidth
-      applyZoom()
-    }, 30)
-    window.addEventListener('resize', applyZoom)
-    return () => { clearTimeout(t); window.removeEventListener('resize', applyZoom) }
-  }, [overview, loading, applyZoom])
 
   if (loading) return (
     <div className="flex items-center justify-center py-16">
@@ -170,119 +214,83 @@ export default function BracketContent() {
 
   const sf1 = upperSFSlot[0]
   const sf2 = lowerSFSlot[0]
-
-  const bracketInner = (
-    <div
-      ref={bracketRef}
-      className="flex items-center"
-      style={{ minWidth: 'max-content', gap: COL_GAP }}
-    >
-      <BracketColumn slots={upperR32Slots} gap={GAP.r32} pairGap={PAIR_GAP.r32} showConnector flip={false} />
-      <BracketColumn slots={upperR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16} showConnector flip={false} />
-      <BracketColumn slots={upperQFSlots}  gap={GAP.qf}  pairGap={0}            showConnector flip={false} />
-
-      {/* Upper SF + connector to Final */}
-      <div className="flex items-center" style={{ gap: COL_GAP }}>
-        <BracketMatchCard
-          match={sf1?.match ?? null}
-          homeLabel={sf1?.homeLabel ?? '待定'} awayLabel={sf1?.awayLabel ?? '待定'}
-          homeTla={sf1?.homeTla} awayTla={sf1?.awayTla}
-          homeConfirmed={sf1?.homeConfirmed} awayConfirmed={sf1?.awayConfirmed}
-        />
-        <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
-          <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
-        </div>
-      </div>
-
-      {/* Final */}
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="flex flex-col items-center gap-0">
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" className="text-amber-400 drop-shadow-sm">
-            <path d="M10 2l1.2 3.6h3.8l-3.1 2.2 1.2 3.6L10 9.2l-3.1 2.2 1.2-3.6L5 5.6h3.8z" fill="currentColor"/>
-            <path d="M6.5 14.5h7M8 16.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-            <path d="M10 11V14.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-          </svg>
-          <span className="text-[8px] font-black tracking-[0.18em] text-amber-500/80 dark:text-amber-400/70">FINAL</span>
-        </div>
-        <BracketMatchCard
-          match={finalMatch}
-          homeLabel={sf1?.homeLabel ?? '待定'}
-          awayLabel={sf2?.awayLabel ?? '待定'}
-        />
-      </div>
-
-      {/* Lower SF + connector to Final */}
-      <div className="flex items-center flex-row-reverse" style={{ gap: COL_GAP }}>
-        <BracketMatchCard
-          match={sf2?.match ?? null}
-          homeLabel={sf2?.homeLabel ?? '待定'} awayLabel={sf2?.awayLabel ?? '待定'}
-          homeTla={sf2?.homeTla} awayTla={sf2?.awayTla}
-          homeConfirmed={sf2?.homeConfirmed} awayConfirmed={sf2?.awayConfirmed}
-        />
-        <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
-          <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
-        </div>
-      </div>
-
-      <BracketColumn slots={lowerQFSlots}  gap={GAP.qf}  pairGap={0}            showConnector flip />
-      <BracketColumn slots={lowerR16Slots}  gap={GAP.r16} pairGap={PAIR_GAP.r16} showConnector flip />
-      <BracketColumn slots={lowerR32Slots}  gap={GAP.r32} pairGap={PAIR_GAP.r32} showConnector={false} flip />
-    </div>
-  )
+  const sfX = cx(3, 0)  // center x of SF/Final column = 348
 
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程</h1>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            32强 → 16强 → 8强 → 4强 → 决赛
-          </p>
-          <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1.5">
-            <svg viewBox="0 0 14 14" width="11" height="11" fill="none">
-              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3"/>
-              <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-            </svg>
-            32强名单根据目前小组赛结果预测，以实际赛果为准
-          </p>
-        </div>
-        <button
-          onClick={() => { setUserOverride(true); setOverview(v => !v) }}
-          className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all tap-scale
-            ${overview
-              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300/50 dark:border-amber-500/30'
-              : 'bg-gray-100/80 dark:bg-white/8 text-gray-500 dark:text-gray-400 border border-black/[0.06] dark:border-white/10'}`}
-        >
-          <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
-            <rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-            <rect x="9.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-            <rect x="1.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-            <rect x="9.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
+      <div className="mb-5">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程</h1>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">32强 → 16强 → 8强 → 4强 → 决赛</p>
+        <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1.5">
+          <svg viewBox="0 0 14 14" width="11" height="11" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3"/>
+            <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
           </svg>
-          {overview ? '退出' : '全览'}
-        </button>
-      </div>
-
-      {/* Bracket */}
-      <div ref={outerRef} className={overview ? 'overflow-hidden' : ''}>
-        {overview ? (
-          <div style={{ zoom: zoomLevel }}>
-            {bracketInner}
-          </div>
-        ) : (
-          <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4">
-            {bracketInner}
-          </div>
-        )}
-      </div>
-
-      {/* Hint */}
-      {!overview && (
-        <p className="text-[10px] text-gray-400/60 dark:text-gray-600 mt-2 text-center">
-          左右滑动查看完整赛程 · 点击「全览」缩放至全屏
+          32强名单根据目前小组赛结果预测，以实际赛果为准
         </p>
-      )}
+      </div>
+
+      {/* Bracket — vertical layout, horizontal scroll if screen too narrow */}
+      <div className="overflow-x-auto -mx-4 px-4">
+        <div className="flex flex-col" style={{ minWidth: TOTAL_W }}>
+
+          {/* ── Upper bracket: R32 → SF ── */}
+          <RoundLabel label="32强" />
+          <RoundRow round={0} slots={upperR32Slots} />
+          <ConvergeRow parentRound={0} parentCount={8} />
+
+          <RoundLabel label="16强" />
+          <RoundRow round={1} slots={upperR16Slots} />
+          <ConvergeRow parentRound={1} parentCount={4} />
+
+          <RoundLabel label="8强" />
+          <RoundRow round={2} slots={upperQFSlots} />
+          <ConvergeRow parentRound={2} parentCount={2} />
+
+          <RoundLabel label="半决赛" />
+          <RoundRow round={3} slots={upperSFSlot} />
+          <StraightRow xPos={sfX} />
+
+          {/* ── Final ── */}
+          <div className="shrink-0 flex items-center gap-1.5 mb-1 mt-1" style={{ width: TOTAL_W }}>
+            <span className="block w-[2px] h-3 rounded-full bg-amber-400/80" />
+            <svg viewBox="0 0 20 20" width="12" height="12" fill="none" className="text-amber-400">
+              <path d="M10 2l1.2 3.6h3.8l-3.1 2.2 1.2 3.6L10 9.2l-3.1 2.2 1.2-3.6L5 5.6h3.8z" fill="currentColor"/>
+              <path d="M6.5 14.5h7M8 16.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+              <path d="M10 11V14.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+            </svg>
+            <span className="text-[9px] font-bold text-amber-500/80 tracking-widest uppercase">决赛</span>
+          </div>
+          <div className="relative shrink-0" style={{ width: TOTAL_W, height: VH }}>
+            <div className="absolute top-0" style={{ left: sfX - VW / 2 }}>
+              <BracketMatchCard
+                match={finalMatch}
+                homeLabel={sf1?.homeLabel ?? '待定'}
+                awayLabel={sf2?.awayLabel ?? '待定'}
+              />
+            </div>
+          </div>
+          <StraightRow xPos={sfX} />
+
+          {/* ── Lower bracket: SF → R32 ── */}
+          <RoundLabel label="半决赛" />
+          <RoundRow round={3} slots={lowerSFSlot} />
+          <ExpandRow parentRound={3} childRound={2} parentCount={1} />
+
+          <RoundLabel label="8强" />
+          <RoundRow round={2} slots={lowerQFSlots} />
+          <ExpandRow parentRound={2} childRound={1} parentCount={2} />
+
+          <RoundLabel label="16强" />
+          <RoundRow round={1} slots={lowerR16Slots} />
+          <ExpandRow parentRound={1} childRound={0} parentCount={4} />
+
+          <RoundLabel label="32强" />
+          <RoundRow round={0} slots={lowerR32Slots} />
+
+        </div>
+      </div>
     </div>
   )
 }

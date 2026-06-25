@@ -438,19 +438,6 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 <span>{syncing ? '更新中...' : '手动更新'}</span>
               </button>
               {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
-              <div className="ml-auto flex items-center gap-3">
-                <button
-                  onClick={() => setShowThirdPlace(true)}
-                  className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
-                >
-                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M3 13V8M7 13V5M11 13V3M14 13H2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                  <span>第三名推算</span>
-                </button>
-                <Link href="/bracket" className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
-                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M5 2h6v5a3 3 0 0 1-6 0V2Z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 2H3a1.5 1.5 0 0 0-1.5 1.5V5a3 3 0 0 0 2.7 2.99M12 2h1a1.5 1.5 0 0 1 1.5 1.5V5a3 3 0 0 1-2.7 2.99" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M8 10v4M6 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
-                  <span>淘汰赛赛程</span>
-                </Link>
-              </div>
             </div>
             <div className="space-y-2">
               {displayMatches.length === 0 && (
