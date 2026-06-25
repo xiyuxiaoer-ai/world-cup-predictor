@@ -18,18 +18,24 @@ const PAIR_GAP: Record<string, number> = {
   qf: (CARD_H + 6) * 3 + 28,
 }
 
-const R32_COLOR   = 'bg-blue-200/40 dark:bg-blue-800/20'
-const R16_COLOR   = 'bg-teal-200/40 dark:bg-teal-800/20'
-const QF_COLOR    = 'bg-amber-200/40 dark:bg-amber-800/20'
-const SF_COLOR    = 'bg-violet-200/40 dark:bg-violet-800/20'
-const FINAL_COLOR = 'bg-amber-100/60 dark:bg-amber-700/25'
+// 每轮卡片颜色 = 背景色 + 彩色内光CSS类
+const R32_COLOR   = 'bg-blue-100/70 dark:bg-blue-900/25 bracket-card-r32'
+const R16_COLOR   = 'bg-teal-100/70 dark:bg-teal-900/25 bracket-card-r16'
+const QF_COLOR    = 'bg-orange-100/65 dark:bg-orange-900/20 bracket-card-qf'
+const SF_COLOR    = 'bg-violet-100/70 dark:bg-violet-900/25 bracket-card-sf'
+const FINAL_COLOR = 'bg-amber-50/90 dark:bg-amber-900/30 bracket-card-fin'
 
 const ROUND_TABS = [
-  { level: 0, label: '32强',   activeTab: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-400/40 dark:border-blue-400/30' },
-  { level: 1, label: '16强',   activeTab: 'bg-teal-500/10 text-teal-600 dark:text-teal-300 border-teal-400/40 dark:border-teal-400/30' },
-  { level: 2, label: '8强',    activeTab: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-400/40 dark:border-amber-400/30' },
-  { level: 3, label: '半决赛',  activeTab: 'bg-violet-500/10 text-violet-600 dark:text-violet-300 border-violet-400/40 dark:border-violet-400/30' },
-  { level: 3, label: '决赛',   activeTab: 'bg-amber-400/10 text-amber-700 dark:text-amber-300 border-amber-400/40 dark:border-amber-400/30' },
+  { level: 0, label: '32强',
+    activeTab: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-400/40 dark:border-blue-400/30 shadow-sm shadow-blue-400/25 dark:shadow-blue-400/15' },
+  { level: 1, label: '16强',
+    activeTab: 'bg-teal-500/10 text-teal-600 dark:text-teal-300 border-teal-400/40 dark:border-teal-400/30 shadow-sm shadow-teal-400/25 dark:shadow-teal-400/15' },
+  { level: 2, label: '8强',
+    activeTab: 'bg-orange-500/10 text-orange-600 dark:text-orange-300 border-orange-400/40 dark:border-orange-400/30 shadow-sm shadow-orange-400/25 dark:shadow-orange-400/15' },
+  { level: 3, label: '半决赛',
+    activeTab: 'bg-violet-500/10 text-violet-600 dark:text-violet-300 border-violet-400/40 dark:border-violet-400/30 shadow-sm shadow-violet-400/25 dark:shadow-violet-400/15' },
+  { level: 3, label: '决赛',
+    activeTab: 'bg-amber-400/10 text-amber-700 dark:text-amber-300 border-amber-400/40 dark:border-amber-400/30 shadow-sm shadow-amber-400/30 dark:shadow-amber-400/20' },
 ]
 
 function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchData> {
@@ -111,6 +117,14 @@ export default function BracketContent() {
   const [maxRound, setMaxRound] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // 根据屏幕宽度自动设定初始展开轮次
+  useEffect(() => {
+    const w = window.innerWidth
+    if (w >= 1280) setMaxRound(2)       // 大屏展开至8强
+    else if (w >= 640) setMaxRound(1)   // 平板展开至16强
+    // 手机默认仅展示32强
+  }, [])
+
   useEffect(() => {
     Promise.all([
       fetch('/api/bracket-matches').then(r => r.json()),
@@ -130,7 +144,7 @@ export default function BracketContent() {
   }, [loading, maxRound])
 
   if (loading) return (
-    <div className="flex items-center justify-center py-16">
+    <div className="flex items-center justify-center py-20">
       <div className="flex flex-col items-center gap-3">
         <div className="w-6 h-6 rounded-full border-2 border-amber-400/30 border-t-amber-400 animate-spin" />
         <span className="text-xs text-gray-400 dark:text-gray-500">加载赛程...</span>
@@ -159,7 +173,7 @@ export default function BracketContent() {
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="mb-4">
+      <div className="mb-5">
         <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程</h1>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
           32强 → 16强 → 8强 → 4强 → 决赛
@@ -174,18 +188,18 @@ export default function BracketContent() {
       </div>
 
       {/* 轮次选择器 */}
-      <div className="flex gap-2 mb-4 items-center flex-wrap">
-        <span className="text-[10px] text-gray-400 dark:text-gray-500 mr-1">展开至：</span>
+      <div className="flex gap-2 mb-5 items-center flex-wrap">
+        <span className="text-[10px] text-gray-400 dark:text-gray-500 shrink-0">展开至：</span>
         {ROUND_TABS.map(({ level, label, activeTab }) => {
           const isActive = maxRound >= level
           return (
             <button
               key={label}
               onClick={() => setMaxRound(level)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all cursor-pointer tap-scale
+              className={`px-3 py-1 rounded-lg text-[11px] font-medium border transition-all duration-200 cursor-pointer tap-scale
                 ${isActive
                   ? activeTab
-                  : 'bg-white/30 dark:bg-white/[0.04] border-black/[0.06] dark:border-white/10 text-gray-400 dark:text-gray-500 opacity-50'
+                  : 'bg-white/30 dark:bg-white/[0.04] border-black/[0.06] dark:border-white/10 text-gray-400 dark:text-gray-500 opacity-50 hover:opacity-70'
                 }`}
             >
               {label}
@@ -195,34 +209,43 @@ export default function BracketContent() {
       </div>
 
       {/* Bracket */}
-      <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4">
+      <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4 pb-2">
         <div className="flex items-center" style={{ minWidth: 'max-content', gap: COL_GAP }}>
 
+          {/* Upper R32 */}
           <BracketColumn
             slots={upperR32Slots} gap={GAP.r32} pairGap={PAIR_GAP.r32}
             showConnector={showR16} flip={false}
             roundColor={R32_COLOR}
           />
 
+          {/* Upper R16 — 从左侧弹入 */}
           {showR16 && (
-            <BracketColumn
-              slots={upperR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16}
-              showConnector={showQF} flip={false}
-              roundColor={R16_COLOR}
-            />
+            <div className="animate-bracket-left">
+              <BracketColumn
+                slots={upperR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16}
+                showConnector={showQF} flip={false}
+                roundColor={R16_COLOR}
+              />
+            </div>
           )}
 
+          {/* Upper QF — 从左侧弹入（稍延迟） */}
           {showQF && (
-            <BracketColumn
-              slots={upperQFSlots} gap={GAP.qf} pairGap={0}
-              showConnector={showSF} flip={false}
-              roundColor={QF_COLOR}
-            />
+            <div className="animate-bracket-left" style={{ animationDelay: '40ms' }}>
+              <BracketColumn
+                slots={upperQFSlots} gap={GAP.qf} pairGap={0}
+                showConnector={showSF} flip={false}
+                roundColor={QF_COLOR}
+              />
+            </div>
           )}
 
+          {/* SF + Final 区 或 展开按钮 */}
           {showSF ? (
-            <>
-              {/* Upper SF + connector to Final */}
+            /* 半决赛+决赛作为整体弹入 */
+            <div className="flex items-center animate-bracket-center" style={{ gap: COL_GAP }}>
+              {/* Upper SF + connector */}
               <div className="flex items-center" style={{ gap: COL_GAP }}>
                 <BracketMatchCard
                   match={sf1?.match ?? null}
@@ -236,15 +259,15 @@ export default function BracketContent() {
                 </div>
               </div>
 
-              {/* Final */}
-              <div className="flex flex-col items-center gap-1.5">
+              {/* Final — 金色辉光包裹 */}
+              <div className="flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl animate-final-glow">
                 <div className="flex flex-col items-center gap-0">
-                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" className="text-amber-400 drop-shadow-sm">
+                  <svg viewBox="0 0 20 20" width="18" height="18" fill="none" className="text-amber-400 drop-shadow-sm">
                     <path d="M10 2l1.2 3.6h3.8l-3.1 2.2 1.2 3.6L10 9.2l-3.1 2.2 1.2-3.6L5 5.6h3.8z" fill="currentColor"/>
                     <path d="M6.5 14.5h7M8 16.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                     <path d="M10 11V14.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
                   </svg>
-                  <span className="text-[8px] font-black tracking-[0.18em] text-amber-500/80 dark:text-amber-400/70">FINAL</span>
+                  <span className="text-[8px] font-black tracking-[0.2em] text-amber-500/80 dark:text-amber-400/70">FINAL</span>
                 </div>
                 <BracketMatchCard
                   match={finalMatch}
@@ -254,7 +277,7 @@ export default function BracketContent() {
                 />
               </div>
 
-              {/* Lower SF + connector to Final */}
+              {/* Lower SF + connector */}
               <div className="flex items-center flex-row-reverse" style={{ gap: COL_GAP }}>
                 <BracketMatchCard
                   match={sf2?.match ?? null}
@@ -267,44 +290,51 @@ export default function BracketContent() {
                   <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
                 </div>
               </div>
-            </>
+            </div>
           ) : (
-            /* 展开下一轮按钮 */
+            /* 展开下一轮按钮（呼吸光环） */
             <div className="flex flex-col items-center justify-center px-2" style={{ minHeight: CARD_H * 2 }}>
               <button
                 onClick={() => setMaxRound(prev => Math.min(prev + 1, 3))}
-                className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl
-                  bg-white/40 dark:bg-white/[0.06]
-                  hover:bg-white/70 dark:hover:bg-white/[0.10]
-                  border border-dashed border-black/10 dark:border-white/15
-                  backdrop-blur-[8px]
+                className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl
+                  bg-white/50 dark:bg-white/[0.07]
+                  hover:bg-white/80 dark:hover:bg-white/[0.12]
+                  border border-black/[0.07] dark:border-white/[0.12]
+                  backdrop-blur-[10px]
                   text-gray-400 dark:text-gray-500
-                  transition-all cursor-pointer tap-scale"
+                  transition-all duration-200 cursor-pointer tap-scale animate-expand-ring"
               >
-                <span className="text-[10px] font-medium">{['16强', '8强', '半决赛'][maxRound] ?? ''}</span>
+                <span className="text-[10px] font-semibold tracking-wide">{['16强', '8强', '半决赛'][maxRound] ?? ''}</span>
                 <svg viewBox="0 0 6 10" width="10" height="10" fill="none">
-                  <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
             </div>
           )}
 
+          {/* Lower QF — 从右侧弹入（稍延迟） */}
           {showQF && (
-            <BracketColumn
-              slots={lowerQFSlots} gap={GAP.qf} pairGap={0}
-              showConnector={showSF} flip={true}
-              roundColor={QF_COLOR}
-            />
+            <div className="animate-bracket-right" style={{ animationDelay: '40ms' }}>
+              <BracketColumn
+                slots={lowerQFSlots} gap={GAP.qf} pairGap={0}
+                showConnector={showSF} flip={true}
+                roundColor={QF_COLOR}
+              />
+            </div>
           )}
 
+          {/* Lower R16 — 从右侧弹入 */}
           {showR16 && (
-            <BracketColumn
-              slots={lowerR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16}
-              showConnector={showQF} flip={true}
-              roundColor={R16_COLOR}
-            />
+            <div className="animate-bracket-right">
+              <BracketColumn
+                slots={lowerR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16}
+                showConnector={showQF} flip={true}
+                roundColor={R16_COLOR}
+              />
+            </div>
           )}
 
+          {/* Lower R32 */}
           <BracketColumn
             slots={lowerR32Slots} gap={GAP.r32} pairGap={PAIR_GAP.r32}
             showConnector={showR16} flip={true}
@@ -314,7 +344,7 @@ export default function BracketContent() {
         </div>
       </div>
 
-      <p className="text-[10px] text-gray-400/60 dark:text-gray-600 mt-2 text-center">
+      <p className="text-[10px] text-gray-400/50 dark:text-gray-600 mt-2 text-center">
         左右滑动查看完整赛程
       </p>
     </div>

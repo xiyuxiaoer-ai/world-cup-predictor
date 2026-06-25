@@ -388,3 +388,131 @@ button, a, [role="button"], select, input, textarea, label {
     width  0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
     opacity 0.15s ease;
 }
+
+/* ══════════════════════════════════════════════════════
+   淘汰赛赛程表专用动效
+   ══════════════════════════════════════════════════════ */
+
+/* 轮次列从左侧弹入 */
+@keyframes bracket-col-left {
+  0%   { opacity: 0; transform: translateX(-20px); }
+  55%  { opacity: 1; transform: translateX(2px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+/* 轮次列从右侧弹入 */
+@keyframes bracket-col-right {
+  0%   { opacity: 0; transform: translateX(20px); }
+  55%  { opacity: 1; transform: translateX(-2px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.animate-bracket-left {
+  animation: bracket-col-left 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+.animate-bracket-right {
+  animation: bracket-col-right 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+/* SF+决赛区弹入（从中心放大） */
+.animate-bracket-center {
+  animation: spring-in 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 展开按钮呼吸光环 */
+@keyframes expand-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(156,163,175,0.6), 0 2px 6px rgba(0,0,0,0.06); }
+  65%  { box-shadow: 0 0 0 10px rgba(156,163,175,0), 0 2px 6px rgba(0,0,0,0.06); }
+  100% { box-shadow: 0 0 0 0 rgba(156,163,175,0), 0 2px 6px rgba(0,0,0,0.06); }
+}
+.animate-expand-ring {
+  animation: expand-ring 2.4s ease-out infinite;
+}
+
+/* 决赛区金色辉光（作用于 wrapper div） */
+@keyframes final-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 10px 2px rgba(251,191,36,0.22),
+      0 4px 24px rgba(251,191,36,0.12);
+  }
+  50% {
+    box-shadow:
+      0 0 24px 6px rgba(251,191,36,0.42),
+      0 6px 36px rgba(251,191,36,0.22);
+  }
+}
+.animate-final-glow {
+  animation: final-glow 2.8s ease-in-out infinite;
+}
+
+/* 轮次卡片彩色玻璃内光（覆盖 Tailwind shadow-sm） */
+.bracket-card-r32 {
+  box-shadow:
+    0 0 0 1px rgba(96,165,250,0.22),
+    0 2px 8px rgba(96,165,250,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.72),
+    inset 0 -1px 0 rgba(96,165,250,0.08);
+}
+.bracket-card-r16 {
+  box-shadow:
+    0 0 0 1px rgba(45,212,191,0.22),
+    0 2px 8px rgba(45,212,191,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.72),
+    inset 0 -1px 0 rgba(45,212,191,0.08);
+}
+.bracket-card-qf {
+  box-shadow:
+    0 0 0 1px rgba(251,146,60,0.22),
+    0 2px 8px rgba(251,146,60,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.72),
+    inset 0 -1px 0 rgba(251,146,60,0.08);
+}
+.bracket-card-sf {
+  box-shadow:
+    0 0 0 1px rgba(167,139,250,0.22),
+    0 2px 8px rgba(167,139,250,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.72),
+    inset 0 -1px 0 rgba(167,139,250,0.08);
+}
+.bracket-card-fin {
+  box-shadow:
+    0 0 0 1px rgba(251,191,36,0.35),
+    0 2px 12px rgba(251,191,36,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.82),
+    inset 0 -1px 0 rgba(251,191,36,0.12);
+}
+@media (prefers-color-scheme: dark) {
+  .bracket-card-r32 {
+    box-shadow:
+      0 0 0 1px rgba(96,165,250,0.30),
+      0 2px 10px rgba(96,165,250,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(96,165,250,0.12);
+  }
+  .bracket-card-r16 {
+    box-shadow:
+      0 0 0 1px rgba(45,212,191,0.30),
+      0 2px 10px rgba(45,212,191,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(45,212,191,0.12);
+  }
+  .bracket-card-qf {
+    box-shadow:
+      0 0 0 1px rgba(251,146,60,0.30),
+      0 2px 10px rgba(251,146,60,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(251,146,60,0.12);
+  }
+  .bracket-card-sf {
+    box-shadow:
+      0 0 0 1px rgba(167,139,250,0.30),
+      0 2px 10px rgba(167,139,250,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 0 rgba(167,139,250,0.12);
+  }
+  .bracket-card-fin {
+    box-shadow:
+      0 0 0 1px rgba(251,191,36,0.40),
+      0 2px 16px rgba(251,191,36,0.32),
+      inset 0 1px 0 rgba(255,255,255,0.12),
+      inset 0 -1px 0 rgba(251,191,36,0.18);
+  }
+}
