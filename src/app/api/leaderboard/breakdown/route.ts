@@ -21,9 +21,14 @@ export async function GET(request: Request) {
     .eq('user_id', userId)
     .not('points_earned', 'is', null)
     .neq('points_earned', 0)
-    .order('kickoff_time', { ascending: false, referencedTable: 'matches' })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  return NextResponse.json(predictions || [])
+  const sorted = (predictions ?? []).sort((a: any, b: any) => {
+    const tA = new Date(a.match?.kickoff_time ?? 0).getTime()
+    const tB = new Date(b.match?.kickoff_time ?? 0).getTime()
+    return tB - tA  // 最近的比赛排最前
+  })
+
+  return NextResponse.json(sorted)
 }
