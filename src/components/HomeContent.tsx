@@ -270,7 +270,15 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   if (!selectedGameId) {
     return (
       <div className="text-center py-20">
-        <div className="text-5xl mb-4">⚽</div>
+        <div className="mb-4 flex justify-center text-amber-400 dark:text-amber-500">
+          <svg viewBox="0 0 48 48" width="52" height="52" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="1.8"/>
+            <path d="M24 4v7M24 37v7M4 24h7M37 24h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" opacity="0.3"/>
+            <path d="M24 10 L29 15 L27 22 L21 22 L19 15 Z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+            <path d="M29 15 L35 13 L38 18 L35 23 L27 22 Z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+            <path d="M21 22 L16 26 L11 22 L13 16 L19 15 Z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+          </svg>
+        </div>
         <p className="text-zinc-400 mb-6">你还没有加入任何 Game</p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
@@ -343,7 +351,9 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
               title="复制 Game 码邀请朋友"
               className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg font-mono transition-all tap-scale"
             >
-              {copied ? '✓ 已复制' : `码: ${selectedGameId.slice(0, 8)}`}
+              {copied
+                ? <span className="flex items-center gap-1 font-sans"><svg viewBox="0 0 12 12" width="11" height="11" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>已复制</span>
+                : `码: ${selectedGameId.slice(0, 8)}`}
             </button>
             {isAdmin && !confirmDeleteGame && (
               <button
@@ -377,7 +387,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 <h2 className="text-sm font-bold text-gray-700 dark:text-gray-300 tracking-wide">待竞猜</h2>
               </div>
               {pendingMatches.length === 0 ? (
-                <p className="text-gray-400 dark:text-gray-500 text-sm">暂无待竞猜比赛 🎉</p>
+                <p className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500 text-sm">
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none" className="text-amber-400"><path d="M8 1v2.5M8 12.5V15M1 8h2.5M12.5 8H15M3 3l1.8 1.8M11.2 11.2L13 13M13 3l-1.8 1.8M4.8 11.2L3 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><circle cx="8" cy="8" r="2.5" fill="currentColor" fillOpacity="0.25" stroke="currentColor" strokeWidth="1.3"/></svg>
+                  暂无待竞猜比赛
+                </p>
               ) : (
                 <div className="space-y-3">
                   {pendingMatches.map(match => (
@@ -418,7 +431,10 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                 disabled={syncing}
                 className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50 transition-colors"
               >
-                <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" className={syncing ? 'animate-spin' : ''}>
+                  <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.8 0 3.4.87 4.4 2.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                  <path d="M12 2v3h-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
                 <span>{syncing ? '更新中...' : '手动更新'}</span>
               </button>
               {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
@@ -427,10 +443,12 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                   onClick={() => setShowThirdPlace(true)}
                   className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
                 >
-                  <span>📊</span><span>第三名推算</span>
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M3 13V8M7 13V5M11 13V3M14 13H2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  <span>第三名推算</span>
                 </button>
                 <Link href="/bracket" className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-amber-500 dark:hover:text-amber-400 transition-colors">
-                  <span>🏆</span><span>淘汰赛赛程</span>
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M5 2h6v5a3 3 0 0 1-6 0V2Z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 2H3a1.5 1.5 0 0 0-1.5 1.5V5a3 3 0 0 0 2.7 2.99M12 2h1a1.5 1.5 0 0 1 1.5 1.5V5a3 3 0 0 1-2.7 2.99" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M8 10v4M6 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+                  <span>淘汰赛赛程</span>
                 </Link>
               </div>
             </div>

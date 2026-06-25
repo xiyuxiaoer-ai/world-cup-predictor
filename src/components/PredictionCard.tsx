@@ -139,7 +139,7 @@ function PredictionCard({
             </span>
             {venue && <button type="button" onClick={() => setShowMap(true)} className="text-xs text-gray-400 dark:text-gray-500 shrink-0 hover:text-amber-500 transition-colors"><IconPin /> {venue.city} · {venue.stadium}</button>}
           </div>
-          <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-medium shrink-0 ml-2">✓ 已提交</span>
+          <span className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-medium shrink-0 ml-2 flex items-center gap-1"><svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>已提交</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 flex-1 justify-end">

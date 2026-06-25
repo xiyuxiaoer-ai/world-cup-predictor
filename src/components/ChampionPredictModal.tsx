@@ -55,8 +55,17 @@ export default function ChampionPredictModal({
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">🏆 猜世界杯冠军</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none p-1">✕</button>
+          <div className="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" className="text-amber-500 dark:text-amber-400">
+              <path d="M6 3H4a1.5 1.5 0 0 0-1.5 1.5v1.5A4 4 0 0 0 6 10M18 3h2a1.5 1.5 0 0 1 1.5 1.5V6a4 4 0 0 1-3.5 3.97" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+              <path d="M6 3h12v6a6 6 0 0 1-12 0V3Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 15v4M8.5 21h7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+            </svg>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">猜世界杯冠军</h2>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100/70 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/20 transition-all tap-scale">
+            <svg viewBox="0 0 14 14" width="12" height="12" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          </button>
         </div>
 
         {loading ? (
@@ -100,7 +109,14 @@ export default function ChampionPredictModal({
 
             {error && <p className="text-red-500 text-xs mb-3">{error}</p>}
 
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">⚠️ 提交后不可更改，请谨慎选择</p>
+            <p className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 mb-4">
+              <svg viewBox="0 0 16 16" width="13" height="13" fill="none" className="shrink-0 text-amber-500">
+                <path d="M8 1.5L14.5 13H1.5L8 1.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M8 6v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                <circle cx="8" cy="10.5" r="0.7" fill="currentColor"/>
+              </svg>
+              提交后不可更改，请谨慎选择
+            </p>
 
             <button
               onClick={handleSubmit}

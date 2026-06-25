@@ -116,7 +116,10 @@ export default function GroupModal({
         {predictingMatch && (
           <div className="absolute inset-0 z-10 flex flex-col rounded-2xl" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(20px)' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-              <button onClick={() => { setPredictingMatch(null); setSaveError('') }} className="text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">← 返回</button>
+              <button onClick={() => { setPredictingMatch(null); setSaveError('') }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors tap-scale">
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                返回
+              </button>
               <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">猜比分</span>
               <div className="w-12" />
             </div>
@@ -171,7 +174,9 @@ export default function GroupModal({
         {/* 弹窗主内容 */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/40 dark:border-white/10">
           <h2 className="font-semibold text-gray-900 dark:text-gray-100 text-sm">{label} · 全部比赛</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100/70 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/20 transition-all tap-scale">
+            <svg viewBox="0 0 14 14" width="12" height="12" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          </button>
         </div>
 
         {standings.length > 0 && (

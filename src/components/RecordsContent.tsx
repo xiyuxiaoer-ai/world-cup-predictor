@@ -134,7 +134,10 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             disabled={syncing}
             className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-zinc-300 disabled:opacity-50 transition-colors"
           >
-            <span className={syncing ? 'animate-spin inline-block' : ''}>↻</span>
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="none" className={syncing ? 'animate-spin' : ''}>
+              <path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.8 0 3.4.87 4.4 2.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              <path d="M12 2v3h-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span>{syncing ? '更新中...' : '手动更新'}</span>
           </button>
           {syncMsg && <span className="text-xs text-amber-500">{syncMsg}</span>}
@@ -343,7 +346,10 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                   </div>
                 ) : (
                   <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <span>🔒</span>
+                    <svg viewBox="0 0 14 16" width="12" height="14" fill="none" className="shrink-0">
+                      <rect x="2" y="7" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
+                      <path d="M4.5 7V5a2.5 2.5 0 0 1 5 0v2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                    </svg>
                     <span>请先提交竞猜，才能查看其他成员的预测</span>
                   </div>
                 )}

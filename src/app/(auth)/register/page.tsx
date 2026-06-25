@@ -40,7 +40,15 @@ export default function RegisterPage() {
   return (
     <div className="w-full max-w-sm animate-float-up">
       <div className="mb-6 text-center">
-        <div className="text-5xl mb-3 animate-football">⚽</div>
+        <div className="mb-3 animate-football flex justify-center text-amber-500 dark:text-amber-400">
+          <svg viewBox="0 0 48 48" width="52" height="52" fill="none">
+            <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2"/>
+            <path d="M24 4v7M24 37v7M4 24h7M37 24h7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" opacity="0.3"/>
+            <path d="M24 10 L29 15 L27 22 L21 22 L19 15 Z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+            <path d="M29 15 L35 13 L38 18 L35 23 L27 22 Z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+            <path d="M21 22 L16 26 L11 22 L13 16 L19 15 Z" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15"/>
+          </svg>
+        </div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">世界杯竞猜</h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">创建你的账号加入竞猜</p>
       </div>

@@ -169,7 +169,9 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                   <div className="text-xs text-amber-600 dark:text-amber-400 font-bold">共 {selected.total_points} 分</div>
                 </div>
               </div>
-              <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
+              <button onClick={() => setSelected(null)} className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100/70 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/20 transition-all tap-scale">
+                <svg viewBox="0 0 14 14" width="12" height="12" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+              </button>
             </div>
 
             {/* Body */}

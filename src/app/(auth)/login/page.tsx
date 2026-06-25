@@ -61,7 +61,7 @@ export default function LoginPage() {
             type="submit" disabled={loading}
             className="w-full bg-amber-500 hover:bg-amber-400 active:bg-amber-600 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors shadow-sm"
           >
-            {loading ? '登录中...' : '登录 ⚽'}
+            {loading ? '登录中...' : '登录'}
           </button>
           <p className="text-center text-gray-500 dark:text-gray-400 text-sm">
             没有账号？{' '}

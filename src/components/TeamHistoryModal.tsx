@@ -97,8 +97,12 @@ function PlayerCard({ player, index }: { player: any; index: number }) {
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-amber-100/80 to-orange-100/60 dark:from-amber-900/40 dark:to-orange-900/20 flex items-center justify-center">
-            <span className="text-2xl">⚽</span>
+          <div className="w-full h-full bg-gradient-to-br from-amber-100/80 to-orange-100/60 dark:from-amber-900/40 dark:to-orange-900/20 flex items-center justify-center text-amber-400 dark:text-amber-500">
+            <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+              <circle cx="16" cy="16" r="13" stroke="currentColor" strokeWidth="1.6"/>
+              <path d="M16 3v5M16 24v5M3 16h5M24 16h5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" opacity="0.35"/>
+              <path d="M16 7 L20 11 L18.5 16 L13.5 16 L12 11 Z" stroke="currentColor" strokeWidth="1.3" fill="currentColor" fillOpacity="0.15"/>
+            </svg>
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
@@ -139,10 +143,11 @@ function ReadMoreText({ text, maxLen }: { text: string; maxLen: number }) {
 }
 
 /* ─── Section Block ─── */
-function SectionBlock({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionBlock({ title, icon, children }: { title: string; icon?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="mt-0">
       <div className="px-4 sm:px-5 pt-4 pb-2 flex items-center gap-2">
+        {icon && <span className="text-amber-500 dark:text-amber-400 shrink-0">{icon}</span>}
         <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</span>
         <div className="flex-1 h-px bg-gray-200/60 dark:bg-white/10" />
       </div>
@@ -158,19 +163,19 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
   return (
     <div className="pb-6">
       {intro ? (
-        <SectionBlock title="⚽ 球队历史">
+        <SectionBlock title="球队历史" icon={<svg viewBox="0 0 16 16" width="13" height="13" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 2v3M8 11v3M2 8h3M11 8h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" opacity="0.4"/><path d="M8 4.5L10 6.5 9.2 9 6.8 9 6 6.5Z" stroke="currentColor" strokeWidth="1.2" fill="currentColor" fillOpacity="0.2"/></svg>}>
           <ReadMoreText text={intro} maxLen={300} />
         </SectionBlock>
       ) : null}
 
       {worldCupRecord ? (
-        <SectionBlock title="🏆 世界杯征程">
+        <SectionBlock title="世界杯征程" icon={<svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M4 2h8v5a4 4 0 0 1-8 0V2Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/><path d="M3 2H2a1 1 0 0 0-1 1v1a3 3 0 0 0 2.5 2.96M13 2h1a1 1 0 0 1 1 1v1a3 3 0 0 1-2.5 2.96" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M8 10v4M6 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>}>
           <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{worldCupRecord}</p>
         </SectionBlock>
       ) : null}
 
       {players && players.length > 0 && (
-        <SectionBlock title={`⭐ 传奇球星（共 ${players.length} 位）`}>
+        <SectionBlock title={`传奇球星（共 ${players.length} 位）`} icon={<svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M8 1.5l1.8 3.8 4.2.6-3 3 .7 4.1L8 11l-3.7 2 .7-4.1-3-3 4.2-.6L8 1.5Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" fill="currentColor" fillOpacity="0.2"/></svg>}>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-1 mt-0.5">
             {players.map((p: any, i: number) => (
               <PlayerCard key={p.name} player={p} index={i} />
@@ -188,7 +193,7 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
       )}
 
       {goal2026 ? (
-        <SectionBlock title="🎯 2026世界杯目标">
+        <SectionBlock title="2026世界杯目标" icon={<svg viewBox="0 0 16 16" width="13" height="13" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3"/><circle cx="8" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.3"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>}>
           <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{goal2026}</p>
         </SectionBlock>
       ) : null}
@@ -200,9 +205,9 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
           rel="noopener noreferrer"
           className="group flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[12px] font-medium text-gray-600 dark:text-gray-300 glass-sm hover:bg-white/50 dark:hover:bg-white/8 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
-          <span className="text-base">📖</span>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" className="shrink-0 text-gray-500 dark:text-gray-400"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9z" stroke="currentColor" strokeWidth="1.3"/><path d="M5 2v12M5 6h5M5 9h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
           <span>在百度百科查看完整历史</span>
-          <span className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform">↗</span>
+          <span className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform"><svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 3H2v7h7V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
         </a>
       </div>
     </div>
@@ -320,9 +325,9 @@ export default function TeamHistoryModal({
             </div>
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100/70 dark:bg-white/10 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/20 transition-all text-sm leading-none active:scale-90"
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100/70 dark:bg-white/10 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/20 transition-all active:scale-90"
             >
-              ✕
+              <svg viewBox="0 0 14 14" width="12" height="12" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
             </button>
           </div>
 
@@ -369,7 +374,7 @@ export default function TeamHistoryModal({
                 : legendError
                   ? (
                     <div className="flex flex-col items-center gap-3 p-10 text-center">
-                      <span className="text-4xl">🌐</span>
+                      <svg viewBox="0 0 48 48" width="48" height="48" fill="none" className="text-gray-300 dark:text-gray-600"><circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2"/><ellipse cx="24" cy="24" rx="8" ry="20" stroke="currentColor" strokeWidth="2"/><path d="M4 24h40M24 4a28 28 0 0 1 0 40M24 4a28 28 0 0 0 0 40" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                       <p className="text-sm text-gray-500 dark:text-gray-400">暂无该球队的历史资料</p>
                       <button
                         onClick={() => setLegendError(false)}
@@ -484,7 +489,7 @@ function NewsList({ items }: { items: any[] }) {
             {item.source && <span className="font-medium text-gray-500 dark:text-gray-400 truncate max-w-[120px]">{item.source}</span>}
             {item.source && item.pubDate && <span>·</span>}
             {item.pubDate && <span>{timeAgo(item.pubDate)}</span>}
-            <span className="ml-auto shrink-0">↗</span>
+            <span className="ml-auto shrink-0"><svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 3H2v7h7V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
           </div>
         </a>
       ))}

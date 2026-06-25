@@ -96,9 +96,9 @@ export default function AdminPage() {
     const res = await fetch('/api/admin/sync-squads', { method: 'POST' })
     const data = await res.json()
     if (res.ok) {
-      setSyncResult(`✅ 同步完成！共 ${data.teams} 支球队，${data.players} 条球员/教练记录。${data.tableCreated ? '（已自动建表）' : ''}`)
+      setSyncResult(`同步完成！共 ${data.teams} 支球队，${data.players} 条球员/教练记录。${data.tableCreated ? '（已自动建表）' : ''}`)
     } else {
-      setSyncResult(`❌ ${data.error}`)
+      setSyncResult(`错误：${data.error}`)
     }
     setSyncing(false)
   }
@@ -109,9 +109,9 @@ export default function AdminPage() {
     const res = await fetch('/api/champion-prediction/finalize', { method: 'POST' })
     const data = await res.json()
     if (res.ok) {
-      setFinalizeResult(`✅ 结算完成！冠军：${data.champion}，猜中 ${data.correct} 人，更新 ${data.applied} 条积分记录`)
+      setFinalizeResult(`结算完成！冠军：${data.champion}，猜中 ${data.correct} 人，更新 ${data.applied} 条积分记录`)
     } else {
-      setFinalizeResult(`❌ ${data.error}`)
+      setFinalizeResult(`错误：${data.error}`)
     }
     setFinalizing(false)
   }
@@ -154,13 +154,16 @@ export default function AdminPage() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">超级管理员</h1>
-          <button onClick={() => router.push('/')} className="text-sm text-zinc-400 hover:text-white transition-colors">← 返回主页</button>
+          <button onClick={() => router.push('/')} className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-1.5">
+            <svg viewBox="0 0 10 10" width="10" height="10" fill="none"><path d="M7 1L2 5l5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            返回主页
+          </button>
         </div>
 
         {msg && (
           <div className="mb-4 p-3 bg-zinc-800 rounded-lg text-sm text-emerald-400 flex justify-between">
             <span>{msg}</span>
-            <button onClick={() => setMsg('')} className="text-zinc-500 hover:text-white">✕</button>
+            <button onClick={() => setMsg('')} className="text-zinc-500 hover:text-white"><svg viewBox="0 0 14 14" width="12" height="12" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg></button>
           </div>
         )}
 
@@ -169,7 +172,7 @@ export default function AdminPage() {
           {(['users', 'games', 'predictions', 'champion'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
-              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : t === 'champion' ? '🏆 彩蛋结算' : '🗒️ 球队名单'}
+              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : t === 'champion' ? '彩蛋结算' : '球队名单'}
             </button>
           ))}
         </div>
@@ -339,9 +342,15 @@ export default function AdminPage() {
         {tab === 'champion' && (
           <div className="space-y-4">
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
-              <h2 className="text-lg font-bold text-amber-400">🏆 彩蛋：计算最终得分</h2>
+              <h2 className="text-lg font-bold text-amber-400 flex items-center gap-2">
+                <svg viewBox="0 0 16 16" width="16" height="16" fill="none"><path d="M8 2l.9 2.7h2.9l-2.3 1.7.9 2.7L8 7.4 5.6 9.1l.9-2.7L4.2 4.7h2.9z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round"/><path d="M4 12h8M6 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+                彩蛋：计算最终得分
+              </h2>
               <p className="text-sm text-zinc-400">决赛结束并同步后，点击下方按钮自动识别冠军，将猜中用户的彩蛋积分写入各 Game 积分榜。</p>
-              <p className="text-xs text-zinc-500">⚠️ 此操作只能执行一次，执行前请确认决赛比赛结果已同步。</p>
+              <p className="text-xs text-zinc-500 flex items-center gap-1.5">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M8 2L1 14h14L8 2z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/><path d="M8 7v3.5M8 12v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+                此操作只能执行一次，执行前请确认决赛比赛结果已同步。
+              </p>
               {finalizeResult && (
                 <div className="text-sm bg-zinc-800 rounded-lg p-3 text-emerald-400 break-all">{finalizeResult}</div>
               )}
@@ -360,13 +369,19 @@ export default function AdminPage() {
         {tab === 'squads' && (
           <div className="space-y-4">
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
-              <h2 className="text-lg font-bold text-blue-400">🗒️ 世界杯球队名单同步</h2>
+              <h2 className="text-lg font-bold text-blue-400 flex items-center gap-2">
+                <svg viewBox="0 0 16 16" width="15" height="15" fill="none"><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 5h4M6 8h4M6 11h2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                世界杯球队名单同步
+              </h2>
               <p className="text-sm text-zinc-400">
                 从 football-data.org 拉取 2026 世界杯全部 48 支球队的出场名单（含球员号码、位置、俱乐部）和主教练信息，写入 Supabase。
               </p>
-              <p className="text-xs text-zinc-500">⚠️ 第一次运行时若提示「表不存在」，请先在 Supabase SQL Editor 执行 <code className="font-mono bg-zinc-800 px-1 rounded">sql/create_team_squads.sql</code>，再点击同步。</p>
+              <p className="text-xs text-zinc-500 flex items-start gap-1.5">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="none" className="shrink-0 mt-[1px]"><path d="M8 2L1 14h14L8 2z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/><path d="M8 7v3.5M8 12v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>
+                <span>第一次运行时若提示「表不存在」，请先在 Supabase SQL Editor 执行 <code className="font-mono bg-zinc-800 px-1 rounded">sql/create_team_squads.sql</code>，再点击同步。</span>
+              </p>
               {syncResult && (
-                <div className={`text-sm rounded-lg p-3 break-all ${syncResult.startsWith('✅') ? 'bg-zinc-800 text-emerald-400' : 'bg-red-950/40 text-red-400'}`}>
+                <div className={`text-sm rounded-lg p-3 break-all ${!syncResult.startsWith('错误：') ? 'bg-zinc-800 text-emerald-400' : 'bg-red-950/40 text-red-400'}`}>
                   {syncResult}
                 </div>
               )}

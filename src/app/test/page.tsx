@@ -47,7 +47,7 @@ export default function TestPage() {
           disabled={loading}
           className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
         >
-          <span className={loading ? 'animate-spin inline-block' : ''}>↻</span>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" className={loading ? 'animate-spin' : ''}><path d="M13.5 8A5.5 5.5 0 1 1 8 2.5c1.8 0 3.4.87 4.4 2.2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/><path d="M12 2v3h-3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           刷新
         </button>
       </div>

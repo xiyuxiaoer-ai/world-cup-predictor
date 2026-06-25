@@ -78,7 +78,9 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
             <h2 className="text-sm font-bold text-gray-900 dark:text-gray-100">第三名晋级推算</h2>
             <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">12组各取第3，积分最高8支晋级 · 点组别可查看剩余赛程</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg px-1">✕</button>
+          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100/70 dark:bg-white/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-200/70 dark:hover:bg-white/20 transition-all tap-scale">
+            <svg viewBox="0 0 14 14" width="12" height="12" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
+          </button>
         </div>
 
         {/* Table */}

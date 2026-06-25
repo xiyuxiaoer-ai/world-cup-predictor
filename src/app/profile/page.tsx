@@ -174,7 +174,7 @@ export default function ProfilePage() {
             <p className="text-xs text-zinc-600 mt-1 text-right">{bio.length}/60</p>
           </div>
           {msg && (
-            <p className={`text-sm ${msg.includes('✓') ? 'text-amber-500' : msg.includes('待保存') || msg.includes('已选择') ? 'text-amber-400' : 'text-red-400'}`}>
+            <p className={`text-sm ${msg.includes('待保存') || msg.includes('已选择') ? 'text-amber-400' : 'text-red-400'}`}>
               {msg}
             </p>
           )}
@@ -190,7 +190,7 @@ export default function ProfilePage() {
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col">
           <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 dark:border-zinc-700">
             <span className="font-semibold dark:text-gray-100">裁剪头像</span>
-            <button onClick={() => setCropSrc(null)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">✕</button>
+            <button onClick={() => setCropSrc(null)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"><svg viewBox="0 0 14 14" width="14" height="14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg></button>
           </div>
           <div className="relative flex-1">
             <Cropper

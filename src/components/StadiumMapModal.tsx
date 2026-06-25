@@ -693,7 +693,7 @@ export default function StadiumMapModal({ homeTla, awayTla, homeTeam, awayTeam, 
             className="text-xs font-bold transition-colors" style={{ color: '#f59e0b' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#fbbf24')}
             onMouseLeave={e => (e.currentTarget.style.color = '#f59e0b')}>
-            在地图中打开 →
+            <span className="flex items-center gap-1">在地图中打开 <svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 3H2v7h7V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
           </a>
         </div>
 
