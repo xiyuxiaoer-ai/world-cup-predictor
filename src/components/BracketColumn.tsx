@@ -19,11 +19,12 @@ type Props = {
   pairGap: number
   showConnector: boolean
   flip?: boolean
+  roundColor?: string
 }
 
-function MatchPair({ top, bottom, gap, showConnector, flip }: {
+function MatchPair({ top, bottom, gap, showConnector, flip, roundColor }: {
   top: SlotItem; bottom: SlotItem
-  gap: number; showConnector: boolean; flip: boolean
+  gap: number; showConnector: boolean; flip: boolean; roundColor?: string
 }) {
   const totalH = CARD_H + gap + CARD_H
   const vertH = gap + CARD_H
@@ -35,11 +36,13 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
           match={top.match} homeLabel={top.homeLabel} awayLabel={top.awayLabel}
           homeTla={top.homeTla} awayTla={top.awayTla}
           homeConfirmed={top.homeConfirmed} awayConfirmed={top.awayConfirmed}
+          roundColor={roundColor}
         />
         <BracketMatchCard
           match={bottom.match} homeLabel={bottom.homeLabel} awayLabel={bottom.awayLabel}
           homeTla={bottom.homeTla} awayTla={bottom.awayTla}
           homeConfirmed={bottom.homeConfirmed} awayConfirmed={bottom.awayConfirmed}
+          roundColor={roundColor}
         />
       </div>
 
@@ -71,7 +74,7 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
   )
 }
 
-export default function BracketColumn({ slots, gap, pairGap, showConnector, flip = false }: Props) {
+export default function BracketColumn({ slots, gap, pairGap, showConnector, flip = false, roundColor }: Props) {
   const pairs: [SlotItem, SlotItem][] = []
   for (let i = 0; i < slots.length; i += 2) {
     pairs.push([slots[i], slots[i + 1] ?? { match: null, homeLabel: '待定', awayLabel: '待定' }])
@@ -80,7 +83,7 @@ export default function BracketColumn({ slots, gap, pairGap, showConnector, flip
   return (
     <div className="flex flex-col" style={{ gap: pairGap }}>
       {pairs.map(([top, bottom], i) => (
-        <MatchPair key={i} top={top} bottom={bottom} gap={gap} showConnector={showConnector} flip={flip} />
+        <MatchPair key={i} top={top} bottom={bottom} gap={gap} showConnector={showConnector} flip={flip} roundColor={roundColor} />
       ))}
     </div>
   )

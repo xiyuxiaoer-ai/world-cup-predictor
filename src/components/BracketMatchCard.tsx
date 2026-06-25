@@ -22,6 +22,7 @@ type Props = {
   awayTla?: string | null
   homeConfirmed?: boolean
   awayConfirmed?: boolean
+  roundColor?: string
 }
 
 function Flag({ tla, faded }: { tla: string | null | undefined; faded?: boolean }) {
@@ -66,7 +67,7 @@ function Row({ tla, name, score, winner, loser, unknown }: {
 
 export default function BracketMatchCard({
   match, homeLabel = '待定', awayLabel = '待定',
-  homeTla, awayTla, homeConfirmed, awayConfirmed,
+  homeTla, awayTla, homeConfirmed, awayConfirmed, roundColor,
 }: Props) {
   if (!match) {
     const homeDisplay = homeTla ? (getTeamZh(homeTla) ?? homeLabel) : homeLabel
@@ -74,10 +75,10 @@ export default function BracketMatchCard({
     const homeKnown = !!homeTla
     const awayKnown = !!awayTla
     return (
-      <div className="w-20 rounded-lg overflow-hidden shrink-0
+      <div className={`w-20 rounded-lg overflow-hidden shrink-0
         border border-dashed border-black/[0.08] dark:border-white/[0.09]
-        bg-white/20 dark:bg-white/[0.03]
-        backdrop-blur-[6px]">
+        backdrop-blur-[6px]
+        ${roundColor ?? 'bg-white/20 dark:bg-white/[0.03]'}`}>
         <div className="flex items-center gap-[5px] px-[6px] h-[22px]">
           <Flag tla={homeTla} />
           <span className={`flex-1 text-[10px] truncate leading-none ${
@@ -123,11 +124,11 @@ export default function BracketMatchCard({
   const effectiveAwayTla = awayTbd ? awayTla : match.away_tla
 
   return (
-    <div className="w-20 rounded-lg overflow-hidden shrink-0
+    <div className={`w-20 rounded-lg overflow-hidden shrink-0
       border border-white/50 dark:border-white/[0.13]
-      bg-white/80 dark:bg-gray-800/75
       backdrop-blur-[8px]
-      shadow-sm shadow-black/[0.07] dark:shadow-black/30">
+      shadow-sm shadow-black/[0.07] dark:shadow-black/30
+      ${roundColor ?? 'bg-white/80 dark:bg-gray-800/75'}`}>
       <Row tla={effectiveHomeTla} name={homeName} score={finished ? h : null} winner={homeWin} loser={awayWin} unknown={false} />
       <div className="h-px bg-black/[0.05] dark:bg-white/[0.06]" />
       <Row tla={effectiveAwayTla} name={awayName} score={finished ? a : null} winner={awayWin} loser={homeWin} unknown={false} />

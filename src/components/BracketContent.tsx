@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { R32_SLOTS, LATER_ROUNDS, getSlotLabel } from '@/lib/bracketSlots'
 import BracketColumn, { CARD_H, CONNECTOR_W } from './BracketColumn'
 import BracketMatchCard, { type BracketMatchData } from './BracketMatchCard'
@@ -17,6 +17,20 @@ const PAIR_GAP: Record<string, number> = {
   r16: CARD_H + 6 + 28,
   qf: (CARD_H + 6) * 3 + 28,
 }
+
+const R32_COLOR   = 'bg-blue-200/40 dark:bg-blue-800/20'
+const R16_COLOR   = 'bg-teal-200/40 dark:bg-teal-800/20'
+const QF_COLOR    = 'bg-amber-200/40 dark:bg-amber-800/20'
+const SF_COLOR    = 'bg-violet-200/40 dark:bg-violet-800/20'
+const FINAL_COLOR = 'bg-amber-100/60 dark:bg-amber-700/25'
+
+const ROUND_TABS = [
+  { level: 0, label: '32强',   activeTab: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-400/40 dark:border-blue-400/30' },
+  { level: 1, label: '16强',   activeTab: 'bg-teal-500/10 text-teal-600 dark:text-teal-300 border-teal-400/40 dark:border-teal-400/30' },
+  { level: 2, label: '8强',    activeTab: 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-400/40 dark:border-amber-400/30' },
+  { level: 3, label: '半决赛',  activeTab: 'bg-violet-500/10 text-violet-600 dark:text-violet-300 border-violet-400/40 dark:border-violet-400/30' },
+  { level: 3, label: '决赛',   activeTab: 'bg-amber-400/10 text-amber-700 dark:text-amber-300 border-amber-400/40 dark:border-amber-400/30' },
+]
 
 function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchData> {
   const map = new Map<number, BracketMatchData>()
@@ -94,23 +108,8 @@ export default function BracketContent() {
   const [matches, setMatches] = useState<BracketMatchData[]>([])
   const [standings, setStandings] = useState<Record<string, { team: string; tla: string | null; confirmed: boolean }[]>>({})
   const [loading, setLoading] = useState(true)
-  const [overview, setOverview] = useState(false)
-  const [zoomLevel, setZoomLevel] = useState(1)
-  const [userOverride, setUserOverride] = useState(false)
-  const naturalWRef = useRef(0)
-
-  const outerRef = useRef<HTMLDivElement>(null)
-  const bracketRef = useRef<HTMLDivElement>(null)
+  const [maxRound, setMaxRound] = useState(0)
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  // 手机端自动开启全览；用户手动切换后不再自动覆盖
-  useEffect(() => {
-    if (userOverride) return
-    const check = () => setOverview(window.innerWidth < 768)
-    check()
-    window.addEventListener('resize', check)
-    return () => window.removeEventListener('resize', check)
-  }, [userOverride])
 
   useEffect(() => {
     Promise.all([
@@ -124,29 +123,11 @@ export default function BracketContent() {
   }, [])
 
   useEffect(() => {
-    if (!loading && scrollRef.current && !overview) {
+    if (!loading && scrollRef.current) {
       const el = scrollRef.current
       el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2
     }
-  }, [loading, overview])
-
-  const applyZoom = useCallback(() => {
-    if (!outerRef.current || naturalWRef.current === 0) return
-    const ow = outerRef.current.clientWidth
-    setZoomLevel(Math.min(1, ow / naturalWRef.current))
-  }, [])
-
-  useEffect(() => {
-    if (!overview || loading) { setZoomLevel(1); naturalWRef.current = 0; return }
-    // Measure at zoom=1 (initial state), then apply scale
-    const t = setTimeout(() => {
-      if (!bracketRef.current || !outerRef.current) return
-      naturalWRef.current = bracketRef.current.scrollWidth
-      applyZoom()
-    }, 30)
-    window.addEventListener('resize', applyZoom)
-    return () => { clearTimeout(t); window.removeEventListener('resize', applyZoom) }
-  }, [overview, loading, applyZoom])
+  }, [loading, maxRound])
 
   if (loading) return (
     <div className="flex items-center justify-center py-16">
@@ -171,118 +152,171 @@ export default function BracketContent() {
   const sf1 = upperSFSlot[0]
   const sf2 = lowerSFSlot[0]
 
-  const bracketInner = (
-    <div
-      ref={bracketRef}
-      className="flex items-center"
-      style={{ minWidth: 'max-content', gap: COL_GAP }}
-    >
-      <BracketColumn slots={upperR32Slots} gap={GAP.r32} pairGap={PAIR_GAP.r32} showConnector flip={false} />
-      <BracketColumn slots={upperR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16} showConnector flip={false} />
-      <BracketColumn slots={upperQFSlots}  gap={GAP.qf}  pairGap={0}            showConnector flip={false} />
-
-      {/* Upper SF + connector to Final */}
-      <div className="flex items-center" style={{ gap: COL_GAP }}>
-        <BracketMatchCard
-          match={sf1?.match ?? null}
-          homeLabel={sf1?.homeLabel ?? '待定'} awayLabel={sf1?.awayLabel ?? '待定'}
-          homeTla={sf1?.homeTla} awayTla={sf1?.awayTla}
-          homeConfirmed={sf1?.homeConfirmed} awayConfirmed={sf1?.awayConfirmed}
-        />
-        <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
-          <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
-        </div>
-      </div>
-
-      {/* Final */}
-      <div className="flex flex-col items-center gap-1.5">
-        <div className="flex flex-col items-center gap-0">
-          <svg viewBox="0 0 20 20" width="16" height="16" fill="none" className="text-amber-400 drop-shadow-sm">
-            <path d="M10 2l1.2 3.6h3.8l-3.1 2.2 1.2 3.6L10 9.2l-3.1 2.2 1.2-3.6L5 5.6h3.8z" fill="currentColor"/>
-            <path d="M6.5 14.5h7M8 16.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-            <path d="M10 11V14.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-          </svg>
-          <span className="text-[8px] font-black tracking-[0.18em] text-amber-500/80 dark:text-amber-400/70">FINAL</span>
-        </div>
-        <BracketMatchCard
-          match={finalMatch}
-          homeLabel={sf1?.homeLabel ?? '待定'}
-          awayLabel={sf2?.awayLabel ?? '待定'}
-        />
-      </div>
-
-      {/* Lower SF + connector to Final */}
-      <div className="flex items-center flex-row-reverse" style={{ gap: COL_GAP }}>
-        <BracketMatchCard
-          match={sf2?.match ?? null}
-          homeLabel={sf2?.homeLabel ?? '待定'} awayLabel={sf2?.awayLabel ?? '待定'}
-          homeTla={sf2?.homeTla} awayTla={sf2?.awayTla}
-          homeConfirmed={sf2?.homeConfirmed} awayConfirmed={sf2?.awayConfirmed}
-        />
-        <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
-          <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
-        </div>
-      </div>
-
-      <BracketColumn slots={lowerQFSlots}  gap={GAP.qf}  pairGap={0}            showConnector flip />
-      <BracketColumn slots={lowerR16Slots}  gap={GAP.r16} pairGap={PAIR_GAP.r16} showConnector flip />
-      <BracketColumn slots={lowerR32Slots}  gap={GAP.r32} pairGap={PAIR_GAP.r32} showConnector={false} flip />
-    </div>
-  )
+  const showR16 = maxRound >= 1
+  const showQF  = maxRound >= 2
+  const showSF  = maxRound >= 3
 
   return (
     <div className="pb-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程</h1>
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            32强 → 16强 → 8强 → 4强 → 决赛
-          </p>
-          <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1.5">
-            <svg viewBox="0 0 14 14" width="11" height="11" fill="none">
-              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3"/>
-              <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-            </svg>
-            32强名单根据目前小组赛结果预测，以实际赛果为准
-          </p>
-        </div>
-        <button
-          onClick={() => { setUserOverride(true); setOverview(v => !v) }}
-          className={`shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all tap-scale
-            ${overview
-              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-300/50 dark:border-amber-500/30'
-              : 'bg-gray-100/80 dark:bg-white/8 text-gray-500 dark:text-gray-400 border border-black/[0.06] dark:border-white/10'}`}
-        >
-          <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
-            <rect x="1.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-            <rect x="9.5" y="1.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-            <rect x="1.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
-            <rect x="9.5" y="9.5" width="5" height="5" rx="1" stroke="currentColor" strokeWidth="1.3"/>
+      <div className="mb-4">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程</h1>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+          32强 → 16强 → 8强 → 4强 → 决赛
+        </p>
+        <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1.5">
+          <svg viewBox="0 0 14 14" width="11" height="11" fill="none">
+            <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3"/>
+            <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
           </svg>
-          {overview ? '退出' : '全览'}
-        </button>
+          32强名单根据目前小组赛结果预测，以实际赛果为准
+        </p>
+      </div>
+
+      {/* 轮次选择器 */}
+      <div className="flex gap-2 mb-4 items-center flex-wrap">
+        <span className="text-[10px] text-gray-400 dark:text-gray-500 mr-1">展开至：</span>
+        {ROUND_TABS.map(({ level, label, activeTab }) => {
+          const isActive = maxRound >= level
+          return (
+            <button
+              key={label}
+              onClick={() => setMaxRound(level)}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all cursor-pointer tap-scale
+                ${isActive
+                  ? activeTab
+                  : 'bg-white/30 dark:bg-white/[0.04] border-black/[0.06] dark:border-white/10 text-gray-400 dark:text-gray-500 opacity-50'
+                }`}
+            >
+              {label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Bracket */}
-      <div ref={outerRef} className={overview ? 'overflow-hidden' : ''}>
-        {overview ? (
-          <div style={{ zoom: zoomLevel }}>
-            {bracketInner}
-          </div>
-        ) : (
-          <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4">
-            {bracketInner}
-          </div>
-        )}
+      <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4">
+        <div className="flex items-center" style={{ minWidth: 'max-content', gap: COL_GAP }}>
+
+          <BracketColumn
+            slots={upperR32Slots} gap={GAP.r32} pairGap={PAIR_GAP.r32}
+            showConnector={showR16} flip={false}
+            roundColor={R32_COLOR}
+          />
+
+          {showR16 && (
+            <BracketColumn
+              slots={upperR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16}
+              showConnector={showQF} flip={false}
+              roundColor={R16_COLOR}
+            />
+          )}
+
+          {showQF && (
+            <BracketColumn
+              slots={upperQFSlots} gap={GAP.qf} pairGap={0}
+              showConnector={showSF} flip={false}
+              roundColor={QF_COLOR}
+            />
+          )}
+
+          {showSF ? (
+            <>
+              {/* Upper SF + connector to Final */}
+              <div className="flex items-center" style={{ gap: COL_GAP }}>
+                <BracketMatchCard
+                  match={sf1?.match ?? null}
+                  homeLabel={sf1?.homeLabel ?? '待定'} awayLabel={sf1?.awayLabel ?? '待定'}
+                  homeTla={sf1?.homeTla} awayTla={sf1?.awayTla}
+                  homeConfirmed={sf1?.homeConfirmed} awayConfirmed={sf1?.awayConfirmed}
+                  roundColor={SF_COLOR}
+                />
+                <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
+                  <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
+                </div>
+              </div>
+
+              {/* Final */}
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="flex flex-col items-center gap-0">
+                  <svg viewBox="0 0 20 20" width="16" height="16" fill="none" className="text-amber-400 drop-shadow-sm">
+                    <path d="M10 2l1.2 3.6h3.8l-3.1 2.2 1.2 3.6L10 9.2l-3.1 2.2 1.2-3.6L5 5.6h3.8z" fill="currentColor"/>
+                    <path d="M6.5 14.5h7M8 16.5h4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                    <path d="M10 11V14.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                  </svg>
+                  <span className="text-[8px] font-black tracking-[0.18em] text-amber-500/80 dark:text-amber-400/70">FINAL</span>
+                </div>
+                <BracketMatchCard
+                  match={finalMatch}
+                  homeLabel={sf1?.homeLabel ?? '待定'}
+                  awayLabel={sf2?.awayLabel ?? '待定'}
+                  roundColor={FINAL_COLOR}
+                />
+              </div>
+
+              {/* Lower SF + connector to Final */}
+              <div className="flex items-center flex-row-reverse" style={{ gap: COL_GAP }}>
+                <BracketMatchCard
+                  match={sf2?.match ?? null}
+                  homeLabel={sf2?.homeLabel ?? '待定'} awayLabel={sf2?.awayLabel ?? '待定'}
+                  homeTla={sf2?.homeTla} awayTla={sf2?.awayTla}
+                  homeConfirmed={sf2?.homeConfirmed} awayConfirmed={sf2?.awayConfirmed}
+                  roundColor={SF_COLOR}
+                />
+                <div className="shrink-0 flex items-center" style={{ width: CONNECTOR_W, height: CARD_H }}>
+                  <div className="w-full border-b border-gray-300/50 dark:border-gray-500/40" />
+                </div>
+              </div>
+            </>
+          ) : (
+            /* 展开下一轮按钮 */
+            <div className="flex flex-col items-center justify-center px-2" style={{ minHeight: CARD_H * 2 }}>
+              <button
+                onClick={() => setMaxRound(prev => Math.min(prev + 1, 3))}
+                className="flex flex-col items-center gap-1.5 px-4 py-3 rounded-xl
+                  bg-white/40 dark:bg-white/[0.06]
+                  hover:bg-white/70 dark:hover:bg-white/[0.10]
+                  border border-dashed border-black/10 dark:border-white/15
+                  backdrop-blur-[8px]
+                  text-gray-400 dark:text-gray-500
+                  transition-all cursor-pointer tap-scale"
+              >
+                <span className="text-[10px] font-medium">{['16强', '8强', '半决赛'][maxRound] ?? ''}</span>
+                <svg viewBox="0 0 6 10" width="10" height="10" fill="none">
+                  <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {showQF && (
+            <BracketColumn
+              slots={lowerQFSlots} gap={GAP.qf} pairGap={0}
+              showConnector={showSF} flip={true}
+              roundColor={QF_COLOR}
+            />
+          )}
+
+          {showR16 && (
+            <BracketColumn
+              slots={lowerR16Slots} gap={GAP.r16} pairGap={PAIR_GAP.r16}
+              showConnector={showQF} flip={true}
+              roundColor={R16_COLOR}
+            />
+          )}
+
+          <BracketColumn
+            slots={lowerR32Slots} gap={GAP.r32} pairGap={PAIR_GAP.r32}
+            showConnector={showR16} flip={true}
+            roundColor={R32_COLOR}
+          />
+
+        </div>
       </div>
 
-      {/* Hint */}
-      {!overview && (
-        <p className="text-[10px] text-gray-400/60 dark:text-gray-600 mt-2 text-center">
-          左右滑动查看完整赛程 · 点击「全览」缩放至全屏
-        </p>
-      )}
+      <p className="text-[10px] text-gray-400/60 dark:text-gray-600 mt-2 text-center">
+        左右滑动查看完整赛程
+      </p>
     </div>
   )
 }
