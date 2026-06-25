@@ -94,7 +94,7 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
                   <th className="px-2 py-2 text-center">积分</th>
                   <th className="px-2 py-2 text-center">净胜</th>
                   <th className="px-2 py-2 text-center">进球</th>
-                  <th className="px-2 py-2 text-right pr-3">最后一场</th>
+                  <th className="px-2 py-2 pr-3">最后一场</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,9 +131,9 @@ export default function ThirdPlaceModal({ onClose, onGroupClick }: {
                         <td className="px-2 py-2.5 text-center font-bold text-gray-800 dark:text-gray-200">{row.pts}</td>
                         <td className="px-2 py-2.5 text-center"><GdBadge gd={row.gd} /></td>
                         <td className="px-2 py-2.5 text-center text-gray-600 dark:text-gray-400">{row.gf}</td>
-                        <td className="px-2 py-2.5 pr-3 text-right">
+                        <td className="px-2 py-2.5 pr-3">
                           {row.remaining > 0 && row.vsTeam ? (
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center gap-1.5">
                               <Flag tla={row.vsTla} />
                               <span className="text-gray-500 dark:text-gray-400 text-[10px]">{getTeamDisplay(row.vsTla, row.vsTeam)}</span>
                             </div>
