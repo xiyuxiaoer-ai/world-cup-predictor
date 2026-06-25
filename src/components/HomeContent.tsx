@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import GroupModal from './GroupModal'
@@ -65,6 +66,15 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const selectedGame = games.find(g => g.id === selectedGameId)
   const isAdmin = selectedGame?.role === 'admin'
   const now = new Date()
+
+  const searchParams = useSearchParams()
+  useEffect(() => {
+    const openGroup = searchParams.get('openGroup')
+    const groupLabel = searchParams.get('groupLabel')
+    if (openGroup) {
+      setGroupModal({ stage: 'group', group_name: openGroup, label: groupLabel ?? openGroup })
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const handler = (e: Event) => {

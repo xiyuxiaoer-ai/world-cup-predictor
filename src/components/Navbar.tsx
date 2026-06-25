@@ -233,7 +233,11 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
       <ThirdPlaceModal
         onClose={() => setShowThirdPlace(false)}
         onGroupClick={(groupName, label) => {
-          window.dispatchEvent(new CustomEvent('wcp-open-group', { detail: { groupName, label } }))
+          if (pathnameRef.current === '/') {
+            window.dispatchEvent(new CustomEvent('wcp-open-group', { detail: { groupName, label } }))
+          } else {
+            router.push(`/?openGroup=${encodeURIComponent(groupName)}&groupLabel=${encodeURIComponent(label)}`)
+          }
         }}
       />,
       document.body
