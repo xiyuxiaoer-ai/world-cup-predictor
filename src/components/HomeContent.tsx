@@ -67,6 +67,15 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
   const now = new Date()
 
   useEffect(() => {
+    const handler = (e: Event) => {
+      const { groupName, label } = (e as CustomEvent).detail
+      setGroupModal({ stage: 'group', group_name: groupName, label })
+    }
+    window.addEventListener('wcp-open-group', handler)
+    return () => window.removeEventListener('wcp-open-group', handler)
+  }, [])
+
+  useEffect(() => {
     // 检查是否已猜过，未猜且本次 session 未关闭过则弹出
     if (sessionStorage.getItem('egg_dismissed')) return
     fetch('/api/champion-prediction')
