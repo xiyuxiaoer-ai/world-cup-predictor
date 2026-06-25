@@ -19,11 +19,11 @@ const PAIR_GAP: Record<string, number> = {
 }
 
 // 每轮卡片颜色 = 背景色 + 彩色内光CSS类
-const R32_COLOR   = 'bg-blue-100/70 dark:bg-blue-900/25 bracket-card-r32'
-const R16_COLOR   = 'bg-teal-100/70 dark:bg-teal-900/25 bracket-card-r16'
-const QF_COLOR    = 'bg-orange-100/65 dark:bg-orange-900/20 bracket-card-qf'
-const SF_COLOR    = 'bg-violet-100/70 dark:bg-violet-900/25 bracket-card-sf'
-const FINAL_COLOR = 'bg-amber-50/90 dark:bg-amber-900/30 bracket-card-fin'
+const R32_COLOR   = 'bg-blue-100/50 dark:bg-blue-900/25 bracket-card-r32'
+const R16_COLOR   = 'bg-teal-100/50 dark:bg-teal-900/25 bracket-card-r16'
+const QF_COLOR    = 'bg-orange-100/45 dark:bg-orange-900/20 bracket-card-qf'
+const SF_COLOR    = 'bg-violet-100/50 dark:bg-violet-900/25 bracket-card-sf'
+const FINAL_COLOR = 'bg-amber-50/70 dark:bg-amber-900/30 bracket-card-fin'
 
 const ROUND_TABS = [
   { level: 0, label: '32强',
