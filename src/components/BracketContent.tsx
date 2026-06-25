@@ -175,10 +175,7 @@ export default function BracketContent() {
       {/* Header */}
       <div className="mb-5">
         <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">淘汰赛赛程</h1>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-          32强 → 16强 → 8强 → 4强 → 决赛
-        </p>
-        <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1.5">
+        <p className="flex items-center gap-1 text-[11px] text-amber-600/80 dark:text-amber-400/60 mt-1">
           <svg viewBox="0 0 14 14" width="11" height="11" fill="none">
             <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3"/>
             <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>

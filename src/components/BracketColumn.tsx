@@ -1,6 +1,6 @@
 import BracketMatchCard, { type BracketMatchData } from './BracketMatchCard'
 
-export const CARD_H = 45
+export const CARD_H = 60
 export const CONNECTOR_W = 14
 
 type SlotItem = {
