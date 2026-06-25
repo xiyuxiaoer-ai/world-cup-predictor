@@ -207,7 +207,9 @@ export default function BracketContent() {
 
       {/* Bracket */}
       <div ref={scrollRef} className="overflow-x-auto -mx-4 px-4 pb-2">
-        <div className="flex items-center" style={{ minWidth: 'max-content', gap: COL_GAP }}>
+        {/* 居中包裹：宽度不足时 justify-center 使赛程树居中；超出时 shrink-0 保证完整渲染 */}
+        <div className="min-w-full flex justify-center py-2">
+        <div className="flex items-center shrink-0" style={{ gap: COL_GAP }}>
 
           {/* Upper R32 */}
           <BracketColumn
@@ -339,9 +341,10 @@ export default function BracketContent() {
           />
 
         </div>
+        </div>
       </div>
 
-      <p className="text-[10px] text-gray-400/50 dark:text-gray-600 mt-2 text-center">
+      <p className="text-[10px] text-gray-400/50 dark:text-gray-600 mt-2 text-center md:hidden">
         左右滑动查看完整赛程
       </p>
     </div>

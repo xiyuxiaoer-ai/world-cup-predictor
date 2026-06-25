@@ -99,7 +99,7 @@ export default function BracketMatchCard({
     const homeKnown = !!homeTla
     const awayKnown = !!awayTla
     return (
-      <div className={`w-20 rounded-lg overflow-hidden shrink-0
+      <div className={`w-20 sm:w-24 rounded-lg overflow-hidden shrink-0
         border border-dashed border-black/[0.08] dark:border-white/[0.09]
         backdrop-blur-[6px]
         ${roundColor ?? 'bg-white/20 dark:bg-white/[0.03]'}`}>
@@ -149,7 +149,7 @@ export default function BracketMatchCard({
   const effectiveAwayTla = awayTbd ? awayTla : match.away_tla
 
   return (
-    <div className={`w-20 rounded-lg overflow-hidden shrink-0
+    <div className={`w-20 sm:w-24 rounded-lg overflow-hidden shrink-0
       border border-white/50 dark:border-white/[0.13]
       backdrop-blur-[8px]
       shadow-sm shadow-black/[0.07] dark:shadow-black/30
