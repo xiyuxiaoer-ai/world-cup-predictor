@@ -27,9 +27,9 @@ type Props = {
 function Flag({ tla, faded }: { tla: string | null | undefined; faded?: boolean }) {
   const url = tla ? getFlagUrl(tla) : null
   if (url) return (
-    <img src={url} alt="" className={`w-[18px] h-[13px] object-cover rounded-[2px] shrink-0 ${faded ? 'opacity-30' : ''}`} />
+    <img src={url} alt="" className={`w-[18px] h-[13px] object-cover rounded-[2px] shrink-0 ${faded ? 'opacity-25' : ''}`} />
   )
-  return <span className="w-[18px] h-[13px] shrink-0 rounded-[2px] bg-white/10 dark:bg-white/5" />
+  return <span className="w-[18px] h-[13px] shrink-0 rounded-[2px] bg-black/[0.06] dark:bg-white/[0.06]" />
 }
 
 function Row({ tla, name, score, winner, loser, unknown }: {
@@ -41,18 +41,22 @@ function Row({ tla, name, score, winner, loser, unknown }: {
   unknown: boolean
 }) {
   return (
-    <div className={`flex items-center gap-[5px] px-[6px] h-[22px] ${winner ? 'bg-amber-400/10' : ''}`}>
+    <div className={`flex items-center gap-[5px] px-[6px] h-[22px] transition-colors ${
+      winner ? 'bg-amber-400/[0.13] dark:bg-amber-500/[0.12]' : ''
+    }`}>
       <Flag tla={tla} faded={loser} />
-      <span className={`flex-1 text-[10px] truncate leading-none min-w-0
-        ${unknown ? 'text-gray-400/50 dark:text-gray-600/80' :
-          loser ? 'text-gray-400/70 dark:text-gray-500 line-through decoration-gray-300/60' :
-          winner ? 'font-semibold text-gray-900 dark:text-white' :
-          'text-gray-700 dark:text-gray-300'}`}>
+      <span className={`flex-1 text-[10px] truncate leading-none min-w-0 transition-colors ${
+        unknown ? 'text-gray-400/40 dark:text-gray-600/70' :
+        loser ? 'text-gray-400/60 dark:text-gray-500/80 line-through decoration-gray-300/50' :
+        winner ? 'font-semibold text-gray-900 dark:text-gray-50' :
+        'text-gray-700 dark:text-gray-300'
+      }`}>
         {name}
       </span>
       {score !== null && (
-        <span className={`text-[11px] font-bold shrink-0 leading-none tabular-nums w-3 text-right
-          ${winner ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500'}`}>
+        <span className={`text-[11px] font-bold shrink-0 leading-none tabular-nums w-3 text-right ${
+          winner ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400/80 dark:text-gray-500'
+        }`}>
           {score}
         </span>
       )}
@@ -64,31 +68,37 @@ export default function BracketMatchCard({
   match, homeLabel = '待定', awayLabel = '待定',
   homeTla, awayTla, homeConfirmed, awayConfirmed,
 }: Props) {
-  // No match data yet — show expected opponents from slot info
   if (!match) {
     const homeDisplay = homeTla ? (getTeamZh(homeTla) ?? homeLabel) : homeLabel
     const awayDisplay = awayTla ? (getTeamZh(awayTla) ?? awayLabel) : awayLabel
     const homeKnown = !!homeTla
     const awayKnown = !!awayTla
     return (
-      <div className="w-20 rounded-md overflow-hidden shrink-0 border border-dashed border-white/20 dark:border-white/10 bg-white/30 dark:bg-gray-800/30">
+      <div className="w-20 rounded-lg overflow-hidden shrink-0
+        border border-dashed border-black/[0.08] dark:border-white/[0.09]
+        bg-white/20 dark:bg-white/[0.03]
+        backdrop-blur-[6px]">
         <div className="flex items-center gap-[5px] px-[6px] h-[22px]">
           <Flag tla={homeTla} />
-          <span className={`flex-1 text-[10px] truncate leading-none ${homeKnown ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300/80 dark:text-gray-700'}`}>
+          <span className={`flex-1 text-[10px] truncate leading-none ${
+            homeKnown ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400/50 dark:text-gray-600/60'
+          }`}>
             {homeDisplay}
           </span>
           {homeKnown && !homeConfirmed && (
-            <span className="text-[9px] text-gray-400/50 shrink-0 leading-none">?</span>
+            <span className="text-[9px] text-gray-400/40 shrink-0 leading-none">?</span>
           )}
         </div>
-        <div className="h-px bg-white/20 dark:bg-white/[0.05]" />
+        <div className="h-px bg-black/[0.05] dark:bg-white/[0.05]" />
         <div className="flex items-center gap-[5px] px-[6px] h-[22px]">
           <Flag tla={awayTla} />
-          <span className={`flex-1 text-[10px] truncate leading-none ${awayKnown ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300/80 dark:text-gray-700'}`}>
+          <span className={`flex-1 text-[10px] truncate leading-none ${
+            awayKnown ? 'text-gray-500 dark:text-gray-400' : 'text-gray-400/50 dark:text-gray-600/60'
+          }`}>
             {awayDisplay}
           </span>
           {awayKnown && !awayConfirmed && (
-            <span className="text-[9px] text-gray-400/50 shrink-0 leading-none">?</span>
+            <span className="text-[9px] text-gray-400/40 shrink-0 leading-none">?</span>
           )}
         </div>
       </div>
@@ -113,9 +123,13 @@ export default function BracketMatchCard({
   const effectiveAwayTla = awayTbd ? awayTla : match.away_tla
 
   return (
-    <div className="w-20 rounded-md overflow-hidden shrink-0 border border-white/25 dark:border-white/[0.12] bg-white/80 dark:bg-gray-800/80 shadow-sm">
+    <div className="w-20 rounded-lg overflow-hidden shrink-0
+      border border-white/50 dark:border-white/[0.13]
+      bg-white/80 dark:bg-gray-800/75
+      backdrop-blur-[8px]
+      shadow-sm shadow-black/[0.07] dark:shadow-black/30">
       <Row tla={effectiveHomeTla} name={homeName} score={finished ? h : null} winner={homeWin} loser={awayWin} unknown={false} />
-      <div className="h-px bg-gray-200/60 dark:bg-white/[0.07]" />
+      <div className="h-px bg-black/[0.05] dark:bg-white/[0.06]" />
       <Row tla={effectiveAwayTla} name={awayName} score={finished ? a : null} winner={awayWin} loser={homeWin} unknown={false} />
     </div>
   )

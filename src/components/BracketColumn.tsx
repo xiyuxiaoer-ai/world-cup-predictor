@@ -46,7 +46,7 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
       {showConnector && (
         <div className="relative shrink-0" style={{ width: CONNECTOR_W, height: totalH }}>
           <div
-            className={`absolute border-t ${flip ? 'border-l' : 'border-r'} border-gray-300/60 dark:border-gray-600/60`}
+            className={`absolute border-t ${flip ? 'border-l' : 'border-r'} border-gray-300/80 dark:border-gray-500/50`}
             style={{
               top: CARD_H / 2,
               [flip ? 'right' : 'left']: 0,
@@ -56,7 +56,7 @@ function MatchPair({ top, bottom, gap, showConnector, flip }: {
             }}
           />
           <div
-            className={`absolute border-b ${flip ? 'border-l' : 'border-r'} border-gray-300/60 dark:border-gray-600/60`}
+            className={`absolute border-b ${flip ? 'border-l' : 'border-r'} border-gray-300/80 dark:border-gray-500/50`}
             style={{
               bottom: CARD_H / 2,
               [flip ? 'right' : 'left']: 0,
