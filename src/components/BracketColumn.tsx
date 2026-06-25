@@ -11,6 +11,8 @@ type SlotItem = {
   awayLabel: string
   homeTla?: string | null
   awayTla?: string | null
+  homeConfirmed?: boolean
+  awayConfirmed?: boolean
 }
 
 type Props = {
@@ -39,8 +41,8 @@ function MatchPair({ top, bottom, gap, showConnector, flip, roundColor }: {
     <div className="flex items-stretch" style={{ flexDirection: flip ? 'row-reverse' : 'row' }}>
       {/* 卡片列 */}
       <div className="flex flex-col" style={{ gap }}>
-        <BracketMatchCard match={top.match} homeLabel={top.homeLabel} awayLabel={top.awayLabel} homeTla={top.homeTla} awayTla={top.awayTla} roundColor={roundColor} />
-        <BracketMatchCard match={bottom.match} homeLabel={bottom.homeLabel} awayLabel={bottom.awayLabel} homeTla={bottom.homeTla} awayTla={bottom.awayTla} roundColor={roundColor} />
+        <BracketMatchCard match={top.match} homeLabel={top.homeLabel} awayLabel={top.awayLabel} homeTla={top.homeTla} awayTla={top.awayTla} homeConfirmed={top.homeConfirmed} awayConfirmed={top.awayConfirmed} roundColor={roundColor} />
+        <BracketMatchCard match={bottom.match} homeLabel={bottom.homeLabel} awayLabel={bottom.awayLabel} homeTla={bottom.homeTla} awayTla={bottom.awayTla} homeConfirmed={bottom.homeConfirmed} awayConfirmed={bottom.awayConfirmed} roundColor={roundColor} />
       </div>
 
       {/* 连线区 */}

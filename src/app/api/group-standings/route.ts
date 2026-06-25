@@ -13,21 +13,27 @@ type TeamStats = {
 
 export async function GET() {
   const supabase = await createClient()
+
+  // 取全部小组赛（含未完赛）用于判断完赛状态
   const { data, error } = await supabase
     .from('matches')
     .select('group_name, home_team, away_team, home_tla, away_tla, home_score_90, away_score_90, status')
     .eq('stage', 'group')
-    .eq('status', 'finished')
 
-  if (error) return NextResponse.json({}, { status: 500 })
+  if (error) return NextResponse.json({ standings: {}, complete: [] }, { status: 500 })
 
-  // 按组计算积分
   const groups: Record<string, Record<string, TeamStats>> = {}
+  const matchCount: Record<string, number> = {}      // 总场数
+  const finishedCount: Record<string, number> = {}   // 已完赛场数
 
   for (const m of data ?? []) {
     if (!m.group_name) continue
     const g = m.group_name as string
     if (!groups[g]) groups[g] = {}
+    matchCount[g] = (matchCount[g] ?? 0) + 1
+
+    if (m.status !== 'finished') continue
+    finishedCount[g] = (finishedCount[g] ?? 0) + 1
 
     const h = m.home_score_90 as number | null
     const a = m.away_score_90 as number | null
@@ -56,14 +62,16 @@ export async function GET() {
     }
   }
 
-  // 排序：积分 → 净胜球 → 进球数
-  const result: Record<string, { team: string; tla: string | null }[]> = {}
+  const standings: Record<string, { team: string; tla: string | null }[]> = {}
   for (const [g, teams] of Object.entries(groups)) {
-    result[g] = Object.values(teams)
+    standings[g] = Object.values(teams)
       .map(t => ({ ...t, gd: t.gf - t.ga }))
       .sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf)
       .map(t => ({ team: t.team, tla: t.tla }))
   }
 
-  return NextResponse.json(result)
+  // 6场全打完才算该组完赛
+  const complete = Object.keys(matchCount).filter(g => (finishedCount[g] ?? 0) >= (matchCount[g] ?? 6))
+
+  return NextResponse.json({ standings, complete })
 }

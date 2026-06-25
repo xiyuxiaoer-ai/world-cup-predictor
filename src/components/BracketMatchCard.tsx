@@ -20,20 +20,22 @@ type Props = {
   awayLabel?: string
   homeTla?: string | null
   awayTla?: string | null
+  homeConfirmed?: boolean
+  awayConfirmed?: boolean
   roundColor?: string
 }
 
-function TeamRow({ name, tla, slotTla, score, isWinner, isLoser, label }: {
-  name: string; tla: string | null; slotTla?: string | null; score: number | null
+function TeamRow({ name, tla, slotTla, slotConfirmed, score, isWinner, isLoser, label }: {
+  name: string; tla: string | null; slotTla?: string | null; slotConfirmed?: boolean; score: number | null
   isWinner: boolean; isLoser: boolean; label: string
 }) {
   const isTbd = name === 'TBD' || !name
-  // 当 DB 里是 TBD 但积分榜已知时，用 slotTla 显示国旗和中文名
   const effectiveTla = isTbd ? (slotTla ?? null) : tla
   const flagUrl = effectiveTla ? getFlagUrl(effectiveTla) : null
   const display = isTbd
     ? (slotTla ? (getTeamZh(slotTla) ?? label) : label)
     : getTeamDisplay(tla, name)
+  const showTentative = isTbd && !!slotTla && !slotConfirmed
 
   return (
     <div className={`flex items-center gap-1.5 px-2 py-[5px] ${isWinner ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}>
@@ -48,6 +50,9 @@ function TeamRow({ name, tla, slotTla, score, isWinner, isLoser, label }: {
           'text-gray-700 dark:text-gray-300'}`}>
         {display}
       </span>
+      {showTentative && (
+        <span className="text-[9px] text-gray-400 dark:text-gray-500 shrink-0">暂定</span>
+      )}
       {score !== null && (
         <span className={`text-[11px] font-bold shrink-0 w-3 text-right
           ${isWinner ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400'}`}>
@@ -58,7 +63,7 @@ function TeamRow({ name, tla, slotTla, score, isWinner, isLoser, label }: {
   )
 }
 
-function LabelRow({ label, tla }: { label: string; tla?: string | null }) {
+function LabelRow({ label, tla, confirmed }: { label: string; tla?: string | null; confirmed?: boolean }) {
   const flagUrl = tla ? getFlagUrl(tla) : null
   const display = tla ? (getTeamZh(tla) ?? label) : label
   const isKnown = !!tla
@@ -71,17 +76,20 @@ function LabelRow({ label, tla }: { label: string; tla?: string | null }) {
       <span className={`text-[11px] truncate leading-tight ${isKnown ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
         {display}
       </span>
+      {isKnown && !confirmed && (
+        <span className="text-[9px] text-gray-400 dark:text-gray-500 shrink-0">暂定</span>
+      )}
     </div>
   )
 }
 
-export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定', homeTla, awayTla, roundColor = '' }: Props) {
+export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定', homeTla, awayTla, homeConfirmed, awayConfirmed, roundColor = '' }: Props) {
   if (!match) {
     return (
       <div className={`w-[130px] rounded-lg border border-dashed border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 ${roundColor}`}>
-        <LabelRow label={homeLabel} tla={homeTla} />
+        <LabelRow label={homeLabel} tla={homeTla} confirmed={homeConfirmed} />
         <div className="h-px bg-gray-100 dark:bg-gray-800" />
-        <LabelRow label={awayLabel} tla={awayTla} />
+        <LabelRow label={awayLabel} tla={awayTla} confirmed={awayConfirmed} />
       </div>
     )
   }
@@ -100,14 +108,14 @@ export default function BracketMatchCard({ match, homeLabel = '待定', awayLabe
         <span className="text-[10px] text-gray-400 dark:text-gray-500">{dateStr}</span>
       </div>
       <TeamRow
-        name={match.home_team} tla={match.home_tla} slotTla={homeTla}
+        name={match.home_team} tla={match.home_tla} slotTla={homeTla} slotConfirmed={homeConfirmed}
         score={finished ? h : null}
         isWinner={homeWin} isLoser={awayWin}
         label={homeLabel}
       />
       <div className="h-px bg-gray-100 dark:bg-gray-800" />
       <TeamRow
-        name={match.away_team} tla={match.away_tla} slotTla={awayTla}
+        name={match.away_team} tla={match.away_tla} slotTla={awayTla} slotConfirmed={awayConfirmed}
         score={finished ? a : null}
         isWinner={awayWin} isLoser={homeWin}
         label={awayLabel}
