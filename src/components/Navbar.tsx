@@ -108,6 +108,7 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
   const isActive = (href: string) => navTarget ? navTarget === href : pathname === href
 
   return (
+    <>
     <nav className="sticky top-0 z-50 glass-nav">
       {/* 顶部进度条：点击导航后立即出现，页面加载完自动消失 */}
       {navigating && (
@@ -232,5 +233,6 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
       <ThirdPlaceModal onClose={() => setShowThirdPlace(false)} />,
       document.body
     )}
+    </>
   )
 }
