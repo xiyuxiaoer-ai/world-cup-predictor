@@ -22,40 +22,37 @@ type Props = {
   awayTla?: string | null
   homeConfirmed?: boolean
   awayConfirmed?: boolean
-  roundColor?: string
 }
 
-function TeamRow({ name, tla, slotTla, slotConfirmed, score, isWinner, isLoser, label }: {
-  name: string; tla: string | null; slotTla?: string | null; slotConfirmed?: boolean; score: number | null
-  isWinner: boolean; isLoser: boolean; label: string
-}) {
-  const isTbd = name === 'TBD' || !name
-  const effectiveTla = isTbd ? (slotTla ?? null) : tla
-  const flagUrl = effectiveTla ? getFlagUrl(effectiveTla) : null
-  const display = isTbd
-    ? (slotTla ? (getTeamZh(slotTla) ?? label) : label)
-    : getTeamDisplay(tla, name)
-  const showTentative = isTbd && !!slotTla && !slotConfirmed
+function Flag({ tla, faded }: { tla: string | null | undefined; faded?: boolean }) {
+  const url = tla ? getFlagUrl(tla) : null
+  if (url) return (
+    <img src={url} alt="" className={`w-[18px] h-[13px] object-cover rounded-[2px] shrink-0 ${faded ? 'opacity-30' : ''}`} />
+  )
+  return <span className="w-[18px] h-[13px] shrink-0 rounded-[2px] bg-white/10 dark:bg-white/5" />
+}
 
+function Row({ tla, name, score, winner, loser, unknown }: {
+  tla: string | null | undefined
+  name: string
+  score: number | null
+  winner: boolean
+  loser: boolean
+  unknown: boolean
+}) {
   return (
-    <div className={`flex items-center gap-1.5 px-2 py-[5px] ${isWinner ? 'bg-amber-50 dark:bg-amber-900/20' : ''}`}>
-      {flagUrl
-        ? <img src={flagUrl} alt="" className={`w-5 h-3.5 object-cover rounded-sm shrink-0 ${isLoser ? 'opacity-40' : ''}`} />
-        : <span className="w-5 h-3.5 shrink-0" />
-      }
-      <span className={`text-[11px] flex-1 truncate leading-tight
-        ${isTbd && !slotTla ? 'text-gray-400 dark:text-gray-500' :
-          isLoser ? 'text-gray-400 dark:text-gray-500 line-through' :
-          isWinner ? 'font-bold text-gray-900 dark:text-gray-100' :
+    <div className={`flex items-center gap-[5px] px-[6px] h-[22px] ${winner ? 'bg-amber-400/10' : ''}`}>
+      <Flag tla={tla} faded={loser} />
+      <span className={`flex-1 text-[10px] truncate leading-none min-w-0
+        ${unknown ? 'text-gray-400/50 dark:text-gray-600/80' :
+          loser ? 'text-gray-400/70 dark:text-gray-500 line-through decoration-gray-300/60' :
+          winner ? 'font-semibold text-gray-900 dark:text-white' :
           'text-gray-700 dark:text-gray-300'}`}>
-        {display}
+        {name}
       </span>
-      {showTentative && (
-        <span className="text-[9px] text-gray-400 dark:text-gray-500 shrink-0">暂定</span>
-      )}
       {score !== null && (
-        <span className={`text-[11px] font-bold shrink-0 w-3 text-right
-          ${isWinner ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400'}`}>
+        <span className={`text-[11px] font-bold shrink-0 leading-none tabular-nums w-3 text-right
+          ${winner ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500'}`}>
           {score}
         </span>
       )}
@@ -63,33 +60,37 @@ function TeamRow({ name, tla, slotTla, slotConfirmed, score, isWinner, isLoser, 
   )
 }
 
-function LabelRow({ label, tla, confirmed }: { label: string; tla?: string | null; confirmed?: boolean }) {
-  const flagUrl = tla ? getFlagUrl(tla) : null
-  const display = tla ? (getTeamZh(tla) ?? label) : label
-  const isKnown = !!tla
-  return (
-    <div className="px-2 py-[5px] flex items-center gap-1.5">
-      {flagUrl
-        ? <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />
-        : <span className="w-5 h-3.5 shrink-0" />
-      }
-      <span className={`text-[11px] truncate leading-tight ${isKnown ? 'text-gray-700 dark:text-gray-300' : 'text-gray-300 dark:text-gray-600'}`}>
-        {display}
-      </span>
-      {isKnown && !confirmed && (
-        <span className="text-[9px] text-gray-400 dark:text-gray-500 shrink-0">暂定</span>
-      )}
-    </div>
-  )
-}
-
-export default function BracketMatchCard({ match, homeLabel = '待定', awayLabel = '待定', homeTla, awayTla, homeConfirmed, awayConfirmed, roundColor = '' }: Props) {
+export default function BracketMatchCard({
+  match, homeLabel = '待定', awayLabel = '待定',
+  homeTla, awayTla, homeConfirmed, awayConfirmed,
+}: Props) {
+  // No match data yet — show expected opponents from slot info
   if (!match) {
+    const homeDisplay = homeTla ? (getTeamZh(homeTla) ?? homeLabel) : homeLabel
+    const awayDisplay = awayTla ? (getTeamZh(awayTla) ?? awayLabel) : awayLabel
+    const homeKnown = !!homeTla
+    const awayKnown = !!awayTla
     return (
-      <div className={`w-[130px] rounded-lg border border-dashed border-gray-200 dark:border-gray-700 overflow-hidden shrink-0 ${roundColor}`}>
-        <LabelRow label={homeLabel} tla={homeTla} confirmed={homeConfirmed} />
-        <div className="h-px bg-gray-100 dark:bg-gray-800" />
-        <LabelRow label={awayLabel} tla={awayTla} confirmed={awayConfirmed} />
+      <div className="w-20 rounded-md overflow-hidden shrink-0 border border-dashed border-white/20 dark:border-white/10 bg-white/30 dark:bg-gray-800/30">
+        <div className="flex items-center gap-[5px] px-[6px] h-[22px]">
+          <Flag tla={homeTla} />
+          <span className={`flex-1 text-[10px] truncate leading-none ${homeKnown ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300/80 dark:text-gray-700'}`}>
+            {homeDisplay}
+          </span>
+          {homeKnown && !homeConfirmed && (
+            <span className="text-[9px] text-gray-400/50 shrink-0 leading-none">?</span>
+          )}
+        </div>
+        <div className="h-px bg-white/20 dark:bg-white/[0.05]" />
+        <div className="flex items-center gap-[5px] px-[6px] h-[22px]">
+          <Flag tla={awayTla} />
+          <span className={`flex-1 text-[10px] truncate leading-none ${awayKnown ? 'text-gray-600 dark:text-gray-400' : 'text-gray-300/80 dark:text-gray-700'}`}>
+            {awayDisplay}
+          </span>
+          {awayKnown && !awayConfirmed && (
+            <span className="text-[9px] text-gray-400/50 shrink-0 leading-none">?</span>
+          )}
+        </div>
       </div>
     )
   }
@@ -100,26 +101,22 @@ export default function BracketMatchCard({ match, homeLabel = '待定', awayLabe
   const homeWin = finished && h !== null && a !== null && h > a
   const awayWin = finished && h !== null && a !== null && a > h
 
-  const dateStr = new Date(match.kickoff_time).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+  const homeTbd = match.home_team === 'TBD' || !match.home_team
+  const awayTbd = match.away_team === 'TBD' || !match.away_team
+  const homeName = homeTbd
+    ? (homeTla ? (getTeamZh(homeTla) ?? homeLabel) : homeLabel)
+    : getTeamDisplay(match.home_tla, match.home_team)
+  const awayName = awayTbd
+    ? (awayTla ? (getTeamZh(awayTla) ?? awayLabel) : awayLabel)
+    : getTeamDisplay(match.away_tla, match.away_team)
+  const effectiveHomeTla = homeTbd ? homeTla : match.home_tla
+  const effectiveAwayTla = awayTbd ? awayTla : match.away_tla
 
   return (
-    <div className={`w-[130px] rounded-lg border border-black/[0.06] dark:border-white/[0.08] overflow-hidden shrink-0 ${roundColor || 'bg-white dark:bg-gray-900'}`}>
-      <div className="px-2 py-0.5 bg-gray-50 dark:bg-gray-800 border-b border-black/[0.04] dark:border-white/[0.06]">
-        <span className="text-[10px] text-gray-400 dark:text-gray-500">{dateStr}</span>
-      </div>
-      <TeamRow
-        name={match.home_team} tla={match.home_tla} slotTla={homeTla} slotConfirmed={homeConfirmed}
-        score={finished ? h : null}
-        isWinner={homeWin} isLoser={awayWin}
-        label={homeLabel}
-      />
-      <div className="h-px bg-gray-100 dark:bg-gray-800" />
-      <TeamRow
-        name={match.away_team} tla={match.away_tla} slotTla={awayTla} slotConfirmed={awayConfirmed}
-        score={finished ? a : null}
-        isWinner={awayWin} isLoser={homeWin}
-        label={awayLabel}
-      />
+    <div className="w-20 rounded-md overflow-hidden shrink-0 border border-white/25 dark:border-white/[0.12] bg-white/80 dark:bg-gray-800/80 shadow-sm">
+      <Row tla={effectiveHomeTla} name={homeName} score={finished ? h : null} winner={homeWin} loser={awayWin} unknown={false} />
+      <div className="h-px bg-gray-200/60 dark:bg-white/[0.07]" />
+      <Row tla={effectiveAwayTla} name={awayName} score={finished ? a : null} winner={awayWin} loser={homeWin} unknown={false} />
     </div>
   )
 }
