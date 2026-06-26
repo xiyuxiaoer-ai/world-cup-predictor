@@ -10,7 +10,7 @@ const STAGE_LABELS: Record<string, string> = {
   quarter_final: '八强', semi_final: '四强', third_place: '季军赛', final: '决赛',
 }
 
-type Tab = 'users' | 'games' | 'predictions' | 'champion' | 'squads'
+type Tab = 'users' | 'games' | 'predictions' | 'champion' | 'squads' | 'sync'
 
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('users')
@@ -30,6 +30,8 @@ export default function AdminPage() {
   const [finalizeResult, setFinalizeResult] = useState<string>('')
   const [syncing, setSyncing] = useState(false)
   const [syncResult, setSyncResult] = useState<string>('')
+  const [syncingMatches, setSyncingMatches] = useState(false)
+  const [syncMatchesResult, setSyncMatchesResult] = useState<string>('')
   const router = useRouter()
 
   useEffect(() => {
@@ -88,6 +90,18 @@ export default function AdminPage() {
     if (res.ok) { setMsg('Game 已删除'); loadData() }
     else setMsg(data.error || '删除失败')
     setConfirmDelete(null)
+  }
+
+  async function handleSyncMatches() {
+    setSyncingMatches(true); setSyncMatchesResult('')
+    const res = await fetch('/api/sync-matches', { method: 'POST' })
+    const data = await res.json()
+    if (res.ok) {
+      setSyncMatchesResult(`同步完成！共 ${data.matches} 场比赛，积分更新 ${data.scored} 条。`)
+    } else {
+      setSyncMatchesResult(`错误：${data.error}`)
+    }
+    setSyncingMatches(false)
   }
 
   async function handleSyncSquads() {
@@ -169,10 +183,10 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          {(['users', 'games', 'predictions', 'champion'] as Tab[]).map(t => (
+          {(['users', 'games', 'predictions', 'champion', 'sync'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${tab === t ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>
-              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : t === 'champion' ? '彩蛋结算' : '球队名单'}
+              {t === 'users' ? `用户管理 (${users.length})` : t === 'games' ? `Game管理 (${games.length})` : t === 'predictions' ? `猜球管理 (${totalPreds})` : t === 'champion' ? '彩蛋结算' : t === 'sync' ? '同步数据' : '球队名单'}
             </button>
           ))}
         </div>
@@ -360,6 +374,58 @@ export default function AdminPage() {
                 className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
               >
                 {finalizing ? '结算中...' : '计算最终得分'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Sync Tab */}
+        {tab === 'sync' && (
+          <div className="space-y-4">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold text-emerald-400 flex items-center gap-2">
+                <svg viewBox="0 0 16 16" width="15" height="15" fill="none"><path d="M2 8a6 6 0 1 0 1.5-3.9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M2 4v4h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                同步比赛数据
+              </h2>
+              <p className="text-sm text-zinc-400">
+                从 football-data.org 拉取最新比赛结果，更新数据库中的小组赛比分、32强/16强对阵球队，并自动计算用户积分。
+              </p>
+              <p className="text-xs text-zinc-500">
+                每天北京时间 14:00（UTC 06:00）自动同步一次。也可在此手动触发。
+              </p>
+              {syncMatchesResult && (
+                <div className={`text-sm rounded-lg p-3 break-all ${!syncMatchesResult.startsWith('错误：') ? 'bg-zinc-800 text-emerald-400' : 'bg-red-950/40 text-red-400'}`}>
+                  {syncMatchesResult}
+                </div>
+              )}
+              <button
+                onClick={handleSyncMatches}
+                disabled={syncingMatches}
+                className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                {syncingMatches ? '同步中...' : '立即同步比赛数据'}
+              </button>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold text-blue-400 flex items-center gap-2">
+                <svg viewBox="0 0 16 16" width="15" height="15" fill="none"><rect x="3" y="1.5" width="10" height="13" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 5h4M6 8h4M6 11h2.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                同步球队名单
+              </h2>
+              <p className="text-sm text-zinc-400">
+                从 football-data.org 拉取 2026 世界杯全部 48 支球队的出场名单（含球员号码、位置、俱乐部）和主教练信息，写入 Supabase。
+              </p>
+              {syncResult && (
+                <div className={`text-sm rounded-lg p-3 break-all ${!syncResult.startsWith('错误：') ? 'bg-zinc-800 text-emerald-400' : 'bg-red-950/40 text-red-400'}`}>
+                  {syncResult}
+                </div>
+              )}
+              <button
+                onClick={handleSyncSquads}
+                disabled={syncing}
+                className="bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                {syncing ? '同步中...' : '同步球队名单'}
               </button>
             </div>
           </div>

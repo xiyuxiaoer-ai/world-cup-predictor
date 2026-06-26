@@ -13,7 +13,21 @@ const STAGE_MAP: Record<string, string> = {
   FINAL: 'final',
 }
 
+// Vercel Cron 每日自动调用（GET + Bearer CRON_SECRET 鉴权）
+export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET
+  const authHeader = request.headers.get('Authorization')
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return runSync()
+}
+
 export async function POST() {
+  return runSync()
+}
+
+async function runSync() {
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
