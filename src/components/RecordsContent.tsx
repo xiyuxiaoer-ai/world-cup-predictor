@@ -296,17 +296,17 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                     />
                                   </div>
                                 ) : (
-                                  <div className="flex items-center justify-center gap-1.5">
+                                  <div className="flex flex-col items-center gap-0.5">
                                     <span className="font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
                                     {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (() => {
                                       const tla = pred.pred_et_winner === match.home_team ? match.home_tla : match.away_tla
                                       const name = getTeamDisplay(tla, pred.pred_et_winner)
-                                      return <span className="text-[10px] text-gray-400 dark:text-gray-500">延→{name}</span>
+                                      return <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-none">延→{name}</span>
                                     })()}
                                     {pred.pred_et_winner === 'draw' && pred.pred_penalty_winner && (() => {
                                       const tla = pred.pred_penalty_winner === match.home_team ? match.home_tla : match.away_tla
                                       const name = getTeamDisplay(tla, pred.pred_penalty_winner)
-                                      return <span className="text-[10px] text-gray-400 dark:text-gray-500">点→{name}</span>
+                                      return <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-none">点→{name}</span>
                                     })()}
                                   </div>
                                 )}
