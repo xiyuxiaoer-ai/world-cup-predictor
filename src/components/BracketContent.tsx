@@ -87,26 +87,15 @@ function buildSlots(
     let homeTla: string | null = null, awayTla: string | null = null
     let homeConfirmed = false, awayConfirmed = false
     if (isR32) {
-      // 优先用 DB 里已确定的队名，TBD 再回退到积分榜推算
       if (match?.home_team && match.home_team !== 'TBD') {
         homeLabel = match.home_team; homeTla = match.home_tla ?? null; homeConfirmed = true
+      } else {
+        homeLabel = 'TBD'
       }
       if (match?.away_team && match.away_team !== 'TBD') {
         awayLabel = match.away_team; awayTla = match.away_tla ?? null; awayConfirmed = true
-      }
-      if (homeLabel === '待定' || awayLabel === '待定') {
-        const entry = Object.entries(R32_SLOTS).find(([, s]) => s.matchNum === num)
-        if (entry) {
-          const apiId = Number(entry[0])
-          if (homeLabel === '待定') {
-            const h = resolveLabel(getSlotLabel(apiId, true), standings)
-            homeLabel = h.label; homeTla = h.tla; homeConfirmed = h.confirmed
-          }
-          if (awayLabel === '待定') {
-            const a = resolveLabel(getSlotLabel(apiId, false), standings)
-            awayLabel = a.label; awayTla = a.tla; awayConfirmed = a.confirmed
-          }
-        }
+      } else {
+        awayLabel = 'TBD'
       }
     }
     return { match, homeLabel, awayLabel, homeTla, awayTla, homeConfirmed, awayConfirmed }
