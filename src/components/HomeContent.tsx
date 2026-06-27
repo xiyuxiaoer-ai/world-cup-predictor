@@ -524,7 +524,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             .map(m => ({
               ...(m as any),
               userPrediction: predictions[m.id]
-                ? { pred_home_score: predictions[m.id].pred_home_score, pred_away_score: predictions[m.id].pred_away_score }
+                ? { pred_home_score: predictions[m.id].pred_home_score, pred_away_score: predictions[m.id].pred_away_score, pred_et_winner: predictions[m.id].pred_et_winner ?? null, pred_penalty_winner: predictions[m.id].pred_penalty_winner ?? null }
                 : null
             }))}
           gameIds={games.map(g => g.id)}

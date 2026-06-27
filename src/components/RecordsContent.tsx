@@ -394,7 +394,7 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
             .map(m => ({
               ...m,
               userPrediction: m.user_prediction
-                ? { pred_home_score: m.user_prediction.pred_home_score, pred_away_score: m.user_prediction.pred_away_score }
+                ? { pred_home_score: m.user_prediction.pred_home_score, pred_away_score: m.user_prediction.pred_away_score, pred_et_winner: m.user_prediction.pred_et_winner ?? null, pred_penalty_winner: m.user_prediction.pred_penalty_winner ?? null }
                 : null
             }))}
           gameIds={games.map(g => g.id)}

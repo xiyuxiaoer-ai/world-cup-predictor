@@ -20,7 +20,7 @@ export interface GroupModalMatch {
   away_score_pen?: number | null
   group_name?: string | null
   stage?: string
-  userPrediction?: { pred_home_score: number | null; pred_away_score: number | null } | null
+  userPrediction?: { pred_home_score: number | null; pred_away_score: number | null; pred_et_winner?: string | null; pred_penalty_winner?: string | null } | null
 }
 
 export default function GroupModal({
@@ -43,7 +43,7 @@ export default function GroupModal({
   const [penaltyWinner, setPenaltyWinner] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
-  const [localPredictions, setLocalPredictions] = useState<Record<string, { pred_home_score: number; pred_away_score: number }>>({})
+  const [localPredictions, setLocalPredictions] = useState<Record<string, { pred_home_score: number; pred_away_score: number; pred_et_winner?: string | null; pred_penalty_winner?: string | null }>>({})
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
 
   const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
@@ -78,7 +78,12 @@ export default function GroupModal({
       if (anyOk) {
         setLocalPredictions(prev => ({
           ...prev,
-          [predictingMatch.id]: { pred_home_score: parseInt(predHome), pred_away_score: parseInt(predAway) },
+          [predictingMatch.id]: {
+            pred_home_score: parseInt(predHome),
+            pred_away_score: parseInt(predAway),
+            pred_et_winner: showEtSelect ? (etWinner || null) : null,
+            pred_penalty_winner: showPenaltySelect ? (penaltyWinner || null) : null,
+          },
         }))
         setPredictingMatch(null)
         onPredictionSaved?.()
@@ -301,14 +306,22 @@ export default function GroupModal({
                           <span className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {m.home_score_pen}–{m.away_score_pen}</span>
                         )}
                         {effectivePrediction && (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}</span>
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">
+                            我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}
+                            {effectivePrediction.pred_et_winner && effectivePrediction.pred_et_winner !== 'draw' && ` 延→${getTeamDisplay(effectivePrediction.pred_et_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_et_winner)}`}
+                            {effectivePrediction.pred_et_winner === 'draw' && effectivePrediction.pred_penalty_winner && ` 点→${getTeamDisplay(effectivePrediction.pred_penalty_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_penalty_winner)}`}
+                          </span>
                         )}
                       </>
                     ) : (
                       <>
                         <span className="text-gray-300 dark:text-gray-600 text-sm font-bold leading-tight">vs</span>
                         {effectivePrediction ? (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}</span>
+                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">
+                            我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}
+                            {effectivePrediction.pred_et_winner && effectivePrediction.pred_et_winner !== 'draw' && ` 延→${getTeamDisplay(effectivePrediction.pred_et_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_et_winner)}`}
+                            {effectivePrediction.pred_et_winner === 'draw' && effectivePrediction.pred_penalty_winner && ` 点→${getTeamDisplay(effectivePrediction.pred_penalty_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_penalty_winner)}`}
+                          </span>
                         ) : (
                           <button
                             onClick={() => { setPredictingMatch(m); setPredHome(''); setPredAway(''); setSaveError('') }}
