@@ -30,6 +30,10 @@ async function runSql(supabaseUrl: string, serviceRoleKey: string, sql: string):
   return res.ok
 }
 
+export async function GET(request: Request) {
+  return POST(request)
+}
+
 export async function POST(request: Request) {
   const sp = new URL(request.url).searchParams
 
