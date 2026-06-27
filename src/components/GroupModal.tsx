@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { getFlagUrl, getTeamDisplay, getTeamJa } from '@/lib/flags'
 import TeamHistoryModal from './TeamHistoryModal'
+import { ScorePicker } from './ScorePicker'
 
 export interface GroupModalMatch {
   id: string
@@ -39,6 +40,8 @@ export default function GroupModal({
   const [predictingMatch, setPredictingMatch] = useState<GroupModalMatch | null>(null)
   const [predHome, setPredHome] = useState('')
   const [predAway, setPredAway] = useState('')
+  const [pickerHome, setPickerHome] = useState(0)
+  const [pickerAway, setPickerAway] = useState(0)
   const [etWinner, setEtWinner] = useState('')
   const [penaltyWinner, setPenaltyWinner] = useState('')
   const [saving, setSaving] = useState(false)
@@ -57,19 +60,24 @@ export default function GroupModal({
 
   const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
   const isKnockout = !!predictingMatch && KNOCKOUT_STAGES.includes(predictingMatch.stage ?? '')
-  const isDraw = predHome !== '' && predAway !== '' && predHome === predAway
+  const isDraw = (predHome !== '' && predAway !== '' && predHome === predAway) || (pickerHome === pickerAway)
   const showEtSelect = isKnockout && isDraw
   const showPenaltySelect = showEtSelect && etWinner === 'draw'
 
   async function handleSave() {
-    if (!predictingMatch || predHome === '' || predAway === '') return
+    if (!predictingMatch) return
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+    const homeScore = isMobile ? pickerHome : parseInt(predHome)
+    const awayScore = isMobile ? pickerAway : parseInt(predAway)
+    if (!isMobile && (predHome === '' || predAway === '')) return
+    if (isNaN(homeScore) || isNaN(awayScore)) return
     setSaving(true)
     setSaveError('')
     try {
       const body = {
         match_id: predictingMatch.id,
-        pred_home_score: parseInt(predHome),
-        pred_away_score: parseInt(predAway),
+        pred_home_score: homeScore,
+        pred_away_score: awayScore,
         pred_et_winner: showEtSelect ? (etWinner || null) : null,
         pred_penalty_winner: showPenaltySelect ? (penaltyWinner || null) : null,
       }
@@ -88,8 +96,8 @@ export default function GroupModal({
         setLocalPredictions(prev => ({
           ...prev,
           [predictingMatch.id]: {
-            pred_home_score: parseInt(predHome),
-            pred_away_score: parseInt(predAway),
+            pred_home_score: homeScore,
+            pred_away_score: awayScore,
             pred_et_winner: showEtSelect ? (etWinner || null) : null,
             pred_penalty_winner: showPenaltySelect ? (penaltyWinner || null) : null,
           },
@@ -165,8 +173,23 @@ export default function GroupModal({
                 </div>
               </div>
 
-              {/* 比分输入 */}
-              <div className="flex items-center gap-4">
+              {/* 比分输入 — 手机：滚轮 / 桌面：数字框 */}
+              {/* Mobile picker */}
+              <div className="flex items-center gap-3 md:hidden">
+                <ScorePicker
+                  key={`home-${predictingMatch.id}`}
+                  value={pickerHome}
+                  onChange={setPickerHome}
+                />
+                <span className="text-gray-400 dark:text-gray-500 text-3xl font-light">–</span>
+                <ScorePicker
+                  key={`away-${predictingMatch.id}`}
+                  value={pickerAway}
+                  onChange={setPickerAway}
+                />
+              </div>
+              {/* Desktop inputs — unchanged */}
+              <div className="hidden md:flex items-center gap-4">
                 <input
                   type="number" min="0" max="20" value={predHome}
                   onChange={e => setPredHome(e.target.value)}
@@ -333,7 +356,7 @@ export default function GroupModal({
                           </span>
                         ) : (
                           <button
-                            onClick={() => { setPredictingMatch(m); setPredHome(''); setPredAway(''); setSaveError('') }}
+                            onClick={() => { setPredictingMatch(m); setPredHome(''); setPredAway(''); setPickerHome(0); setPickerAway(0); setSaveError('') }}
                             className="text-xs text-amber-500 hover:text-amber-400 font-medium whitespace-nowrap leading-tight mt-0.5"
                           >
                             待猜球
