@@ -44,5 +44,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.png$|api/sync-matches|api/init-squads-once).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.png$|api/sync-matches|api/init-squads-once|api/admin/repopulate-squads).*)'],
 }
