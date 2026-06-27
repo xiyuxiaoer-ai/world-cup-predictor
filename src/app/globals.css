@@ -488,6 +488,20 @@ button, a, [role="button"], select, input, textarea, label {
   animation: final-glow 2.8s ease-in-out infinite;
 }
 
+/* ── Score Picker 选中带：自动适配亮/暗色 ── */
+.picker-selection-band {
+  background: rgba(0, 0, 0, 0.055);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.13);
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.13);
+}
+@media (prefers-color-scheme: dark) {
+  .picker-selection-band {
+    background: rgba(255, 255, 255, 0.09);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.22);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.22);
+  }
+}
+
 /* ── 展开面板：从顶部优雅滑下 ── */
 @keyframes slide-down {
   from { opacity: 0; transform: translateY(-12px) scale(0.97); }

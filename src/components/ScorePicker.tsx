@@ -29,7 +29,6 @@ export function ScorePicker({ value, onChange }: Props) {
         dist < 1.5 ? 1 - (dist - 0.5) * 0.58 :
         dist < 2.5 ? 0.42 - (dist - 1.5) * 0.28 :
         0.08
-      // Only animate transform + opacity — both GPU-composited, zero layout cost
       const scale =
         dist < 0.5 ? 1 :
         dist < 1.5 ? 1 - (dist - 0.5) * 0.2 :
@@ -49,13 +48,11 @@ export function ScorePicker({ value, onChange }: Props) {
     lastValue.current = value
 
     const onScroll = () => {
-      // RAF ensures we run once per frame max
       cancelAnimationFrame(rafRef.current)
       rafRef.current = requestAnimationFrame(() => {
         const frac = el.scrollTop / ITEM_H
         applyStyles(frac)
 
-        // Notify parent only after scrolling stops
         if (stopTimer.current) clearTimeout(stopTimer.current)
         stopTimer.current = setTimeout(() => {
           const snapped = Math.min(9, Math.max(0, Math.round(el.scrollTop / ITEM_H)))
@@ -67,7 +64,6 @@ export function ScorePicker({ value, onChange }: Props) {
       })
     }
 
-    // passive: true is critical — lets the browser scroll without waiting for JS
     el.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       el.removeEventListener('scroll', onScroll)
@@ -76,7 +72,7 @@ export function ScorePicker({ value, onChange }: Props) {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Sync when parent changes value (e.g. sheet reopens with existing score)
+  // Sync when parent changes value
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -95,27 +91,17 @@ export function ScorePicker({ value, onChange }: Props) {
       className="relative select-none overflow-hidden rounded-[14px]"
       style={{ width: 80, height: totalH }}
     >
-      {/* Selection band */}
+      {/* Selection highlight band — colors adapt via CSS class */}
       <div
-        className="absolute left-0 right-0 z-10 pointer-events-none"
-        style={{
-          top: SIDE * ITEM_H,
-          height: ITEM_H,
-          background: 'rgba(255,255,255,0.08)',
-          borderTop: '0.5px solid rgba(255,255,255,0.20)',
-          borderBottom: '0.5px solid rgba(255,255,255,0.20)',
-        }}
+        className="picker-selection-band absolute left-0 right-0 z-10 pointer-events-none"
+        style={{ top: SIDE * ITEM_H, height: ITEM_H }}
       />
 
-      {/* Scroll container — scroll-snap handles native momentum, no JS snap logic */}
+      {/* Scroll container */}
       <div
         ref={scrollRef}
         className="absolute inset-0 overflow-y-scroll picker-no-scrollbar"
-        style={{
-          scrollSnapType: 'y mandatory',
-          // Promote to GPU layer so scroll composites without main-thread involvement
-          willChange: 'scroll-position',
-        }}
+        style={{ scrollSnapType: 'y mandatory', willChange: 'scroll-position' }}
       >
         {Array.from({ length: SIDE }, (_, i) => <div key={`t${i}`} style={{ height: ITEM_H }} />)}
 
@@ -130,12 +116,11 @@ export function ScorePicker({ value, onChange }: Props) {
               style={{
                 fontSize: 32,
                 fontWeight: 600,
-                color: 'white',
+                /* inherit color from parent so sheet controls it per mode */
+                color: 'inherit',
                 letterSpacing: '-0.02em',
                 display: 'block',
-                // Let browser composite these on GPU without layout recalc
                 willChange: 'transform, opacity',
-                // Initial visual state — applyStyles() will set correctly after mount
                 opacity: d === value ? 1 : 0.3,
                 transform: d === value ? 'scale(1)' : 'scale(0.8)',
               }}
@@ -148,14 +133,20 @@ export function ScorePicker({ value, onChange }: Props) {
         {Array.from({ length: SIDE }, (_, i) => <div key={`b${i}`} style={{ height: ITEM_H }} />)}
       </div>
 
-      {/* Fade overlays — colour inherited from --picker-fade on parent */}
+      {/* Fade overlays — color inherited from --picker-fade on parent */}
       <div
         className="absolute top-0 left-0 right-0 z-20 pointer-events-none"
-        style={{ height: ITEM_H * SIDE, background: 'linear-gradient(to bottom, var(--picker-fade) 0%, transparent 100%)' }}
+        style={{
+          height: ITEM_H * SIDE,
+          background: 'linear-gradient(to bottom, var(--picker-fade) 0%, transparent 100%)',
+        }}
       />
       <div
         className="absolute bottom-0 left-0 right-0 z-20 pointer-events-none"
-        style={{ height: ITEM_H * SIDE, background: 'linear-gradient(to top, var(--picker-fade) 0%, transparent 100%)' }}
+        style={{
+          height: ITEM_H * SIDE,
+          background: 'linear-gradient(to top, var(--picker-fade) 0%, transparent 100%)',
+        }}
       />
     </div>
   )
