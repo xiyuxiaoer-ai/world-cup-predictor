@@ -32,6 +32,8 @@ export default function AdminPage() {
   const [syncResult, setSyncResult] = useState<string>('')
   const [syncingMatches, setSyncingMatches] = useState(false)
   const [syncMatchesResult, setSyncMatchesResult] = useState<string>('')
+  const [repopulating, setRepopulating] = useState(false)
+  const [repopulateResult, setRepopulateResult] = useState<string>('')
   const router = useRouter()
 
   useEffect(() => {
@@ -115,6 +117,19 @@ export default function AdminPage() {
       setSyncResult(`错误：${data.error}`)
     }
     setSyncing(false)
+  }
+
+  async function handleRepopulateSquads() {
+    if (!confirm('将重新从 football2026tips.com 抓取全部 48 队球员名单（含照片 URL），并覆盖 DB。首次运行会自动给表加 photo_url 列。确定？')) return
+    setRepopulating(true); setRepopulateResult('')
+    const res = await fetch('/api/admin/repopulate-squads', { method: 'POST' })
+    const data = await res.json()
+    if (res.ok) {
+      setRepopulateResult(`完成！${data.ok}/${data.ok + data.failed} 支球队成功，共 ${data.totalPhotos} 张球员照片。`)
+    } else {
+      setRepopulateResult(`错误：${data.error}`)
+    }
+    setRepopulating(false)
   }
 
   async function handleFinalize() {
@@ -457,6 +472,28 @@ export default function AdminPage() {
                 className="bg-blue-500 hover:bg-blue-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
               >
                 {syncing ? '同步中...' : '同步球队名单'}
+              </button>
+            </div>
+
+            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <h2 className="text-lg font-bold text-amber-400 flex items-center gap-2">
+                <svg viewBox="0 0 16 16" width="15" height="15" fill="none"><circle cx="8" cy="6" r="3.5" stroke="currentColor" strokeWidth="1.3"/><path d="M2 14c0-3.3 2.7-5 6-5s6 1.7 6 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+                抓取球员照片（football2026tips）
+              </h2>
+              <p className="text-sm text-zinc-400">
+                从 football2026tips.com 重新抓取 48 支球队名单，同时获取球员头像 URL，写入 DB 的 photo_url 字段。首次运行会自动添加该列（约 3-5 分钟）。
+              </p>
+              {repopulateResult && (
+                <div className={`text-sm rounded-lg p-3 break-all ${!repopulateResult.startsWith('错误：') ? 'bg-zinc-800 text-emerald-400' : 'bg-red-950/40 text-red-400'}`}>
+                  {repopulateResult}
+                </div>
+              )}
+              <button
+                onClick={handleRepopulateSquads}
+                disabled={repopulating}
+                className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              >
+                {repopulating ? '抓取中...' : '抓取球员照片'}
               </button>
             </div>
           </div>

@@ -25,6 +25,7 @@ interface PlayerRow {
   player_name: string
   player_name_zh: string | null
   club: string | null
+  photo_url: string | null
 }
 
 export function parseSquadHtml(html: string, tla: string): PlayerRow[] {
@@ -55,6 +56,10 @@ export function parseSquadHtml(html: string, tla: string): PlayerRow[] {
     const numM = pHtml.match(/squad-num(?:tag|fb)[^>]*>(\d+)/)
     const shirt_number = numM ? parseInt(numM[1]) : null
 
+    // Photo URL: /players/[slug].jpg or .png
+    const imgM = pHtml.match(/<img src="(\/players\/[^"]+)"/)
+    const photo_url = imgM ? `https://football2026tips.com${imgM[1]}` : null
+
     // Chinese name: img alt (with photo) OR font-weight:700 span (no photo)
     const zhM = pHtml.match(/alt="([^"]+)"/)
       ?? pHtml.match(/font-weight:700[^>]*>([一-鿿][^<]*)</)
@@ -79,7 +84,7 @@ export function parseSquadHtml(html: string, tla: string): PlayerRow[] {
       ?.trim() ?? ''
     const club = clubRaw.split('·')[0]?.trim() || null
 
-    players.push({ tla, shirt_number, position, player_name, player_name_zh, club })
+    players.push({ tla, shirt_number, position, player_name, player_name_zh, club, photo_url })
   }
 
   return players
@@ -106,7 +111,7 @@ export async function GET(request: Request) {
   // 1. Try Supabase DB first
   const { data: dbData } = await admin
     .from('team_squads')
-    .select('shirt_number, position, player_name, player_name_zh, club')
+    .select('shirt_number, position, player_name, player_name_zh, club, photo_url')
     .eq('tla', tla)
     .order('shirt_number', { ascending: true, nullsFirst: false })
 

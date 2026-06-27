@@ -497,8 +497,33 @@ function NewsList({ items }: { items: any[] }) {
   )
 }
 
+/* ─── Player Avatar ─── */
+function PlayerAvatar({ photoUrl, name }: { photoUrl?: string | null; name: string }) {
+  const [err, setErr] = React.useState(false)
+  if (photoUrl && !err) {
+    return (
+      <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-gray-200/60 dark:ring-white/10 bg-gray-100 dark:bg-gray-800">
+        <img
+          src={photoUrl}
+          alt={name}
+          className="w-full h-full object-cover object-top"
+          onError={() => setErr(true)}
+        />
+      </div>
+    )
+  }
+  return (
+    <div className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200/60 dark:ring-white/10">
+      <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500">
+        {name?.[0]?.toUpperCase() ?? '?'}
+      </span>
+    </div>
+  )
+}
+
 /* ─── Squad List ─── */
 function SquadList({ squad }: { squad: any[] }) {
+  const hasPhotos = squad.some((p: any) => p.photo_url)
   const grouped: Record<string, any[]> = {}
   for (const p of squad) {
     const pos = p.position || 'FWD'
@@ -517,19 +542,28 @@ function SquadList({ squad }: { squad: any[] }) {
           </div>
           <div className="divide-y divide-white/30 dark:divide-white/10">
             {grouped[pos].map((p: any, idx: number) => (
-              <div key={idx} className="flex items-center gap-3 px-5 py-2.5">
+              <div key={idx} className="flex items-center gap-3 px-4 py-2">
                 {p.shirt_number != null
                   ? <span className="text-xs font-mono text-gray-400 dark:text-gray-500 w-5 text-right shrink-0">{p.shirt_number}</span>
                   : <span className="w-5 shrink-0" />}
+                {hasPhotos && (
+                  <PlayerAvatar photoUrl={p.photo_url} name={p.player_name_zh || p.player_name} />
+                )}
                 <div className="flex-1 min-w-0">
-                  <span className="text-sm text-gray-800 dark:text-gray-200">{p.player_name_zh || p.player_name}</span>
+                  <div className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight">
+                    {p.player_name_zh || p.player_name}
+                  </div>
                   {p.player_name_zh && p.player_name !== p.player_name_zh && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500 ml-1.5">{p.player_name}</span>
+                    <div className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight">
+                      {p.player_name}
+                    </div>
+                  )}
+                  {p.club && (
+                    <div className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight truncate">
+                      {p.club}
+                    </div>
                   )}
                 </div>
-                {p.club && (
-                  <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0 truncate max-w-24">{p.club}</span>
-                )}
               </div>
             ))}
           </div>
