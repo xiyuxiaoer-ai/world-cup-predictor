@@ -9,8 +9,6 @@
   :root {
     --background: #111827;
     --foreground: #F9FAFB;
-    --picker-bg-top: rgba(17,24,39,0.95);
-    --picker-bg-bot: rgba(17,24,39,0.95);
   }
 }
 
@@ -92,16 +90,6 @@ button, a, [role="button"], select, input, textarea, label {
   50%       { box-shadow: 0 0 12px 4px rgba(160,82,30,0.38); }
 }
 .animate-bronze-glow { animation: bronze-glow 2.8s ease-in-out infinite; }
-
-/* ── Score Picker (iOS-style drum roll) ── */
-.picker-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.picker-no-scrollbar::-webkit-scrollbar { display: none; }
-
-/* CSS vars for picker fade gradient — set per-theme in the modal wrapper */
-:root {
-  --picker-bg-top: rgba(255,255,255,0.93);
-  --picker-bg-bot: rgba(255,255,255,0.93);
-}
 
 /* ── 即将锁定 ── */
 @keyframes urgent-pulse {
