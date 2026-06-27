@@ -76,14 +76,17 @@ export function ScorePickerSheet({ initialHome, initialAway, hadScore, onConfirm
 
       {/* Sheet */}
       <div
-        className="fixed inset-x-0 bottom-0 z-50 animate-sheet-up"
+        className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+      >
+      <div
+        className="pointer-events-auto w-full mx-5 max-w-xs animate-spring-in"
         style={{
           background: c.bg,
           backdropFilter: c.blur,
           WebkitBackdropFilter: c.blur,
-          borderTop: c.border,
-          borderRadius: '20px 20px 0 0',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
+          border: c.border,
+          borderRadius: '20px',
+          paddingBottom: 16,
           color: c.text,
           /* picker fade matches sheet bg so gradient blends perfectly */
           ['--picker-fade' as string]: c.bg,
@@ -135,6 +138,7 @@ export function ScorePickerSheet({ initialHome, initialAway, hadScore, onConfirm
           <span className="text-2xl font-light" style={{ color: c.dash }}>–</span>
           <ScorePicker value={away} onChange={handleAwayChange} />
         </div>
+      </div>
       </div>
     </>
   )
