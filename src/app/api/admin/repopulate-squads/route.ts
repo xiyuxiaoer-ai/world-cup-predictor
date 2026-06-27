@@ -31,13 +31,19 @@ async function runSql(supabaseUrl: string, serviceRoleKey: string, sql: string):
 }
 
 export async function POST(request: Request) {
-  const supabase = await createServerClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '未登录' }, { status: 401 })
-  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
-  if (!profile?.is_admin) return NextResponse.json({ error: '无权限' }, { status: 403 })
-
   const sp = new URL(request.url).searchParams
+
+  // 支持两种鉴权方式：1) admin session  2) ?token=service_role_key
+  const tokenParam = sp.get('token')
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  if (tokenParam !== serviceRoleKey) {
+    const supabase = await createServerClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: '未登录或 token 错误' }, { status: 401 })
+    const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+    if (!profile?.is_admin) return NextResponse.json({ error: '无权限' }, { status: 403 })
+  }
+
   const tlaFilter = sp.get('tla')?.toUpperCase()
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
