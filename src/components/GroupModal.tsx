@@ -124,7 +124,7 @@ export default function GroupModal({
 
         {/* 猜分浮层 */}
         {predictingMatch && (
-          <div className="absolute inset-0 z-10 flex flex-col rounded-2xl" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(20px)' }}>
+          <div className="absolute inset-0 z-10 flex flex-col rounded-2xl bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
               <button onClick={() => { setPredictingMatch(null); setSaveError(''); setEtWinner(''); setPenaltyWinner('') }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors tap-scale">
                 <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
