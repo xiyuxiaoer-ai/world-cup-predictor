@@ -210,7 +210,7 @@ export default function GroupModal({
               <button
                 onClick={handleSave}
                 disabled={saving || predHome === '' || predAway === '' || (showEtSelect && !etWinner) || (showPenaltySelect && !penaltyWinner)}
-                className="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-200 dark:disabled:bg-gray-700 text-white disabled:text-gray-400 rounded-xl font-semibold transition-colors"
+                className="w-full py-3 rounded-xl font-semibold text-sm btn-gold-primary tap-scale"
               >
                 {saving ? '保存中...' : '确认猜测'}
               </button>
