@@ -287,6 +287,7 @@ function PredictionCard({
         <ScorePickerSheet
           initialHome={mobileHome !== '' ? parseInt(mobileHome) : 0}
           initialAway={mobileAway !== '' ? parseInt(mobileAway) : 0}
+          hadScore={mobileHome !== ''}
           onConfirm={handleSheetConfirm}
           onClose={() => setShowSheet(false)}
         />
