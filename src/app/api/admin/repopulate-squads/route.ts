@@ -39,8 +39,7 @@ export async function POST(request: Request) {
 
   // 支持两种鉴权方式：1) admin session  2) ?token=service_role_key
   const tokenParam = sp.get('token')
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-  if (tokenParam !== serviceRoleKey) {
+  if (tokenParam !== process.env.SUPABASE_SERVICE_ROLE_KEY!) {
     const supabase = await createServerClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: '未登录或 token 错误' }, { status: 401 })
