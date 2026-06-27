@@ -7,7 +7,6 @@ import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
 import TeamName from './TeamName'
-import { ScorePicker } from './ScorePicker'
 
 const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
@@ -62,10 +61,6 @@ function PredictionCard({
 }) {
   const homeRef = useRef<HTMLInputElement>(null)
   const awayRef = useRef<HTMLInputElement>(null)
-  const initHome = prediction?.pred_home_score ?? 0
-  const initAway = prediction?.pred_away_score ?? 0
-  const [pickerHome, setPickerHome] = useState(initHome)
-  const [pickerAway, setPickerAway] = useState(initAway)
   const [isDraw, setIsDraw] = useState(
     prediction?.pred_home_score !== undefined &&
     prediction?.pred_away_score !== undefined &&
@@ -82,8 +77,6 @@ function PredictionCard({
     const a = awayRef.current?.value ?? ''
     setIsDraw(h !== '' && a !== '' && h === a)
   }
-  function handlePickerHome(v: number) { setPickerHome(v); setIsDraw(v === pickerAway) }
-  function handlePickerAway(v: number) { setPickerAway(v); setIsDraw(pickerHome === v) }
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
   const [showMap, setShowMap] = useState(false)
 
@@ -98,9 +91,8 @@ function PredictionCard({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setError(''); setLoading(true)
-    const isMobile = window.matchMedia('(max-width: 767px)').matches
-    const h = isMobile ? pickerHome : parseInt(homeRef.current?.value ?? '')
-    const a = isMobile ? pickerAway : parseInt(awayRef.current?.value ?? '')
+    const h = parseInt(homeRef.current?.value ?? '')
+    const a = parseInt(awayRef.current?.value ?? '')
     if (isNaN(h) || isNaN(a) || h < 0 || a < 0) { setError('请输入有效比分'); setLoading(false); return }
     const body = {
       match_id: match.id,
@@ -200,27 +192,7 @@ function PredictionCard({
         </div>
       </div>
 
-      {/* Mobile: team names + pickers stacked */}
-      <div className="md:hidden space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 flex-1 justify-end">
-            <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
-            {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-          </div>
-          <span className="text-gray-300 dark:text-gray-600 text-xs font-bold shrink-0">vs</span>
-          <div className="flex items-center gap-1.5 flex-1 justify-start">
-            {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
-            <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
-          </div>
-        </div>
-        <div className="flex items-center justify-center gap-3">
-          <ScorePicker value={pickerHome} onChange={handlePickerHome} />
-          <span className="text-gray-400 dark:text-gray-500 text-3xl font-light">–</span>
-          <ScorePicker value={pickerAway} onChange={handlePickerAway} />
-        </div>
-      </div>
-      {/* Desktop: original single-row layout */}
-      <div className="hidden md:flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <div className="flex items-center gap-1.5 flex-1 justify-end">
           <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
