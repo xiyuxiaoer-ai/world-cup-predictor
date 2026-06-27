@@ -20,6 +20,4 @@ jobs:
             cd /var/www/world-cup-predictor
             git checkout -- .
             git pull
-            rm -rf .next
-            npm run build
-            pm2 restart wcp
+            npm run build && pm2 restart wcp || echo "BUILD FAILED, keeping old version running"
