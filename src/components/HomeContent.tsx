@@ -352,7 +352,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
         </div>
         {/* 展开的操作按钮 */}
         {showGameActions && (
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap animate-slide-down">
             <button
               onClick={() => setShowCreateModal(true)}
               className="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 bg-transparent hover:bg-white/40 dark:hover:bg-white/[0.06] border border-gray-300/60 dark:border-white/[0.12] hover:border-gray-400/70 dark:hover:border-white/20 px-3 py-1.5 rounded-lg transition-all tap-scale"
@@ -395,7 +395,23 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
       </div>
 
       {loading ? (
-        <div className="text-gray-400 dark:text-gray-500 text-sm">加载中...</div>
+        <div className="space-y-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="glass rounded-xl px-3 py-3 space-y-2 animate-stagger-in"
+              style={{ animationDelay: `${i * 60}ms` }}>
+              <div className="flex justify-between">
+                <div className="skeleton-pulse h-3 w-24 rounded-full" />
+                <div className="skeleton-pulse h-3 w-16 rounded-full" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="skeleton-pulse h-5 flex-1 rounded-full" />
+                <div className="skeleton-pulse h-5 w-12 rounded-full" />
+                <div className="skeleton-pulse h-5 flex-1 rounded-full" />
+              </div>
+              <div className="skeleton-pulse h-3 w-32 rounded-full" />
+            </div>
+          ))}
+        </div>
       ) : (
         <>
           {/* Top: Todo + Leaderboard */}
@@ -479,7 +495,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
                           <span className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
                         </button>
                         {finishedExpanded && (
-                          <div className="space-y-2 mt-1">
+                          <div className="space-y-2 mt-1 animate-slide-down">
                             {finished.map((match, i) => renderMatch(match, i))}
                           </div>
                         )}

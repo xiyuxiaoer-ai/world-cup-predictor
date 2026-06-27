@@ -74,7 +74,19 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
       .then(data => { setBreakdown(Array.isArray(data) ? data : []); setBdLoading(false) })
   }
 
-  if (loading) return <div className="text-gray-400 dark:text-gray-500 text-sm p-4">加载中...</div>
+  if (loading) return (
+    <div className="glass rounded-xl overflow-hidden">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-black/[0.04] dark:border-white/[0.04] animate-stagger-in"
+          style={{ animationDelay: `${i * 55}ms` }}>
+          <div className="skeleton-pulse w-6 h-6 rounded-full shrink-0" />
+          <div className="skeleton-pulse w-7 h-7 rounded-full shrink-0" />
+          <div className="skeleton-pulse h-3.5 flex-1 rounded-full" />
+          <div className="skeleton-pulse h-3.5 w-14 rounded-full shrink-0" />
+        </div>
+      ))}
+    </div>
+  )
 
   const sorted = [...entries].sort((a, b) => {
     if (b.total_points !== a.total_points) return b.total_points - a.total_points
@@ -103,7 +115,8 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                 <button
                   key={entry.user_id}
                   onClick={() => openBreakdown(entry)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-all hover:bg-white/40 dark:hover:bg-white/5 cursor-pointer text-left ${rowStyle}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-all hover:bg-white/40 dark:hover:bg-white/5 cursor-pointer text-left animate-stagger-in touch-press ${rowStyle}`}
+                  style={{ animationDelay: `${60 + i * 38}ms` }}
                 >
                   <span className="w-6 text-center shrink-0">
                     {isTop3
@@ -208,7 +221,8 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                     const points = item.points_earned
                     const groupLabel = m.group_name ? ` ${m.group_name.replace('GROUP_', '').replace('_', ' ')}组` : ''
                     return (
-                      <div key={idx} className="flex items-center gap-3 px-5 py-3">
+                      <div key={idx} className="flex items-center gap-3 px-5 py-3 animate-stagger-in"
+                        style={{ animationDelay: `${idx * 30}ms` }}>
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                             {homeName} vs {awayName}

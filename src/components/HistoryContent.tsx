@@ -66,11 +66,27 @@ export default function HistoryContent({ games }: { games: GameWithRole[] }) {
       </div>
 
       {loading ? (
-        <p className="text-gray-500 dark:text-gray-400 text-sm">加载中...</p>
+        <div className="space-y-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="glass rounded-xl p-4 space-y-3 animate-stagger-in"
+              style={{ animationDelay: `${i * 55}ms` }}>
+              <div className="flex justify-between">
+                <div className="skeleton-pulse h-3 w-20 rounded-full" />
+                <div className="skeleton-pulse h-3 w-14 rounded-full" />
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="skeleton-pulse h-4 flex-1 rounded-full" />
+                <div className="skeleton-pulse h-5 w-12 rounded-full" />
+                <div className="skeleton-pulse h-4 flex-1 rounded-full" />
+              </div>
+              <div className="skeleton-pulse h-3 w-28 rounded-full" />
+            </div>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400 text-sm">暂无记录</p>
       ) : (
-        <div className="space-y-3">
+        <div key={filter} className="space-y-3 animate-cross-fade">
           {filtered.map((pred, idx) => {
             const match = pred.matches
             const isFinished = match?.status === 'finished'

@@ -43,8 +43,8 @@ function IconTrophySm() {
 
 const RANK_CARD_STYLES = [
   'bg-gradient-to-br from-amber-400/[0.14] to-transparent dark:from-amber-400/[0.09] border-l-[3px] border-amber-400/80 animate-gold-pulse',
-  'bg-gradient-to-br from-slate-300/[0.22] to-transparent dark:from-slate-500/[0.13] border-l-[3px] border-slate-400/70 dark:border-slate-500/70',
-  'bg-gradient-to-br from-orange-300/[0.15] to-transparent dark:from-amber-700/[0.11] border-l-[3px] border-orange-400/55 dark:border-amber-700/55',
+  'bg-gradient-to-br from-slate-300/[0.22] to-transparent dark:from-slate-500/[0.13] border-l-[3px] border-slate-400/70 dark:border-slate-500/70 animate-silver-shimmer',
+  'bg-gradient-to-br from-orange-300/[0.15] to-transparent dark:from-amber-700/[0.11] border-l-[3px] border-orange-400/55 dark:border-amber-700/55 animate-bronze-glow',
 ]
 
 const CARD_IMAGES = [

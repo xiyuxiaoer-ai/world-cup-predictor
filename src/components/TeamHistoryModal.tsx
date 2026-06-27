@@ -338,19 +338,24 @@ export default function TeamHistoryModal({
                 key={t}
                 onClick={() => setTab(t)}
                 className={`
-                  flex-1 py-2.5 text-[11px] font-medium transition-all duration-200 relative
+                  flex-1 py-2.5 text-[11px] font-medium transition-all duration-200 relative tap-scale
                   ${tab === t
                     ? 'text-amber-500 dark:text-amber-400'
                     : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}
                 `}
               >
                 {TAB_LABELS[t]}
-                {tab === t && (
-                  <span
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-amber-500 dark:bg-amber-400"
-                    style={{ boxShadow: '0 0 8px rgba(245,158,11,0.7)' }}
-                  />
-                )}
+                {/* always rendered — opacity + scale transition instead of mount/unmount */}
+                <span
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 dark:bg-amber-400"
+                  style={{
+                    width: tab === t ? 28 : 0,
+                    height: 2,
+                    opacity: tab === t ? 1 : 0,
+                    boxShadow: tab === t ? '0 0 8px rgba(245,158,11,0.7)' : 'none',
+                    transition: 'width 0.22s cubic-bezier(0.34,1.56,0.64,1), opacity 0.16s ease',
+                  }}
+                />
               </button>
             ))}
           </div>
@@ -359,7 +364,12 @@ export default function TeamHistoryModal({
           <div key={tab} className="overflow-y-auto flex-1 animate-fade-in-up scrollbar-none">
             {tab === 'history' && (
               historyLoading
-                ? <div className="p-6 text-center text-gray-400 text-sm">加载中…</div>
+                ? <div className="p-4 space-y-3">{[...Array(5)].map((_,i)=>(
+                    <div key={i} className="space-y-1.5 animate-stagger-in" style={{animationDelay:`${i*50}ms`}}>
+                      <div className="skeleton-pulse h-3 w-20 rounded-full" />
+                      <div className="skeleton-pulse h-9 rounded-lg" />
+                    </div>
+                  ))}</div>
                 : (
                   <>
                     <Section title="2026世界杯" matches={historyData?.wc || []} tla={tla} isWC />
@@ -391,7 +401,12 @@ export default function TeamHistoryModal({
 
             {tab === 'squad' && (
               squadLoading
-                ? <div className="p-6 text-center text-gray-400 text-sm">加载中…</div>
+                ? <div className="p-4 grid grid-cols-3 sm:grid-cols-4 gap-3">{[...Array(12)].map((_,i)=>(
+                    <div key={i} className="flex flex-col items-center gap-1.5 animate-stagger-in" style={{animationDelay:`${i*30}ms`}}>
+                      <div className="skeleton-pulse w-16 h-16 rounded-xl" />
+                      <div className="skeleton-pulse h-2.5 w-12 rounded-full" />
+                    </div>
+                  ))}</div>
                 : !squadData || squadData.length === 0
                   ? <div className="p-6 text-center text-gray-400 text-sm">暂无名单数据</div>
                   : <SquadList squad={squadData} />
@@ -399,7 +414,13 @@ export default function TeamHistoryModal({
 
             {tab === 'news' && (
               newsLoading
-                ? <div className="p-6 text-center text-gray-400 text-sm">加载中…</div>
+                ? <div className="p-4 space-y-3">{[...Array(4)].map((_,i)=>(
+                    <div key={i} className="space-y-1.5 animate-stagger-in" style={{animationDelay:`${i*55}ms`}}>
+                      <div className="skeleton-pulse h-3.5 rounded-full" />
+                      <div className="skeleton-pulse h-3 w-4/5 rounded-full" />
+                      <div className="skeleton-pulse h-3 w-2/3 rounded-full" />
+                    </div>
+                  ))}</div>
                 : !newsData || newsData.length === 0
                   ? <div className="p-6 text-center text-gray-400 text-sm">暂无新闻</div>
                   : <NewsList items={newsData} />

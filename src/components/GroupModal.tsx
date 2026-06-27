@@ -138,7 +138,7 @@ export default function GroupModal({
 
         {/* 猜分浮层 */}
         {predictingMatch && (
-          <div className="absolute inset-0 z-10 flex flex-col rounded-2xl bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl">
+          <div className="absolute inset-0 z-10 flex flex-col rounded-2xl bg-white/90 dark:bg-gray-900/95 backdrop-blur-xl animate-spring-in">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
               <button onClick={() => { setPredictingMatch(null); setSaveError(''); setEtWinner(''); setPenaltyWinner('') }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors tap-scale">
                 <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -274,7 +274,7 @@ export default function GroupModal({
         )}
 
         <div className="overflow-y-auto flex-1 divide-y divide-white/30 dark:divide-white/10">
-          {matches.map(m => {
+          {matches.map((m, matchIdx) => {
             const homeTla = getTeamDisplay(m.home_tla, m.home_team)
             const awayTla = getTeamDisplay(m.away_tla, m.away_team)
             const homeFlagUrl = getFlagUrl(m.home_tla)
@@ -285,7 +285,8 @@ export default function GroupModal({
             const finished = m.status === 'finished'
             const effectivePrediction = m.userPrediction || localPredictions[m.id] || null
             return (
-              <div key={m.id} className="flex items-center gap-3 px-5 py-3">
+              <div key={m.id} className="flex items-center gap-3 px-5 py-3 animate-stagger-in"
+                style={{ animationDelay: `${matchIdx * 45}ms` }}>
                 <div className="text-xs text-gray-500 dark:text-gray-500 w-14 shrink-0 text-center">
                   {finished ? (
                     <span>已结束</span>
