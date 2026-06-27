@@ -164,7 +164,7 @@ export default function GroupModal({
                   placeholder="0"
                   className="w-18 h-16 text-center text-2xl font-bold border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-500 focus:outline-none"
                 />
-                <span className="text-gray-400 dark:text-gray-500 text-2xl font-bold">–</span>
+                <span className="text-gray-500 dark:text-gray-500 text-2xl font-bold">–</span>
                 <input
                   type="number" min="0" max="20" value={predAway}
                   onChange={e => setPredAway(e.target.value)}
@@ -230,7 +230,7 @@ export default function GroupModal({
           <div className="px-5 py-3 border-b border-gray-200/70 dark:border-white/10">
             <table className="w-full text-xs">
               <thead>
-                <tr className="text-gray-400 dark:text-gray-500">
+                <tr className="text-gray-500 dark:text-gray-500">
                   <th className="text-left pb-1.5 font-medium w-4">#</th>
                   <th className="pb-1.5 w-6"></th>
                   <th className="text-center pb-1.5 font-medium w-8">赛</th>
@@ -246,7 +246,7 @@ export default function GroupModal({
                   const flagUrl = getFlagUrl(team.tla)
                   return (
                     <tr key={team.tla} className="border-t border-gray-100 dark:border-gray-800">
-                      <td className="py-1.5 text-gray-400 dark:text-gray-500 text-xs">{idx + 1}</td>
+                      <td className="py-1.5 text-gray-500 dark:text-gray-500 text-xs">{idx + 1}</td>
                       <td className="py-1.5">
                         {flagUrl && <img src={flagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm" />}
                       </td>
@@ -277,7 +277,7 @@ export default function GroupModal({
             const effectivePrediction = m.userPrediction || localPredictions[m.id] || null
             return (
               <div key={m.id} className="flex items-center gap-3 px-5 py-3">
-                <div className="text-xs text-gray-400 dark:text-gray-500 w-14 shrink-0 text-center">
+                <div className="text-xs text-gray-500 dark:text-gray-500 w-14 shrink-0 text-center">
                   {finished ? (
                     <span>已结束</span>
                   ) : (
@@ -293,20 +293,20 @@ export default function GroupModal({
                       <button type="button" onClick={() => m.home_tla && setHistoryTeam({ tla: m.home_tla, name: m.home_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors">{homeTla}</button>
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                     </div>
-                    {homeJa && <span className="w-full text-[10px] font-normal text-gray-400 dark:text-gray-500 text-right pr-[26px]">{homeJa}</span>}
+                    {homeJa && <span className="w-full text-[10px] font-normal text-gray-500 dark:text-gray-500 text-right pr-[26px]">{homeJa}</span>}
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2 flex flex-col items-center">
                     {finished ? (
                       <>
                         <span className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">{m.home_score_90} – {m.away_score_90}</span>
                         {m.home_score_et != null && m.home_score_pen == null && (
-                          <span className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">延 {m.home_score_et}–{m.away_score_et}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-500 leading-tight mt-0.5">延 {m.home_score_et}–{m.away_score_et}</span>
                         )}
                         {m.home_score_pen != null && (
-                          <span className="text-xs text-gray-400 dark:text-gray-500 leading-tight mt-0.5">点球 {m.home_score_pen}–{m.away_score_pen}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-500 leading-tight mt-0.5">点球 {m.home_score_pen}–{m.away_score_pen}</span>
                         )}
                         {effectivePrediction && (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">
+                          <span className="text-[10px] text-gray-500 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">
                             我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}
                             {effectivePrediction.pred_et_winner && effectivePrediction.pred_et_winner !== 'draw' && ` 延→${getTeamDisplay(effectivePrediction.pred_et_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_et_winner)}`}
                             {effectivePrediction.pred_et_winner === 'draw' && effectivePrediction.pred_penalty_winner && ` 点→${getTeamDisplay(effectivePrediction.pred_penalty_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_penalty_winner)}`}
@@ -317,7 +317,7 @@ export default function GroupModal({
                       <>
                         <span className="text-gray-300 dark:text-gray-600 text-sm font-bold leading-tight">vs</span>
                         {effectivePrediction ? (
-                          <span className="text-[10px] text-gray-400 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">
+                          <span className="text-[10px] text-gray-500 dark:text-gray-500 leading-tight mt-0.5 whitespace-nowrap">
                             我猜: {effectivePrediction.pred_home_score}–{effectivePrediction.pred_away_score}
                             {effectivePrediction.pred_et_winner && effectivePrediction.pred_et_winner !== 'draw' && ` 延→${getTeamDisplay(effectivePrediction.pred_et_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_et_winner)}`}
                             {effectivePrediction.pred_et_winner === 'draw' && effectivePrediction.pred_penalty_winner && ` 点→${getTeamDisplay(effectivePrediction.pred_penalty_winner === m.home_team ? m.home_tla : m.away_tla, effectivePrediction.pred_penalty_winner)}`}
@@ -338,7 +338,7 @@ export default function GroupModal({
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                       <button type="button" onClick={() => m.away_tla && setHistoryTeam({ tla: m.away_tla, name: m.away_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors">{awayTla}</button>
                     </div>
-                    {awayJa && <span className="text-[10px] font-normal text-gray-400 dark:text-gray-500 pl-[26px]">{awayJa}</span>}
+                    {awayJa && <span className="text-[10px] font-normal text-gray-500 dark:text-gray-500 pl-[26px]">{awayJa}</span>}
                   </div>
                 </div>
               </div>
