@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import type { LeaderboardEntry } from '@/types'
 import { getTeamDisplay } from '@/lib/flags'
 import { createClient } from '@/lib/supabase/client'
@@ -182,7 +183,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
       </div>
 
       {/* Breakdown Modal */}
-      {selected && (
+      {selected && createPortal(
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
           onClick={() => setSelected(null)}
@@ -262,7 +263,8 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {profileEntry && (

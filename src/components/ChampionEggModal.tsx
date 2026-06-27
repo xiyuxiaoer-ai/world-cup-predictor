@@ -1,5 +1,7 @@
 'use client'
 
+import { createPortal } from 'react-dom'
+
 export default function ChampionEggModal({
   currentBonus,
   onPredict,
@@ -9,7 +11,7 @@ export default function ChampionEggModal({
   onPredict: () => void
   onDismiss: () => void
 }) {
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <div className="flex items-start justify-between mb-4">
@@ -49,6 +51,7 @@ export default function ChampionEggModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

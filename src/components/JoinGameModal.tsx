@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { GameWithRole } from '@/types'
 
 export default function JoinGameModal({ onJoined, onClose }: { onJoined: (game: GameWithRole) => void; onClose: () => void }) {
@@ -17,7 +18,7 @@ export default function JoinGameModal({ onJoined, onClose }: { onJoined: (game: 
     else onJoined({ ...data.game, role: 'member' })
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">加入 Game</h2>
@@ -35,6 +36,7 @@ export default function JoinGameModal({ onJoined, onClose }: { onJoined: (game: 
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

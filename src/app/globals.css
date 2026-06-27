@@ -284,8 +284,8 @@ button, a, [role="button"], select, input, textarea, label {
 }
 
 /* ── 卡片悬浮：只 transition transform（GPU 合成），不 transition box-shadow（触发 paint）── */
+/* will-change: transform 故意不设：会使元素成为 position:fixed 的 containing block，导致 modal 定位错误 */
 .hover-lift {
-  will-change: transform;
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 /* 仅在真正支持 hover 的设备（桌面）上应用悬浮和点击效果，避免移动端触摸时卡片位移导致 iOS 焦点跳动 */

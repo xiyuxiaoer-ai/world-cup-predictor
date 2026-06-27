@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { STAGE_LABELS } from '@/lib/championBonus'
 
@@ -51,7 +52,7 @@ export default function ChampionPredictModal({
     }
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="glass rounded-2xl p-6 w-full max-w-sm animate-spring-in">
         <div className="flex items-center justify-between mb-5">
@@ -128,6 +129,7 @@ export default function ChampionPredictModal({
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

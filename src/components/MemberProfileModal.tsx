@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { createPortal } from 'react-dom'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 
 const RANK_COLORS = [
@@ -60,7 +61,7 @@ export default function MemberProfileModal({
     onClose()
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-md"
       onClick={onClose}
@@ -168,6 +169,7 @@ export default function MemberProfileModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
