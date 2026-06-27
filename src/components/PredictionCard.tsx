@@ -7,6 +7,7 @@ import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
 import { MATCH_VENUES } from '@/lib/venues'
 import TeamHistoryModal from './TeamHistoryModal'
 import TeamName from './TeamName'
+import { ScorePickerSheet } from './ScorePickerSheet'
 
 const StadiumMapModal = dynamic(() => import('./StadiumMapModal'), { ssr: false })
 
@@ -61,6 +62,9 @@ function PredictionCard({
 }) {
   const homeRef = useRef<HTMLInputElement>(null)
   const awayRef = useRef<HTMLInputElement>(null)
+  const [showSheet, setShowSheet] = useState(false)
+  const [mobileHome, setMobileHome] = useState(prediction?.pred_home_score?.toString() ?? '')
+  const [mobileAway, setMobileAway] = useState(prediction?.pred_away_score?.toString() ?? '')
   const [isDraw, setIsDraw] = useState(
     prediction?.pred_home_score !== undefined &&
     prediction?.pred_away_score !== undefined &&
@@ -89,10 +93,18 @@ function PredictionCard({
   const isUrgent = minutesLeft > 0 && minutesLeft < 120
   const isDouble = ['quarter_final', 'semi_final', 'third_place', 'final'].includes(match.stage)
 
+  function handleSheetConfirm(h: number, a: number) {
+    setMobileHome(String(h))
+    setMobileAway(String(a))
+    setIsDraw(h === a)
+    setShowSheet(false)
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setError(''); setLoading(true)
-    const h = parseInt(homeRef.current?.value ?? '')
-    const a = parseInt(awayRef.current?.value ?? '')
+    const isMobile = window.matchMedia('(max-width: 767px)').matches
+    const h = isMobile ? (mobileHome !== '' ? parseInt(mobileHome) : NaN) : parseInt(homeRef.current?.value ?? '')
+    const a = isMobile ? (mobileAway !== '' ? parseInt(mobileAway) : NaN) : parseInt(awayRef.current?.value ?? '')
     if (isNaN(h) || isNaN(a) || h < 0 || a < 0) { setError('请输入有效比分'); setLoading(false); return }
     const body = {
       match_id: match.id,
@@ -197,12 +209,28 @@ function PredictionCard({
           <button type="button" onClick={() => setHistoryTeam({ tla: match.home_tla!, name: match.home_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-right hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.home_tla} zh={homeName} /></button>
           {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
         </div>
-        <ScoreInputs
-          homeRef={homeRef} awayRef={awayRef}
-          defaultHome={prediction?.pred_home_score?.toString() ?? ''}
-          defaultAway={prediction?.pred_away_score?.toString() ?? ''}
-          onInput={handleScoreInput}
-        />
+
+        {/* Mobile: tappable score display → opens picker sheet */}
+        <div className="md:hidden flex items-center gap-1 shrink-0" onClick={() => setShowSheet(true)}>
+          <div className={inputClass + ' inline-flex items-center justify-center cursor-pointer'}>
+            {mobileHome !== '' ? mobileHome : <span className="text-gray-300 dark:text-gray-600">–</span>}
+          </div>
+          <span className="text-gray-400 dark:text-gray-500 font-bold">:</span>
+          <div className={inputClass + ' inline-flex items-center justify-center cursor-pointer'}>
+            {mobileAway !== '' ? mobileAway : <span className="text-gray-300 dark:text-gray-600">–</span>}
+          </div>
+        </div>
+
+        {/* Desktop: real inputs, unchanged */}
+        <div className="hidden md:block">
+          <ScoreInputs
+            homeRef={homeRef} awayRef={awayRef}
+            defaultHome={prediction?.pred_home_score?.toString() ?? ''}
+            defaultAway={prediction?.pred_away_score?.toString() ?? ''}
+            onInput={handleScoreInput}
+          />
+        </div>
+
         <div className="flex items-center gap-1.5 flex-1 justify-start">
           {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-6 h-4 object-cover rounded-sm shrink-0" />}
           <button type="button" onClick={() => setHistoryTeam({ tla: match.away_tla!, name: match.away_team })} className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-left hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><TeamName tla={match.away_tla} zh={awayName} /></button>
@@ -253,6 +281,14 @@ function PredictionCard({
           venue={venue}
           kickoffTime={match.kickoff_time}
           onClose={() => setShowMap(false)}
+        />
+      )}
+      {showSheet && (
+        <ScorePickerSheet
+          initialHome={mobileHome !== '' ? parseInt(mobileHome) : 0}
+          initialAway={mobileAway !== '' ? parseInt(mobileAway) : 0}
+          onConfirm={handleSheetConfirm}
+          onClose={() => setShowSheet(false)}
         />
       )}
     </form>

@@ -91,6 +91,17 @@ button, a, [role="button"], select, input, textarea, label {
 }
 .animate-bronze-glow { animation: bronze-glow 2.8s ease-in-out infinite; }
 
+/* ── Score picker drum roll ── */
+.picker-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.picker-no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* ── Bottom sheet slide-up ── */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.animate-sheet-up { animation: sheet-up 0.28s cubic-bezier(0.32,0.72,0,1); }
+
 /* ── 即将锁定 ── */
 @keyframes urgent-pulse {
   0%, 100% { border-color: rgba(239,68,68,0.4); }
