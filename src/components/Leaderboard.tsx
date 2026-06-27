@@ -7,28 +7,31 @@ import { createClient } from '@/lib/supabase/client'
 import MemberProfileModal from './MemberProfileModal'
 
 const RANK_ROW_STYLES = [
-  'bg-gradient-to-r from-amber-400/[0.12] to-transparent dark:from-amber-400/[0.08] border-l-[3px] border-amber-400 animate-gold-pulse',
-  'bg-gradient-to-r from-slate-300/20 to-transparent dark:from-slate-500/[0.12] border-l-[3px] border-slate-400/80 dark:border-slate-500',
-  'bg-gradient-to-r from-orange-300/[0.12] to-transparent dark:from-amber-700/[0.10] border-l-[3px] border-orange-400/60 dark:border-amber-700/60',
+  // 金：暖黄，左边框醒目金色，脉冲动效
+  'bg-gradient-to-r from-amber-300/[0.22] via-amber-200/[0.08] to-transparent dark:from-amber-400/[0.16] dark:via-amber-400/[0.04] border-l-[3px] border-amber-400 animate-gold-pulse',
+  // 银：冷调蓝灰，与金形成温冷对比，银色动效
+  'bg-gradient-to-r from-sky-300/[0.20] via-slate-200/[0.08] to-transparent dark:from-slate-400/[0.20] dark:via-sky-400/[0.06] border-l-[3px] border-slate-400 dark:border-slate-400 animate-silver-shimmer',
+  // 铜：深棕铜色，与金黄明显区分，铜色动效
+  'bg-gradient-to-r from-orange-800/[0.14] via-orange-700/[0.05] to-transparent dark:from-orange-900/[0.22] dark:via-orange-800/[0.06] border-l-[3px] border-orange-700/70 dark:border-orange-700 animate-bronze-glow',
 ]
 
 function Medal({ rank }: { rank: number }) {
   if (rank === 1) return (
     <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center"
-      style={{ background: 'linear-gradient(145deg,#FFE55C 0%,#F5A623 52%,#D4810A 100%)', boxShadow: '0 1px 5px rgba(245,166,35,0.65), inset 0 1px 0 rgba(255,255,255,0.55)' }}>
-      <span className="text-[10px] font-black leading-none" style={{ color: '#7A4600' }}>1</span>
+      style={{ background: 'linear-gradient(145deg,#FFE566 0%,#F5A800 50%,#C87800 100%)', boxShadow: '0 2px 8px rgba(245,168,0,0.80), inset 0 1px 0 rgba(255,255,255,0.60), 0 0 0 1px rgba(200,120,0,0.30)' }}>
+      <span className="text-[10px] font-black leading-none" style={{ color: '#6B3A00' }}>1</span>
     </div>
   )
   if (rank === 2) return (
     <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center"
-      style={{ background: 'linear-gradient(145deg,#E8EAF0 0%,#B0BAC8 52%,#8090A0 100%)', boxShadow: '0 1px 5px rgba(128,144,160,0.55), inset 0 1px 0 rgba(255,255,255,0.65)' }}>
-      <span className="text-[10px] font-black leading-none" style={{ color: '#3A4A5A' }}>2</span>
+      style={{ background: 'linear-gradient(145deg,#F0F6FF 0%,#A8BECE 50%,#6888A0 100%)', boxShadow: '0 2px 8px rgba(100,136,170,0.70), inset 0 1px 0 rgba(255,255,255,0.80), 0 0 0 1px rgba(80,110,140,0.25)' }}>
+      <span className="text-[10px] font-black leading-none" style={{ color: '#2A3E52' }}>2</span>
     </div>
   )
   if (rank === 3) return (
     <div className="w-6 h-6 rounded-full shrink-0 flex items-center justify-center"
-      style={{ background: 'linear-gradient(145deg,#E8A468 0%,#C47838 52%,#9A5C1E 100%)', boxShadow: '0 1px 5px rgba(160,92,30,0.55), inset 0 1px 0 rgba(255,255,255,0.40)' }}>
-      <span className="text-[10px] font-black leading-none" style={{ color: '#4A2000' }}>3</span>
+      style={{ background: 'linear-gradient(145deg,#C8845A 0%,#9A5520 50%,#6E3408 100%)', boxShadow: '0 2px 8px rgba(154,85,32,0.70), inset 0 1px 0 rgba(255,200,160,0.45), 0 0 0 1px rgba(100,50,10,0.30)' }}>
+      <span className="text-[10px] font-black leading-none" style={{ color: '#FFD8B0' }}>3</span>
     </div>
   )
   return null
@@ -108,13 +111,28 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
                       : <span className="text-gray-400 dark:text-gray-500 text-sm font-medium">{rank}</span>}
                   </span>
                   {entry.avatar_url ? (
-                    <img src={entry.avatar_url} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 border-2 ${rank === 1 && hasPoints ? 'border-amber-400' : 'border-gray-200 dark:border-gray-700'}`} />
+                    <img src={entry.avatar_url} alt="" className={`w-7 h-7 rounded-full object-cover shrink-0 border-2 ${
+                      rank === 1 && hasPoints ? 'border-amber-400' :
+                      rank === 2 && hasPoints ? 'border-slate-400' :
+                      rank === 3 && hasPoints ? 'border-orange-700/60' :
+                      'border-gray-200 dark:border-gray-700'
+                    }`} />
                   ) : (
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${rank === 1 && hasPoints ? 'bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-300 text-amber-700' : 'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300'}`}>
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      rank === 1 && hasPoints ? 'bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-300 text-amber-700' :
+                      rank === 2 && hasPoints ? 'bg-sky-100 dark:bg-slate-700/50 border-2 border-slate-400 text-slate-600 dark:text-slate-300' :
+                      rank === 3 && hasPoints ? 'bg-orange-100 dark:bg-orange-900/20 border-2 border-orange-700/50 text-orange-800 dark:text-orange-400' :
+                      'bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300'
+                    }`}>
                       {(entry.display_name || entry.username)?.[0]?.toUpperCase()}
                     </div>
                   )}
-                  <span className={`flex-1 text-sm font-medium truncate ${rank === 1 && hasPoints ? 'text-amber-700 dark:text-amber-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                  <span className={`flex-1 text-sm font-medium truncate ${
+                    rank === 1 && hasPoints ? 'text-amber-700 dark:text-amber-400' :
+                    rank === 2 && hasPoints ? 'text-slate-600 dark:text-slate-300' :
+                    rank === 3 && hasPoints ? 'text-orange-800 dark:text-orange-500' :
+                    'text-gray-900 dark:text-gray-100'
+                  }`}>
                     {entry.display_name || entry.username}
                   </span>
                   <div className="text-right shrink-0">

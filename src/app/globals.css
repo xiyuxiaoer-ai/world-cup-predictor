@@ -73,9 +73,23 @@ button, a, [role="button"], select, input, textarea, label {
 /* ── 金色脉冲 ── */
 @keyframes gold-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
-  50%       { box-shadow: 0 0 14px 5px rgba(245,158,11,0.35); }
+  50%       { box-shadow: 0 0 18px 6px rgba(245,158,11,0.50); }
 }
 .animate-gold-pulse { animation: gold-pulse 2s ease-in-out infinite; }
+
+/* ── 银色微光 ── */
+@keyframes silver-shimmer {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(148,163,184,0); }
+  50%       { box-shadow: 0 0 14px 5px rgba(148,163,184,0.45); }
+}
+.animate-silver-shimmer { animation: silver-shimmer 2.4s ease-in-out infinite; }
+
+/* ── 铜色微光 ── */
+@keyframes bronze-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(160,82,30,0); }
+  50%       { box-shadow: 0 0 12px 4px rgba(160,82,30,0.38); }
+}
+.animate-bronze-glow { animation: bronze-glow 2.8s ease-in-out infinite; }
 
 /* ── 即将锁定 ── */
 @keyframes urgent-pulse {
