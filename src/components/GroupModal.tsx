@@ -288,12 +288,12 @@ export default function GroupModal({
                   )}
                 </div>
                 <div className="relative flex items-start flex-1 min-w-0">
-                  <div className="w-1/2 flex flex-col pr-8">
-                    <div className="flex items-center gap-1.5 justify-end">
-                      <button type="button" onClick={() => m.home_tla && setHistoryTeam({ tla: m.home_tla, name: m.home_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors">{homeTla}</button>
+                  <div className="w-1/2 flex flex-col pr-8 overflow-hidden">
+                    <div className="flex items-center gap-1.5 justify-end min-w-0">
+                      <button type="button" onClick={() => m.home_tla && setHistoryTeam({ tla: m.home_tla, name: m.home_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors truncate min-w-0">{homeTla}</button>
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                     </div>
-                    {homeJa && <span className="w-full text-[10px] font-normal text-gray-500 dark:text-gray-500 text-right pr-[26px]">{homeJa}</span>}
+                    {homeJa && <span className="block text-[10px] font-normal text-gray-500 dark:text-gray-500 text-right pr-[26px] truncate">{homeJa}</span>}
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2 flex flex-col items-center">
                     {finished ? (
@@ -333,12 +333,12 @@ export default function GroupModal({
                       </>
                     )}
                   </div>
-                  <div className="w-1/2 flex flex-col pl-8">
-                    <div className="flex items-center gap-1.5">
+                  <div className="w-1/2 flex flex-col pl-8 overflow-hidden">
+                    <div className="flex items-center gap-1.5 min-w-0">
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                      <button type="button" onClick={() => m.away_tla && setHistoryTeam({ tla: m.away_tla, name: m.away_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors">{awayTla}</button>
+                      <button type="button" onClick={() => m.away_tla && setHistoryTeam({ tla: m.away_tla, name: m.away_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors truncate min-w-0">{awayTla}</button>
                     </div>
-                    {awayJa && <span className="text-[10px] font-normal text-gray-500 dark:text-gray-500 pl-[26px]">{awayJa}</span>}
+                    {awayJa && <span className="block text-[10px] font-normal text-gray-500 dark:text-gray-500 pl-[26px] truncate">{awayJa}</span>}
                   </div>
                 </div>
               </div>
