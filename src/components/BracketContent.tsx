@@ -87,15 +87,17 @@ function buildSlots(
     let homeTla: string | null = null, awayTla: string | null = null
     let homeConfirmed = false, awayConfirmed = false
     if (isR32) {
+      const slotEntry = Object.entries(R32_SLOTS).find(([, s]) => s.matchNum === num)
+      const apiId = slotEntry ? Number(slotEntry[0]) : null
       if (match?.home_team && match.home_team !== 'TBD') {
         homeLabel = match.home_team; homeTla = match.home_tla ?? null; homeConfirmed = true
       } else {
-        homeLabel = 'TBD'
+        homeLabel = apiId ? getSlotLabel(apiId, true) : 'TBD'
       }
       if (match?.away_team && match.away_team !== 'TBD') {
         awayLabel = match.away_team; awayTla = match.away_tla ?? null; awayConfirmed = true
       } else {
-        awayLabel = 'TBD'
+        awayLabel = apiId ? getSlotLabel(apiId, false) : 'TBD'
       }
     }
     return { match, homeLabel, awayLabel, homeTla, awayTla, homeConfirmed, awayConfirmed }
