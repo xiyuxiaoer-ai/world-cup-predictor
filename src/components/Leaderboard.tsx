@@ -7,12 +7,19 @@ import { createClient } from '@/lib/supabase/client'
 import MemberProfileModal from './MemberProfileModal'
 
 const RANK_ROW_STYLES = [
-  // 金：暖黄，左边框醒目金色，脉冲动效
-  'bg-gradient-to-r from-amber-300/[0.22] via-amber-200/[0.08] to-transparent dark:from-amber-400/[0.16] dark:via-amber-400/[0.04] border-l-[3px] border-amber-400 animate-gold-pulse',
-  // 银：冷调蓝灰，与金形成温冷对比，银色动效
-  'bg-gradient-to-r from-sky-300/[0.20] via-slate-200/[0.08] to-transparent dark:from-slate-400/[0.20] dark:via-sky-400/[0.06] border-l-[3px] border-slate-400 dark:border-slate-400 animate-silver-shimmer',
-  // 铜：深棕铜色，与金黄明显区分，铜色动效
-  'bg-gradient-to-r from-orange-800/[0.14] via-orange-700/[0.05] to-transparent dark:from-orange-900/[0.22] dark:via-orange-800/[0.06] border-l-[3px] border-orange-700/70 dark:border-orange-700 animate-bronze-glow',
+  // 金：暖黄，左边框醒目金色（动效通过 inline animation 加入，避免与 stagger 冲突）
+  'bg-gradient-to-r from-amber-300/[0.22] via-amber-200/[0.08] to-transparent dark:from-amber-400/[0.16] dark:via-amber-400/[0.04] border-l-[3px] border-amber-400',
+  // 银：冷调蓝灰
+  'bg-gradient-to-r from-sky-300/[0.20] via-slate-200/[0.08] to-transparent dark:from-slate-400/[0.20] dark:via-sky-400/[0.06] border-l-[3px] border-slate-400 dark:border-slate-400',
+  // 铜：深棕铜色
+  'bg-gradient-to-r from-orange-800/[0.14] via-orange-700/[0.05] to-transparent dark:from-orange-900/[0.22] dark:via-orange-800/[0.06] border-l-[3px] border-orange-700/70 dark:border-orange-700',
+]
+
+// 金银铜发光动效名（在 stagger 完成后 400ms 启动，避免 CSS animation 属性互相覆盖）
+const RANK_GLOW = [
+  'gold-pulse 2s ease-in-out',
+  'silver-shimmer 2.4s ease-in-out',
+  'bronze-glow 2.8s ease-in-out',
 ]
 
 function Medal({ rank }: { rank: number }) {
@@ -111,12 +118,18 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
               const isTop3 = rank <= 3 && hasPoints
               const rowStyle = isTop3 ? RANK_ROW_STYLES[rank - 1] : 'border-l-[3px] border-transparent'
 
+              const staggerDelay = 60 + i * 38
+              // Combine stagger + glow in one inline animation so they don't override each other via CSS cascade
+              const rowAnimation = isTop3 && hasPoints
+                ? `stagger-in 0.34s cubic-bezier(0.16,1,0.3,1) ${staggerDelay}ms both, ${RANK_GLOW[rank - 1]} ${staggerDelay + 400}ms infinite`
+                : `stagger-in 0.34s cubic-bezier(0.16,1,0.3,1) ${staggerDelay}ms both`
+
               return (
                 <button
                   key={entry.user_id}
                   onClick={() => openBreakdown(entry)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-all hover:bg-white/40 dark:hover:bg-white/5 cursor-pointer text-left animate-stagger-in touch-press ${rowStyle}`}
-                  style={{ animationDelay: `${60 + i * 38}ms` }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/40 dark:hover:bg-white/5 cursor-pointer text-left ${rowStyle}`}
+                  style={{ animation: rowAnimation }}
                 >
                   <span className="w-6 text-center shrink-0">
                     {isTop3
