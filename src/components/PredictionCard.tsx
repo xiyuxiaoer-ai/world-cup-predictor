@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, memo } from 'react'
+import { createPortal } from 'react-dom'
 import dynamic from 'next/dynamic'
 import type { Match, Prediction } from '@/types'
 import { getFlagUrl, getTeamDisplay } from '@/lib/flags'
@@ -283,14 +284,15 @@ function PredictionCard({
           onClose={() => setShowMap(false)}
         />
       )}
-      {showSheet && (
+      {showSheet && createPortal(
         <ScorePickerSheet
           initialHome={mobileHome !== '' ? parseInt(mobileHome) : 0}
           initialAway={mobileAway !== '' ? parseInt(mobileAway) : 0}
           hadScore={mobileHome !== ''}
           onConfirm={handleSheetConfirm}
           onClose={() => setShowSheet(false)}
-        />
+        />,
+        document.body
       )}
     </form>
   )
