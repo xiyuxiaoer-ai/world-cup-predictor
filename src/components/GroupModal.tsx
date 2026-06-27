@@ -39,10 +39,18 @@ export default function GroupModal({
   const [predictingMatch, setPredictingMatch] = useState<GroupModalMatch | null>(null)
   const [predHome, setPredHome] = useState('')
   const [predAway, setPredAway] = useState('')
+  const [etWinner, setEtWinner] = useState('')
+  const [penaltyWinner, setPenaltyWinner] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [localPredictions, setLocalPredictions] = useState<Record<string, { pred_home_score: number; pred_away_score: number }>>({})
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
+
+  const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
+  const isKnockout = !!predictingMatch && KNOCKOUT_STAGES.includes(predictingMatch.stage ?? '')
+  const isDraw = predHome !== '' && predAway !== '' && predHome === predAway
+  const showEtSelect = isKnockout && isDraw
+  const showPenaltySelect = showEtSelect && etWinner === 'draw'
 
   async function handleSave() {
     if (!predictingMatch || predHome === '' || predAway === '') return
@@ -53,6 +61,8 @@ export default function GroupModal({
         match_id: predictingMatch.id,
         pred_home_score: parseInt(predHome),
         pred_away_score: parseInt(predAway),
+        pred_et_winner: showEtSelect ? (etWinner || null) : null,
+        pred_penalty_winner: showPenaltySelect ? (penaltyWinner || null) : null,
       }
       let anyOk = false
       let lastError = ''
@@ -116,7 +126,7 @@ export default function GroupModal({
         {predictingMatch && (
           <div className="absolute inset-0 z-10 flex flex-col rounded-2xl" style={{ background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(20px)' }}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
-              <button onClick={() => { setPredictingMatch(null); setSaveError('') }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors tap-scale">
+              <button onClick={() => { setPredictingMatch(null); setSaveError(''); setEtWinner(''); setPenaltyWinner('') }} className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors tap-scale">
                 <svg viewBox="0 0 16 16" width="14" height="14" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
                 返回
               </button>
@@ -158,11 +168,43 @@ export default function GroupModal({
                 />
               </div>
 
+              {showEtSelect && (
+                <div className="w-full flex flex-col gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-gray-500 dark:text-gray-400 text-center">加时赛结果</label>
+                    <select
+                      value={etWinner}
+                      onChange={e => { setEtWinner(e.target.value); if (e.target.value !== 'draw') setPenaltyWinner('') }}
+                      className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-500 focus:outline-none"
+                    >
+                      <option value="">请选择</option>
+                      <option value={predictingMatch!.home_team}>{getTeamDisplay(predictingMatch!.home_tla, predictingMatch!.home_team)}</option>
+                      <option value={predictingMatch!.away_team}>{getTeamDisplay(predictingMatch!.away_tla, predictingMatch!.away_team)}</option>
+                      <option value="draw">平局（进点球）</option>
+                    </select>
+                  </div>
+                  {showPenaltySelect && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs text-gray-500 dark:text-gray-400 text-center">点球赛结果</label>
+                      <select
+                        value={penaltyWinner}
+                        onChange={e => setPenaltyWinner(e.target.value)}
+                        className="w-full border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-500 focus:outline-none"
+                      >
+                        <option value="">请选择</option>
+                        <option value={predictingMatch!.home_team}>{getTeamDisplay(predictingMatch!.home_tla, predictingMatch!.home_team)}</option>
+                        <option value={predictingMatch!.away_team}>{getTeamDisplay(predictingMatch!.away_tla, predictingMatch!.away_team)}</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {saveError && <p className="text-red-500 text-xs">{saveError}</p>}
 
               <button
                 onClick={handleSave}
-                disabled={saving || predHome === '' || predAway === ''}
+                disabled={saving || predHome === '' || predAway === '' || (showEtSelect && !etWinner) || (showPenaltySelect && !penaltyWinner)}
                 className="w-full py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-200 dark:disabled:bg-gray-700 text-white disabled:text-gray-400 rounded-xl font-semibold transition-colors"
               >
                 {saving ? '保存中...' : '确认猜测'}
