@@ -46,6 +46,15 @@ export default function GroupModal({
   const [localPredictions, setLocalPredictions] = useState<Record<string, { pred_home_score: number; pred_away_score: number; pred_et_winner?: string | null; pred_penalty_winner?: string | null }>>({})
   const [historyTeam, setHistoryTeam] = useState<{ tla: string; name: string } | null>(null)
 
+  function fmtJa(name: string): string {
+    if (name.includes('・')) return name.replace(/・/g, '\n')
+    const suffixes = ['民主共和国', '首長国連邦', '共和国', '連邦', '王国']
+    for (const s of suffixes) {
+      if (name.endsWith(s) && name.length > s.length) return name.slice(0, -s.length) + '\n' + s
+    }
+    return name
+  }
+
   const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
   const isKnockout = !!predictingMatch && KNOCKOUT_STAGES.includes(predictingMatch.stage ?? '')
   const isDraw = predHome !== '' && predAway !== '' && predHome === predAway
@@ -293,7 +302,7 @@ export default function GroupModal({
                       <button type="button" onClick={() => m.home_tla && setHistoryTeam({ tla: m.home_tla, name: m.home_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors truncate min-w-0">{homeTla}</button>
                       {homeFlagUrl && <img src={homeFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                     </div>
-                    {homeJa && <span className="block text-[10px] font-normal text-gray-500 dark:text-gray-500 text-right pr-[26px] truncate">{homeJa}</span>}
+                    {homeJa && <span className="block text-[9px] font-normal text-gray-500 dark:text-gray-500 text-right pr-[26px] whitespace-pre-line leading-tight">{fmtJa(homeJa)}</span>}
                   </div>
                   <div className="absolute left-1/2 -translate-x-1/2 text-center top-1/2 -translate-y-1/2 flex flex-col items-center">
                     {finished ? (
@@ -338,7 +347,7 @@ export default function GroupModal({
                       {awayFlagUrl && <img src={awayFlagUrl} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
                       <button type="button" onClick={() => m.away_tla && setHistoryTeam({ tla: m.away_tla, name: m.away_team })} className="text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-amber-500 transition-colors truncate min-w-0">{awayTla}</button>
                     </div>
-                    {awayJa && <span className="block text-[10px] font-normal text-gray-500 dark:text-gray-500 pl-[26px] truncate">{awayJa}</span>}
+                    {awayJa && <span className="block text-[9px] font-normal text-gray-500 dark:text-gray-500 pl-[26px] whitespace-pre-line leading-tight">{fmtJa(awayJa)}</span>}
                   </div>
                 </div>
               </div>
