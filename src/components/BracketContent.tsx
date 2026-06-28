@@ -103,11 +103,11 @@ function buildSlots(
   })
 }
 
-const UPPER_R32 = [73, 75, 74, 77, 81, 82, 83, 84]
+const UPPER_R32 = [73, 74, 75, 76, 77, 78, 79, 80]
 const UPPER_R16 = [89, 90, 93, 94]
 const UPPER_QF  = [97, 98]
 const UPPER_SF  = [101]
-const LOWER_R32 = [76, 78, 79, 80, 85, 87, 86, 88]
+const LOWER_R32 = [81, 82, 83, 84, 85, 86, 87, 88]
 const LOWER_R16 = [91, 92, 95, 96]
 const LOWER_QF  = [99, 100]
 const LOWER_SF  = [102]

@@ -12,24 +12,24 @@ export type BracketSlot = {
 // R32 matches keyed by api_match_id
 // ─────────────────────────────────────────────
 export const R32_SLOTS: Record<number, BracketSlot> = {
-  // 上半区 — positions 1-8
-  537417: { homeLabel: 'A2', awayLabel: 'B2',                  half: 'upper', matchNum: 73, round: 'r32', posInRound: 1, feedsInto: 89 },
-  537423: { homeLabel: 'C1', awayLabel: 'F2',                  half: 'upper', matchNum: 75, round: 'r32', posInRound: 2, feedsInto: 89 },
-  537415: { homeLabel: 'E1', awayLabel: '最佳第三(A/B/C/D/F)', half: 'upper', matchNum: 74, round: 'r32', posInRound: 3, feedsInto: 90 },
-  537418: { homeLabel: 'I1', awayLabel: '最佳第三(C/D/F/G/H)', half: 'upper', matchNum: 77, round: 'r32', posInRound: 4, feedsInto: 90 },
-  537421: { homeLabel: 'D1', awayLabel: '最佳第三(B/E/F/I/J)', half: 'upper', matchNum: 81, round: 'r32', posInRound: 5, feedsInto: 93 },
-  537420: { homeLabel: 'G1', awayLabel: '最佳第三(A/E/H/I/J)', half: 'upper', matchNum: 82, round: 'r32', posInRound: 6, feedsInto: 93 },
-  537429: { homeLabel: 'K2', awayLabel: 'L2',                  half: 'upper', matchNum: 83, round: 'r32', posInRound: 7, feedsInto: 94 },
-  537428: { homeLabel: 'H1', awayLabel: 'J2',                  half: 'upper', matchNum: 84, round: 'r32', posInRound: 8, feedsInto: 94 },
-  // 下半区 — positions 1-8
-  537416: { homeLabel: 'F1', awayLabel: 'C2',                  half: 'lower', matchNum: 76, round: 'r32', posInRound: 1, feedsInto: 91 },
-  537424: { homeLabel: 'E2', awayLabel: 'I2',                  half: 'lower', matchNum: 78, round: 'r32', posInRound: 2, feedsInto: 91 },
-  537425: { homeLabel: 'A1', awayLabel: '最佳第三(C/E/F/H/I)', half: 'lower', matchNum: 79, round: 'r32', posInRound: 3, feedsInto: 92 },
-  537426: { homeLabel: 'L1', awayLabel: '最佳第三(E/H/I/J/K)', half: 'lower', matchNum: 80, round: 'r32', posInRound: 4, feedsInto: 92 },
-  537422: { homeLabel: 'B1', awayLabel: '最佳第三(E/F/G/I/J)', half: 'lower', matchNum: 85, round: 'r32', posInRound: 5, feedsInto: 95 },
-  537419: { homeLabel: 'K1', awayLabel: '最佳第三(D/E/I/J/L)', half: 'lower', matchNum: 87, round: 'r32', posInRound: 6, feedsInto: 95 },
-  537427: { homeLabel: 'J1', awayLabel: 'H2',                  half: 'lower', matchNum: 86, round: 'r32', posInRound: 7, feedsInto: 96 },
-  537430: { homeLabel: 'D2', awayLabel: 'G2',                  half: 'lower', matchNum: 88, round: 'r32', posInRound: 8, feedsInto: 96 },
+  // 上半区 — positions 1-8（与懂球帝对齐：GER/FRA→R16-89, RSA/NED→R16-90, K2/ESP→R16-93, USA/BEL→R16-94）
+  537415: { homeLabel: 'E1', awayLabel: '最佳第三(A/B/C/D/F)', half: 'upper', matchNum: 73, round: 'r32', posInRound: 1, feedsInto: 89 },
+  537416: { homeLabel: 'F1', awayLabel: 'C2',                  half: 'upper', matchNum: 74, round: 'r32', posInRound: 2, feedsInto: 89 },
+  537417: { homeLabel: 'A2', awayLabel: 'B2',                  half: 'upper', matchNum: 75, round: 'r32', posInRound: 3, feedsInto: 90 },
+  537418: { homeLabel: 'I1', awayLabel: '最佳第三(C/D/F/G/H)', half: 'upper', matchNum: 76, round: 'r32', posInRound: 4, feedsInto: 90 },
+  537420: { homeLabel: 'G1', awayLabel: '最佳第三(A/E/H/I/J)', half: 'upper', matchNum: 77, round: 'r32', posInRound: 5, feedsInto: 93 },
+  537430: { homeLabel: 'D2', awayLabel: 'G2',                  half: 'upper', matchNum: 78, round: 'r32', posInRound: 6, feedsInto: 93 },
+  537421: { homeLabel: 'D1', awayLabel: '最佳第三(B/E/F/I/J)', half: 'upper', matchNum: 79, round: 'r32', posInRound: 7, feedsInto: 94 },
+  537422: { homeLabel: 'B1', awayLabel: '最佳第三(E/F/G/I/J)', half: 'upper', matchNum: 80, round: 'r32', posInRound: 8, feedsInto: 94 },
+  // 下半区 — positions 1-8（与懂球帝对齐：BRA/CIV→R16-91, MEX/ENG→R16-92, ARG/AUS→R16-95, SUI/K1→R16-96）
+  537423: { homeLabel: 'C1', awayLabel: 'F2',                  half: 'lower', matchNum: 81, round: 'r32', posInRound: 1, feedsInto: 91 },
+  537424: { homeLabel: 'E2', awayLabel: 'I2',                  half: 'lower', matchNum: 82, round: 'r32', posInRound: 2, feedsInto: 91 },
+  537425: { homeLabel: 'A1', awayLabel: '最佳第三(C/E/F/H/I)', half: 'lower', matchNum: 83, round: 'r32', posInRound: 3, feedsInto: 92 },
+  537426: { homeLabel: 'L1', awayLabel: '最佳第三(E/H/I/J/K)', half: 'lower', matchNum: 84, round: 'r32', posInRound: 4, feedsInto: 92 },
+  537427: { homeLabel: 'J1', awayLabel: 'H2',                  half: 'lower', matchNum: 85, round: 'r32', posInRound: 5, feedsInto: 95 },
+  537428: { homeLabel: 'H1', awayLabel: 'J2',                  half: 'lower', matchNum: 86, round: 'r32', posInRound: 6, feedsInto: 95 },
+  537429: { homeLabel: 'K2', awayLabel: 'L2',                  half: 'lower', matchNum: 87, round: 'r32', posInRound: 7, feedsInto: 96 },
+  537419: { homeLabel: 'K1', awayLabel: '最佳第三(D/E/I/J/L)', half: 'lower', matchNum: 88, round: 'r32', posInRound: 8, feedsInto: 96 },
 }
 
 // ─────────────────────────────────────────────
