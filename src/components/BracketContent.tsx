@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { R32_SLOTS, LATER_ROUNDS, getSlotLabel } from '@/lib/bracketSlots'
+import { R32_SLOTS, LATER_ROUNDS, LATER_SLOT_BY_ID, getSlotLabel } from '@/lib/bracketSlots'
 import BracketColumn, { CARD_H, CONNECTOR_W } from './BracketColumn'
 import BracketMatchCard, { type BracketMatchData } from './BracketMatchCard'
 
@@ -41,13 +41,12 @@ const ROUND_TABS = [
 function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchData> {
   const map = new Map<number, BracketMatchData>()
   for (const m of matches) {
-    const slot = R32_SLOTS[m.api_match_id]
-    if (slot) { map.set(slot.matchNum, m); continue }
-    for (const [num, lr] of Object.entries(LATER_ROUNDS)) {
-      if (lr.stage === m.stage && !map.has(Number(num))) {
-        map.set(Number(num), m); break
-      }
-    }
+    // R32: api_match_id 精确命中 R32_SLOTS
+    const r32slot = R32_SLOTS[m.api_match_id]
+    if (r32slot) { map.set(r32slot.matchNum, m); continue }
+    // R16+: api_match_id 精确命中 LATER_SLOT_BY_ID（固定映射，不依赖顺序）
+    const laterNum = LATER_SLOT_BY_ID[m.api_match_id]
+    if (laterNum) map.set(laterNum, m)
   }
   return map
 }
