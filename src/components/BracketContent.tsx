@@ -90,17 +90,13 @@ function buildSlots(
       const apiId = slotEntry ? Number(slotEntry[0]) : null
       if (match?.home_team && match.home_team !== 'TBD') {
         homeLabel = match.home_team; homeTla = match.home_tla ?? null; homeConfirmed = true
-      } else if (apiId) {
-        const raw = R32_SLOTS[apiId]?.homeLabel ?? 'TBD'
-        const r = resolveLabel(raw, standings)
-        homeLabel = r.label; homeTla = r.tla; homeConfirmed = r.confirmed
+      } else {
+        homeLabel = apiId ? getSlotLabel(apiId, true) : 'TBD'
       }
       if (match?.away_team && match.away_team !== 'TBD') {
         awayLabel = match.away_team; awayTla = match.away_tla ?? null; awayConfirmed = true
-      } else if (apiId) {
-        const raw = R32_SLOTS[apiId]?.awayLabel ?? 'TBD'
-        const r = resolveLabel(raw, standings)
-        awayLabel = r.label; awayTla = r.tla; awayConfirmed = r.confirmed
+      } else {
+        awayLabel = apiId ? getSlotLabel(apiId, false) : 'TBD'
       }
     }
     return { match, homeLabel, awayLabel, homeTla, awayTla, homeConfirmed, awayConfirmed }
