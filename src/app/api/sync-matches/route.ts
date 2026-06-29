@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { calculatePoints, getMissPenalty } from '@/lib/scores'
-import { R32_SLOTS, LATER_SLOT_BY_ID, LATER_ROUNDS } from '@/lib/bracketSlots'
+import { R32_SLOTS } from '@/lib/bracketSlots'
 import type { Match, Prediction } from '@/types'
 
 const STAGE_MAP: Record<string, string> = {
@@ -97,60 +97,6 @@ async function runSync() {
     }
   }
 
-  // ── 胜者推算补充：覆盖 R32→R16→QF→SF→决赛 全程 ─────────────────────
-  // matchNum → api_match_id（LATER_SLOT_BY_ID 反转）
-  const matchNumToApiId: Record<number, number> = {}
-  for (const [idStr, mn] of Object.entries(LATER_SLOT_BY_ID)) matchNumToApiId[mn] = Number(idStr)
-
-  // 从 prevMap 里算某场比赛的胜者
-  const getWinner = (prev: any): { name: string; tla: string | null } | null => {
-    if (!prev || prev.status !== 'finished') return null
-    if (prev.penalty_winner) return { name: prev.penalty_winner, tla: prev.penalty_winner === prev.home_team ? prev.home_tla : prev.away_tla }
-    if (prev.et_winner)      return { name: prev.et_winner,      tla: prev.et_winner      === prev.home_team ? prev.home_tla : prev.away_tla }
-    if (prev.result_90 === 'home_win') return { name: prev.home_team, tla: prev.home_tla }
-    if (prev.result_90 === 'away_win') return { name: prev.away_team, tla: prev.away_tla }
-    return null
-  }
-
-  // winnerSupplementMap：目标赛程 api_match_id → { home?, away? }
-  const winnerSupplementMap: Record<number, { home?: string; homeTla?: string | null; away?: string; awayTla?: string | null }> = {}
-
-  const fillSupplementMap = (
-    groups: Record<number, { apiMatchId: number; posInRound: number }[]>
-  ) => {
-    for (const [mnStr, group] of Object.entries(groups)) {
-      const targetApiId = matchNumToApiId[Number(mnStr)]
-      if (!targetApiId) continue
-      for (let i = 0; i < group.length; i++) {
-        const winner = getWinner(prevMap.get(String(group[i].apiMatchId)))
-        if (!winner || winner.name === 'TBD') continue
-        if (!winnerSupplementMap[targetApiId]) winnerSupplementMap[targetApiId] = {}
-        if (i === 0) { winnerSupplementMap[targetApiId].home = winner.name; winnerSupplementMap[targetApiId].homeTla = winner.tla }
-        else         { winnerSupplementMap[targetApiId].away = winner.name; winnerSupplementMap[targetApiId].awayTla = winner.tla }
-      }
-    }
-  }
-
-  // 1. R32 → R16（来源：R32_SLOTS，按 feedsInto 分组）
-  const r32Groups: Record<number, { apiMatchId: number; posInRound: number }[]> = {}
-  for (const [idStr, slot] of Object.entries(R32_SLOTS)) {
-    if (!r32Groups[slot.feedsInto]) r32Groups[slot.feedsInto] = []
-    r32Groups[slot.feedsInto].push({ apiMatchId: Number(idStr), posInRound: slot.posInRound })
-  }
-  for (const arr of Object.values(r32Groups)) arr.sort((a, b) => a.posInRound - b.posInRound)
-  fillSupplementMap(r32Groups)
-
-  // 2. R16 → QF → SF → 决赛（来源：LATER_ROUNDS，按 feedsInto 分组）
-  const laterGroups: Record<number, { apiMatchId: number; posInRound: number }[]> = {}
-  for (const [mnStr, slot] of Object.entries(LATER_ROUNDS)) {
-    if (!slot.feedsInto) continue
-    const apiMatchId = matchNumToApiId[Number(mnStr)]
-    if (!apiMatchId) continue
-    if (!laterGroups[slot.feedsInto]) laterGroups[slot.feedsInto] = []
-    laterGroups[slot.feedsInto].push({ apiMatchId, posInRound: slot.posInRound })
-  }
-  for (const arr of Object.values(laterGroups)) arr.sort((a, b) => a.posInRound - b.posInRound)
-  fillSupplementMap(laterGroups)
 
   const transformed = matches.map((match: any) => {
     const kickoffTime = new Date(match.utcDate)
@@ -183,14 +129,6 @@ async function runSync() {
       }
     }
 
-    // 胜者推算补充（R16、QF、SF、决赛）：仅在 TBD 时填入
-    if (match.stage === 'LAST_16' || match.stage === 'QUARTER_FINALS' || match.stage === 'SEMI_FINALS' || match.stage === 'FINAL') {
-      const supp = winnerSupplementMap[match.id as number]
-      if (supp) {
-        if (homeName === 'TBD' && supp.home) { homeName = supp.home; homeTla = supp.homeTla ?? homeTla }
-        if (awayName === 'TBD' && supp.away) { awayName = supp.away; awayTla = supp.awayTla ?? awayTla }
-      }
-    }
 
     // ── 比分 & 结果：已有值不被 null/空覆盖 ──────────────────────────
     let result90 = prev?.result_90 ?? null
