@@ -583,7 +583,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           onSuccess={() => { setShowPredictModal(false); sessionStorage.setItem('egg_dismissed', '1') }}
         />
       )}
-      {/* 顶部提示 banner + 边缘红光：与内容列同宽（max-w-2xl 居中），不溢出到两侧灰色背景 */}
+      {/* 顶部提示 banner（居中内容宽）+ 边缘红光（全屏四边） */}
       {redEdge && (
         <>
           <div className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-2xl z-[9996] flex items-center justify-center gap-1.5 bg-red-500/90 backdrop-blur-sm text-white text-xs py-2 px-4 font-medium shadow-md pointer-events-none">
@@ -593,7 +593,7 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
             </svg>
             请输入竞猜结果
           </div>
-          <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-2xl z-[9995] pointer-events-none animate-red-edge" />
+          <div className="fixed inset-0 z-[9995] pointer-events-none animate-red-edge" />
         </>
       )}
 
