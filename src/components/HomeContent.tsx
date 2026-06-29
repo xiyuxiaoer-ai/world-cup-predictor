@@ -167,6 +167,24 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
 
   const [finishedExpanded, setFinishedExpanded] = useState(false)
   const [showGameActions, setShowGameActions] = useState(false)
+  const [redEdge, setRedEdge] = useState(false)  // 边缘红光 + 顶部 banner
+  const [missedCount, setMissedCount] = useState(0)
+
+  useEffect(() => {
+    if (loading || !selectedGameId || matches.length === 0) return
+    const t = new Date()
+    // 与积分榜「待开」定义完全一致：已预测 且 kickoff_time > now 的场数
+    const futureMatches = matches.filter(
+      m => m.status === 'scheduled' && new Date(m.kickoff_time) > t
+    )
+    const futurePredicted = futureMatches.filter(m => predictions[m.id]).length
+    const missed = matches.filter(
+      m => m.status === 'scheduled' && new Date(m.lock_time) <= t && !predictions[m.id]
+    ).length
+    setMissedCount(missed)
+    // 待开数 = 0（有未来比赛但一场都没预测）→ 红光警告
+    setRedEdge(futureMatches.length > 0 && futurePredicted === 0)
+  }, [loading, matches, predictions, selectedGameId])
 
   const pendingMatches = matches
     .filter(m => new Date(m.lock_time) > now && m.status === 'scheduled' && !predictions[m.id])
@@ -565,6 +583,20 @@ export default function HomeContent({ initialGames }: { initialGames: GameWithRo
           onSuccess={() => { setShowPredictModal(false); sessionStorage.setItem('egg_dismissed', '1') }}
         />
       )}
+      {/* 顶部提示 banner + 边缘红光：与内容列同宽（max-w-2xl 居中），不溢出到两侧灰色背景 */}
+      {redEdge && (
+        <>
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-2xl z-[9996] flex items-center justify-center gap-1.5 bg-red-500/90 backdrop-blur-sm text-white text-xs py-2 px-4 font-medium shadow-md pointer-events-none">
+            <svg viewBox="0 0 16 16" width="13" height="13" fill="none" className="shrink-0">
+              <path d="M8 2L14.5 13.5H1.5L8 2Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+              <path d="M8 6v3.5M8 11.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+            </svg>
+            请输入竞猜结果
+          </div>
+          <div className="fixed inset-y-0 left-1/2 -translate-x-1/2 w-full max-w-2xl z-[9995] pointer-events-none animate-red-edge" />
+        </>
+      )}
+
       {mapMatch && MATCH_VENUES[(mapMatch as any).api_match_id] && (
         <StadiumMapModal
           homeTla={(mapMatch as any).home_tla!}

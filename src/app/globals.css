@@ -42,6 +42,17 @@ button, a, [role="button"], select, input, textarea, label {
   touch-action: manipulation;
 }
 
+/* ── 未竞猜警告：矩形边缘红光闪烁 ── */
+@keyframes red-edge-pulse {
+  0%, 100% { opacity: 0; }
+  50%       { opacity: 1; }
+}
+.animate-red-edge {
+  animation: red-edge-pulse 2.5s ease-in-out infinite;
+  box-shadow: inset 0 0 0 3px rgba(220, 38, 38, 0.9),
+              inset 0 0 16px rgba(220, 38, 38, 0.35);
+}
+
 /* ── 足球场中圈背景（登录页） ── */
 @keyframes spin-slow {
   from { transform: rotate(0deg); }
