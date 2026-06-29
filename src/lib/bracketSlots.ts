@@ -12,7 +12,7 @@ export type BracketSlot = {
 // R32 matches keyed by api_match_id
 // ─────────────────────────────────────────────
 export const R32_SLOTS: Record<number, BracketSlot> = {
-  // 上半区 — positions 1-8（与懂球帝对齐：GER/FRA→R16-89, RSA/NED→R16-90, K2/ESP→R16-93, USA/BEL→R16-94）
+  // 上半区 — positions 1-8（GER/FRA→R16-89/537375, RSA/NED→R16-90/537376, K2/ESP→R16-93, USA/BEL→R16-94）
   537415: { homeLabel: 'E1', awayLabel: '最佳第三(A/B/C/D/F)', half: 'upper', matchNum: 73, round: 'r32', posInRound: 1, feedsInto: 89 },
   537416: { homeLabel: 'I1', awayLabel: '最佳第三(C/D/F/G/H)', half: 'upper', matchNum: 74, round: 'r32', posInRound: 2, feedsInto: 89 },
   537417: { homeLabel: 'A2', awayLabel: 'B2',                  half: 'upper', matchNum: 75, round: 'r32', posInRound: 3, feedsInto: 90 },
@@ -40,8 +40,8 @@ export const R32_SLOTS: Record<number, BracketSlot> = {
 // ─────────────────────────────────────────────
 export const LATER_SLOT_BY_ID: Record<number, number> = {
   // R16 — 上半区 (07/04 UTC × 2, 07/06 UTC × 2)
-  537376: 89,   // 07/04 17:00 UTC → upper pos1
-  537375: 90,   // 07/04 21:00 UTC → upper pos2
+  537376: 90,   // 07/04 17:00 UTC → upper pos2 (RSA/NED 路)
+  537375: 89,   // 07/04 21:00 UTC → upper pos1 (GER/FRA 路)
   537379: 93,   // 07/06 19:00 UTC → upper pos3
   537380: 94,   // 07/07 00:00 UTC → upper pos4
   // R16 — 下半区 (07/05 UTC × 2, 07/07 UTC × 2)
