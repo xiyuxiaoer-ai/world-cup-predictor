@@ -162,8 +162,14 @@ async function runSync() {
       }
 
       if (hasPenalty) {
-        apiHomePen = match.score.penalties.home
-        apiAwayPen = match.score.penalties.away
+        // score.penalties 是包含 regularTime 的累积值，且不含 sudden death
+        // 用 fullTime - regularTime(- extraTime) 才能得到完整点球阶段得分（含 sudden death）
+        const regHome = match.score.regularTime?.home ?? 0
+        const regAway = match.score.regularTime?.away ?? 0
+        const etHome = hasET ? (match.score.extraTime?.home ?? 0) : 0
+        const etAway = hasET ? (match.score.extraTime?.away ?? 0) : 0
+        apiHomePen = match.score.fullTime.home - regHome - etHome
+        apiAwayPen = match.score.fullTime.away - regAway - etAway
         penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
       } else if (hasET) {
         apiHomeET = match.score.extraTime.home
