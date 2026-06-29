@@ -107,6 +107,8 @@ function PredictionCard({
     const h = isMobile ? (mobileHome !== '' ? parseInt(mobileHome) : NaN) : parseInt(homeRef.current?.value ?? '')
     const a = isMobile ? (mobileAway !== '' ? parseInt(mobileAway) : NaN) : parseInt(awayRef.current?.value ?? '')
     if (isNaN(h) || isNaN(a) || h < 0 || a < 0) { setError('请输入有效比分'); setLoading(false); return }
+    if (showExtraFields && !etWinner) { setError('请选择加时赛胜者'); setLoading(false); return }
+    if (showPenalty && !penaltyWinner) { setError('请选择点球胜者'); setLoading(false); return }
     const body = {
       match_id: match.id,
       pred_home_score: h,
