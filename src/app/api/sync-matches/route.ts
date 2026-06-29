@@ -72,7 +72,7 @@ async function runSync() {
   // 若查询失败则中止同步，绝不用空 prevMap 覆盖好数据
   const { data: allExisting, error: existingError } = await supabaseAdmin
     .from('matches')
-    .select('api_match_id, home_team, away_team, home_tla, away_tla, status, home_score_90, away_score_90, result_90, et_winner, penalty_winner')
+    .select('api_match_id, home_team, away_team, home_tla, away_tla, status, home_score_90, away_score_90, home_score_et, away_score_et, home_score_pen, away_score_pen, result_90, et_winner, penalty_winner')
   if (existingError) return NextResponse.json({ error: '读取现有比赛数据失败，同步中止以保护数据' }, { status: 500 })
   const prevMap = new Map(
     (allExisting || []).map((m: any) => [String(m.api_match_id), m])
@@ -80,7 +80,7 @@ async function runSync() {
   // 额外：通过已有积分的预测反查 finished 状态（防止 status 被 API 重置后保护失效）
   const { data: scoredPredictions } = await supabaseAdmin
     .from('predictions')
-    .select('match_id, matches(api_match_id, home_score_90, away_score_90, result_90, et_winner, penalty_winner)')
+    .select('match_id, matches(api_match_id, home_score_90, away_score_90, home_score_et, away_score_et, home_score_pen, away_score_pen, result_90, et_winner, penalty_winner)')
     .not('points_earned', 'is', null)
   const scoredMatchIds = new Set<string>()
   for (const p of scoredPredictions || []) {
@@ -130,32 +130,55 @@ async function runSync() {
     }
 
 
-    // ── 比分 & 结果：已有值不被 null/空覆盖 ──────────────────────────
+    // ── 比分 & 结果 ────────────────────────────────────────────────────
     let result90 = prev?.result_90 ?? null
     let etWinner = prev?.et_winner ?? null
     let penaltyWinner = prev?.penalty_winner ?? null
 
+    // football-data.org: ET/点球赛时 fullTime 含所有进球（包括点球）
+    // 必须用 regularTime 取 90 分钟比分，用 penalties 取点球比分
+    let apiHome90: number | null = null
+    let apiAway90: number | null = null
+    let apiHomePen: number | null = null
+    let apiAwayPen: number | null = null
+    let apiHomeET: number | null = null
+    let apiAwayET: number | null = null
+
     if (match.status === 'FINISHED') {
-      const h = match.score.fullTime.home
-      const a = match.score.fullTime.away
-      if (h != null && a != null) {
-        if (h > a) result90 = 'home_win'
-        else if (a > h) result90 = 'away_win'
-        else result90 = 'draw'
-      }
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
+
+      // 90分钟比分：优先用 regularTime（ET/点球赛时更准确），否则用 fullTime
+      const src90 = (hasET || hasPenalty) && match.score.regularTime?.home != null
+        ? match.score.regularTime
+        : match.score.fullTime
+      apiHome90 = src90.home
+      apiAway90 = src90.away
+
+      if (apiHome90 != null && apiAway90 != null) {
+        if (apiHome90 > apiAway90) result90 = 'home_win'
+        else if (apiAway90 > apiHome90) result90 = 'away_win'
+        else result90 = 'draw'
+      }
+
       if (hasPenalty) {
+        apiHomePen = match.score.penalties.home
+        apiAwayPen = match.score.penalties.away
         penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
       } else if (hasET) {
+        apiHomeET = match.score.extraTime.home
+        apiAwayET = match.score.extraTime.away
         etWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
       }
     }
 
-    const apiHome = match.status === 'FINISHED' ? match.score.fullTime.home : null
-    const apiAway = match.status === 'FINISHED' ? match.score.fullTime.away : null
-    const home90 = prev?.home_score_90 ?? apiHome
-    const away90 = prev?.away_score_90 ?? apiAway
+    // 保护：API 返回有效值时用 API（允许修正旧错误数据），API 返回 null 时保留 DB 旧值
+    const home90  = apiHome90  ?? prev?.home_score_90  ?? null
+    const away90  = apiAway90  ?? prev?.away_score_90  ?? null
+    const homePen = apiHomePen ?? prev?.home_score_pen ?? null
+    const awayPen = apiAwayPen ?? prev?.away_score_pen ?? null
+    const homeET  = apiHomeET  ?? prev?.home_score_et  ?? null
+    const awayET  = apiAwayET  ?? prev?.away_score_et  ?? null
 
     return {
       api_match_id: match.id,
@@ -169,6 +192,10 @@ async function runSync() {
       status: isFinished ? 'finished' : 'scheduled',
       home_score_90: isFinished ? home90 : null,
       away_score_90: isFinished ? away90 : null,
+      home_score_et: isFinished ? homeET : null,
+      away_score_et: isFinished ? awayET : null,
+      home_score_pen: isFinished ? homePen : null,
+      away_score_pen: isFinished ? awayPen : null,
       result_90: result90,
       et_winner: etWinner,
       penalty_winner: penaltyWinner,
