@@ -196,8 +196,14 @@ async function runSync() {
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
 
-      home90 = match.score.regularTime?.home ?? null
-      away90 = match.score.regularTime?.away ?? null
+      if (match.score.duration === 'REGULAR') {
+        home90 = match.score.fullTime?.home ?? null
+        away90 = match.score.fullTime?.away ?? null
+      } else {
+        // EXTRA_TIME or PENALTY_SHOOTOUT: fullTime includes ET/penalties, use regularTime
+        home90 = match.score.regularTime?.home ?? null
+        away90 = match.score.regularTime?.away ?? null
+      }
 
       if (hasET) {
         homeET = match.score.extraTime.home
