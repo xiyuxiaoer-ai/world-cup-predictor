@@ -192,6 +192,8 @@ async function runSync() {
     }
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
+    // 已算分比赛：直接沿用 DB 值，跳过 API 计算
+    const isScored = scoredMatchIds.has(String(match.id))
     let result90 = prev?.result_90 ?? null
     let etWinner = prev?.et_winner ?? null
     let penaltyWinner = prev?.penalty_winner ?? null
@@ -205,7 +207,7 @@ async function runSync() {
     let apiHomeET: number | null = null
     let apiAwayET: number | null = null
 
-    if (match.status === 'FINISHED') {
+    if (match.status === 'FINISHED' && !isScored) {
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
 
@@ -241,13 +243,14 @@ async function runSync() {
       }
     }
 
-    // 保护：API 返回有效值时用 API（允许修正旧错误数据），API 返回 null 时保留 DB 旧值
-    const home90  = apiHome90  ?? prev?.home_score_90  ?? null
-    const away90  = apiAway90  ?? prev?.away_score_90  ?? null
-    const homePen = apiHomePen ?? prev?.home_score_pen ?? null
-    const awayPen = apiAwayPen ?? prev?.away_score_pen ?? null
-    const homeET  = apiHomeET  ?? prev?.home_score_et  ?? null
-    const awayET  = apiAwayET  ?? prev?.away_score_et  ?? null
+    // 保护：已算分的比赛（scoredMatchIds）比分数据锁定，不被 API 覆盖
+    // 未算分的比赛：API 有值优先，API 无值保留 DB
+    const home90  = isScored ? (prev?.home_score_90  ?? apiHome90)  : (apiHome90  ?? prev?.home_score_90  ?? null)
+    const away90  = isScored ? (prev?.away_score_90  ?? apiAway90)  : (apiAway90  ?? prev?.away_score_90  ?? null)
+    const homePen = isScored ? (prev?.home_score_pen ?? apiHomePen) : (apiHomePen ?? prev?.home_score_pen ?? null)
+    const awayPen = isScored ? (prev?.away_score_pen ?? apiAwayPen) : (apiAwayPen ?? prev?.away_score_pen ?? null)
+    const homeET  = isScored ? (prev?.home_score_et  ?? apiHomeET)  : (apiHomeET  ?? prev?.home_score_et  ?? null)
+    const awayET  = isScored ? (prev?.away_score_et  ?? apiAwayET)  : (apiAwayET  ?? prev?.away_score_et  ?? null)
 
     return {
       api_match_id: match.id,
