@@ -17,12 +17,12 @@ jobs:
           timeout: 300s
           command_timeout: 10m
           script: |
-            echo "=== user crontab ===" && crontab -l 2>/dev/null || echo "(empty)"
-            echo "=== /etc/cron.d/ ===" && ls /etc/cron.d/ 2>/dev/null && grep -r sync-matches /etc/cron.d/ 2>/dev/null || echo "(no match)"
-            echo "=== /etc/crontab ===" && grep sync-matches /etc/crontab 2>/dev/null || echo "(no match)"
-            echo "=== wcp-sync.log (last 10) ===" && tail -10 /var/log/wcp-sync.log 2>/dev/null || echo "(no log)"
-            echo "=== all crontabs ===" && for u in $(cut -f1 -d: /etc/passwd); do crontab -l -u $u 2>/dev/null | grep -q sync-matches && echo "$u has sync cron"; done
+            echo "=== remove sync cron (all users) ==="
             crontab -l 2>/dev/null | grep -v sync-matches | crontab - 2>/dev/null
+            sudo crontab -l 2>/dev/null | grep -v sync-matches | sudo crontab - 2>/dev/null && echo "root cron cleaned" || echo "no sudo or root cron empty"
+            sudo crontab -u root -l 2>/dev/null | grep -v sync-matches | sudo crontab -u root - 2>/dev/null || true
+            sudo grep -rl sync-matches /etc/cron.d/ 2>/dev/null | xargs sudo sed -i '/sync-matches/d' 2>/dev/null || true
+            echo "=== deploy ==="
             cd /var/www/world-cup-predictor
             git checkout -- .
             git pull
