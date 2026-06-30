@@ -192,8 +192,9 @@ async function runSync() {
     }
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
-    // 已算分比赛：直接沿用 DB 值，跳过 API 计算
+    // 双重保护：① scoredMatchIds（已算分预测）② DB 已有 finished + 比分（防 join 查询偶发失败）
     const isScored = scoredMatchIds.has(String(match.id))
+      || (prev?.status === 'finished' && prev?.home_score_90 != null)
     let result90 = prev?.result_90 ?? null
     let etWinner = prev?.et_winner ?? null
     let penaltyWinner = prev?.penalty_winner ?? null
