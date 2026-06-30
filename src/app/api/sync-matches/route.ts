@@ -252,6 +252,21 @@ async function runSync() {
     const homeET  = isScored ? (prev?.home_score_et  ?? apiHomeET)  : (apiHomeET  ?? prev?.home_score_et  ?? null)
     const awayET  = isScored ? (prev?.away_score_et  ?? apiAwayET)  : (apiAwayET  ?? prev?.away_score_et  ?? null)
 
+    // scored 比赛：upsert 对象里完全不带比分字段
+    // Supabase upsert 只更新对象中存在的字段，缺失的字段 DB 原值保持不变
+    // 这样不论 prevMap 里的值是否过期，都绝对不会覆盖 DB 里已有的正确比分
+    const scorePayload = isScored ? {} : {
+      home_score_90: isFinished ? home90 : null,
+      away_score_90: isFinished ? away90 : null,
+      home_score_et: isFinished ? homeET : null,
+      away_score_et: isFinished ? awayET : null,
+      home_score_pen: isFinished ? homePen : null,
+      away_score_pen: isFinished ? awayPen : null,
+      result_90: result90,
+      et_winner: etWinner,
+      penalty_winner: penaltyWinner,
+    }
+
     return {
       api_match_id: match.id,
       stage: STAGE_MAP[match.stage] || 'group',
@@ -262,16 +277,8 @@ async function runSync() {
       kickoff_time: match.utcDate,
       lock_time: lockTime.toISOString(),
       status: isFinished ? 'finished' : 'scheduled',
-      home_score_90: isFinished ? home90 : null,
-      away_score_90: isFinished ? away90 : null,
-      home_score_et: isFinished ? homeET : null,
-      away_score_et: isFinished ? awayET : null,
-      home_score_pen: isFinished ? homePen : null,
-      away_score_pen: isFinished ? awayPen : null,
-      result_90: result90,
-      et_winner: etWinner,
-      penalty_winner: penaltyWinner,
       group_name: match.group || null,
+      ...scorePayload,
     }
   })
 
