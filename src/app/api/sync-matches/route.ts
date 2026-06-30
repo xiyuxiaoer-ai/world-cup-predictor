@@ -262,6 +262,7 @@ async function runSync() {
   })
 
   // DB 里已是 finished 的比赛整条跳过，其余正常 upsert
+  const skippedIds = transformed.filter((m: any) => m._skip).map((m: any) => m.api_match_id)
   const toUpsert = transformed
     .filter((m: any) => !m._skip)
     .map(({ _skip, ...rest }: any) => rest)
@@ -313,5 +314,12 @@ async function runSync() {
     }
   }
 
-  return NextResponse.json({ success: true, matches: transformed.length, scored })
+  return NextResponse.json({
+    success: true,
+    matches: transformed.length,
+    scored,
+    skipped: skippedIds.length,
+    skipped_ids: skippedIds,
+    commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) ?? 'local',
+  })
 }

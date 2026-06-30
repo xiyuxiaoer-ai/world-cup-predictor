@@ -99,7 +99,7 @@ export default function AdminPage() {
     const res = await fetch('/api/sync-matches', { method: 'POST' })
     const data = await res.json()
     if (res.ok) {
-      setSyncMatchesResult(`同步完成！共 ${data.matches} 场比赛，积分更新 ${data.scored} 条。`)
+      setSyncMatchesResult(`同步完成！共 ${data.matches} 场，跳过 ${data.skipped} 场(已结束)，积分更新 ${data.scored} 条。commit:${data.commit} 跳过ID:${JSON.stringify(data.skipped_ids)}`)
     } else {
       setSyncMatchesResult(`错误：${data.error}`)
     }
