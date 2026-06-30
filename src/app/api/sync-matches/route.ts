@@ -232,8 +232,8 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
       }
     }
 
-    // 记录 API 原始比分数据（仅 API 返回 FINISHED 的场次）
-    if (match.status === 'FINISHED') {
+    // 记录 API 原始比分数据：跳过已结束的小组赛（数据量大且无价值），保留淘汰赛和新写入的场次
+    if (match.status === 'FINISHED' && (!isAlreadyFinished || match.stage !== 'GROUP_STAGE')) {
       apiFinishedLog.push({
         api_match_id: match.id,
         home_team: homeName,
