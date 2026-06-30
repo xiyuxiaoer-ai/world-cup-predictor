@@ -175,8 +175,7 @@ async function runSync() {
     }
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
-    // DB 里已是 finished 的比赛：整条跳过 upsert，比分永远不被 API 覆盖
-    // 只有首次从 scheduled→finished 时才写入比分（此后 prev.status='finished'，后续同步全部跳过）
+      // DB 里已是 finished 的比赛：整条跳过 upsert，比分永远不被 API 覆盖
     const isAlreadyFinished = prev?.status === 'finished'
 
     let result90 = prev?.result_90 ?? null
@@ -192,42 +191,21 @@ async function runSync() {
     if (match.status === 'FINISHED' && !isAlreadyFinished) {
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
-      const regTimeHome = match.score.regularTime?.home
 
-      // API 偶尔不返回 regularTime（已知不稳定）：用 fullTime 会算错点球赛
-      // 如果 regularTime 缺失但 DB 已有比分，直接沿用 DB（比重算更可靠）
-      const apiIncomplete = (hasET || hasPenalty) && regTimeHome == null
+      home90 = match.score.regularTime?.home ?? null
+      away90 = match.score.regularTime?.away ?? null
 
-      if (apiIncomplete && prev?.home_score_90 != null) {
-        // API 数据不完整，信任 DB 现有值
-        home90 = prev.home_score_90
-        away90 = prev.away_score_90
-        homePen = prev.home_score_pen ?? null
-        awayPen = prev.away_score_pen ?? null
-        homeET  = prev.home_score_et  ?? null
-        awayET  = prev.away_score_et  ?? null
-      } else {
-        // 正常计算
-        const src90 = (hasET || hasPenalty) && regTimeHome != null
-          ? match.score.regularTime
-          : match.score.fullTime
-        home90 = src90.home
-        away90 = src90.away
+      if (hasET) {
+        homeET = match.score.extraTime.home
+        awayET = match.score.extraTime.away
+      }
 
-        if (hasPenalty) {
-          const regHome = match.score.regularTime?.home ?? 0
-          const regAway = match.score.regularTime?.away ?? 0
-          const etHome = hasET ? (match.score.extraTime?.home ?? 0) : 0
-          const etAway = hasET ? (match.score.extraTime?.away ?? 0) : 0
-          // fullTime = regularTime + extraTime + penaltyKicks
-          homePen = match.score.fullTime.home - regHome - etHome
-          awayPen = match.score.fullTime.away - regAway - etAway
-          penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
-        } else if (hasET) {
-          homeET = match.score.extraTime.home
-          awayET = match.score.extraTime.away
-          etWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
-        }
+      if (hasPenalty) {
+        homePen = match.score.penalties.home
+        awayPen = match.score.penalties.away
+        penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
+      } else if (hasET) {
+        etWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
       }
 
       if (home90 != null && away90 != null) {
