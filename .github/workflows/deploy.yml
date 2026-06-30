@@ -61,3 +61,13 @@ jobs:
             tail -30 ~/.pm2/logs/wcp-out.log 2>/dev/null || echo "(no out log)"
             echo "=== nginx access log (last 10) ==="
             sudo tail -10 /var/log/nginx/access.log 2>/dev/null || echo "(no nginx log)"
+            echo "=== nginx config ==="
+            sudo cat /etc/nginx/sites-enabled/* 2>/dev/null || sudo cat /etc/nginx/nginx.conf 2>/dev/null || echo "(no nginx config)"
+            echo "=== .next/BUILD_ID ==="
+            cat /var/www/world-cup-predictor/.next/BUILD_ID 2>/dev/null || echo "(no BUILD_ID)"
+            echo "=== test GET /api/sync-matches (no auth, expect 401 if new code) ==="
+            curl -s http://localhost:3000/api/sync-matches 2>&1 | head -c 300
+            echo ""
+            echo "=== test POST /api/sync-matches (no cookie, expect 401 if new code) ==="
+            curl -s -X POST http://localhost:3000/api/sync-matches 2>&1 | head -c 300
+            echo ""
