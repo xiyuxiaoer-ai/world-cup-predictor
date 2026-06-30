@@ -269,6 +269,8 @@ async function runSync() {
 
   let scored = 0
   for (const match of (finishedMatches as Match[]) || []) {
+    if (match.result_90 == null) continue  // scores not ready yet, don't lock points at 0
+
     const { data: predictions } = await supabaseAdmin
       .from('predictions')
       .select('*')
