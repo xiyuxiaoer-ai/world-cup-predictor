@@ -44,3 +44,20 @@ jobs:
             ps aux | grep -E "curl|sync-matches" | grep -v grep || echo "(none)"
             echo "=== all cron-related files ==="
             sudo find /etc /var/spool/cron /usr/local/etc -name "*.cron" -o -name "crontab" 2>/dev/null | xargs sudo grep -l sync-matches 2>/dev/null || echo "(none found)"
+            echo "=== ALL users crontabs ==="
+            for user in $(cut -f1 -d: /etc/passwd); do CRON=$(sudo crontab -u $user -l 2>/dev/null); if [ -n "$CRON" ] && echo "$CRON" | grep -qv "^#"; then echo "--- $user ---"; echo "$CRON"; fi; done || echo "(none)"
+            echo "=== /etc/cron.* directories ==="
+            sudo ls /etc/cron.hourly/ /etc/cron.daily/ /etc/cron.weekly/ /etc/cron.monthly/ /etc/cron.d/ 2>/dev/null
+            sudo grep -rl "sync\|football\|supabase\|wcp" /etc/cron.hourly/ /etc/cron.daily/ /etc/cron.weekly/ /etc/cron.monthly/ /etc/cron.d/ 2>/dev/null | xargs sudo cat 2>/dev/null || echo "(nothing found)"
+            echo "=== scripts referencing supabase/football ==="
+            sudo find /root /home /var/www /opt /usr/local/bin -type f \( -name "*.js" -o -name "*.sh" -o -name "*.py" -o -name "*.ts" \) 2>/dev/null | xargs sudo grep -l "supabase\|football-data\|sync-match" 2>/dev/null | grep -v "node_modules\|\.next" || echo "(none)"
+            echo "=== all listening ports ==="
+            ss -tlnp 2>/dev/null || netstat -tlnp 2>/dev/null
+            echo "=== all node/next processes ==="
+            ps aux | grep -E "node|next|npm" | grep -v grep || echo "(none)"
+            echo "=== pm2 list all ==="
+            pm2 list 2>/dev/null
+            echo "=== pm2 out log (last 30 lines) ==="
+            tail -30 ~/.pm2/logs/wcp-out.log 2>/dev/null || echo "(no out log)"
+            echo "=== nginx access log (last 10) ==="
+            sudo tail -10 /var/log/nginx/access.log 2>/dev/null || echo "(no nginx log)"
