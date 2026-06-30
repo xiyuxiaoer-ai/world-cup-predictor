@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { calculatePoints, getMissPenalty } from '@/lib/scores'
-import { R32_SLOTS } from '@/lib/bracketSlots'
+import { R32_SLOTS, LATER_SLOT_BY_ID } from '@/lib/bracketSlots'
 import type { Match, Prediction } from '@/types'
 
 const STAGE_MAP: Record<string, string> = {
@@ -98,6 +98,49 @@ async function runSync() {
   }
 
 
+  // ── R32 胜者 → 补充 R16 队名（API 有时不及时传播，如 winner=null 的 bug）──
+  // 奇数 posInRound 的 R32 胜者 → 该 R16 比赛的主队；偶数 → 客队
+  type TeamRef = { name: string; tla: string | null }
+  const r32Supplement = new Map<number, { homeSlot: TeamRef | null; awaySlot: TeamRef | null }>()
+  for (const m of matches) {
+    if (m.stage !== 'LAST_32' || m.status !== 'FINISHED') continue
+    const slot = R32_SLOTS[m.id as number]
+    if (!slot) continue
+
+    let winnerName: string | null = null
+    let winnerTla: string | null = null
+
+    if (m.score.winner === 'HOME_TEAM') {
+      winnerName = m.homeTeam.name || m.homeTeam.shortName || null
+      winnerTla = m.homeTeam.tla || null
+    } else if (m.score.winner === 'AWAY_TEAM') {
+      winnerName = m.awayTeam.name || m.awayTeam.shortName || null
+      winnerTla = m.awayTeam.tla || null
+    } else {
+      // API winner=null（已知 bug），回退到 DB 存储的点球/加时胜者
+      const prev = prevMap.get(String(m.id))
+      const stored = prev?.penalty_winner ?? prev?.et_winner ?? null
+      if (stored) {
+        const homeApiName = m.homeTeam.name || m.homeTeam.shortName || ''
+        const awayApiName = m.awayTeam.name || m.awayTeam.shortName || ''
+        if (stored === homeApiName) {
+          winnerName = homeApiName; winnerTla = m.homeTeam.tla || null
+        } else {
+          winnerName = awayApiName; winnerTla = m.awayTeam.tla || null
+        }
+      }
+    }
+
+    if (!winnerName) continue
+    const cur = r32Supplement.get(slot.feedsInto) ?? { homeSlot: null, awaySlot: null }
+    // 奇数 posInRound → R16 主队槽位，偶数 → 客队槽位
+    if (slot.posInRound % 2 === 1) {
+      r32Supplement.set(slot.feedsInto, { ...cur, homeSlot: { name: winnerName, tla: winnerTla } })
+    } else {
+      r32Supplement.set(slot.feedsInto, { ...cur, awaySlot: { name: winnerName, tla: winnerTla } })
+    }
+  }
+
   const transformed = matches.map((match: any) => {
     const kickoffTime = new Date(match.utcDate)
     const lockTime = new Date(kickoffTime.getTime() - 60 * 60 * 1000)
@@ -129,6 +172,24 @@ async function runSync() {
       }
     }
 
+
+    // ── R16+ TBD 补充：从 R32 胜者推算（仅当 API 仍返回 TBD 时生效）──────
+    if (match.stage !== 'LAST_32') {
+      const laterNum = LATER_SLOT_BY_ID[match.id as number]
+      if (laterNum !== undefined) {
+        const supp = r32Supplement.get(laterNum)
+        if (supp) {
+          if ((homeName === 'TBD' || !homeName) && supp.homeSlot) {
+            homeName = supp.homeSlot.name
+            homeTla = supp.homeSlot.tla
+          }
+          if ((awayName === 'TBD' || !awayName) && supp.awaySlot) {
+            awayName = supp.awaySlot.name
+            awayTla = supp.awaySlot.tla
+          }
+        }
+      }
+    }
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
     let result90 = prev?.result_90 ?? null

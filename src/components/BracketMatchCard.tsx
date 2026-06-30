@@ -10,6 +10,12 @@ export type BracketMatchData = {
   away_tla: string | null
   home_score_90: number | null
   away_score_90: number | null
+  home_score_pen: number | null
+  away_score_pen: number | null
+  home_score_et: number | null
+  away_score_et: number | null
+  penalty_winner: string | null
+  et_winner: string | null
   status: string
   kickoff_time: string
 }
@@ -33,10 +39,11 @@ function Flag({ tla, faded }: { tla: string | null | undefined; faded?: boolean 
   return <span className="w-[18px] h-[13px] shrink-0 rounded-[2px] bg-black/[0.06] dark:bg-white/[0.06]" />
 }
 
-function Row({ tla, name, score, winner, loser, unknown }: {
+function Row({ tla, name, score, penScore, winner, loser, unknown }: {
   tla: string | null | undefined
   name: string
   score: number | null
+  penScore?: number | null
   winner: boolean
   loser: boolean
   unknown: boolean
@@ -55,11 +62,16 @@ function Row({ tla, name, score, winner, loser, unknown }: {
         {name}
       </span>
       {score !== null && (
-        <span className={`text-[11px] font-bold shrink-0 leading-none tabular-nums w-3 text-right ${
+        <div className={`flex items-baseline shrink-0 leading-none gap-[1px] ${
           winner ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400/80 dark:text-gray-500'
         }`}>
-          {score}
-        </span>
+          <span className="text-[11px] font-bold tabular-nums">
+            {score}
+          </span>
+          {penScore != null && (
+            <span className="text-[9px] tabular-nums opacity-80">({penScore})</span>
+          )}
+        </div>
       )}
     </div>
   )
@@ -134,8 +146,25 @@ export default function BracketMatchCard({
   const finished = match.status === 'FINISHED' || match.status === 'finished'
   const h = match.home_score_90
   const a = match.away_score_90
-  const homeWin = finished && h !== null && a !== null && h > a
-  const awayWin = finished && h !== null && a !== null && a > h
+  const hp = match.home_score_pen ?? null
+  const ap = match.away_score_pen ?? null
+  const hasPen = hp !== null && ap !== null
+
+  // 真正的胜者：点球 > 加时 > 90分
+  let homeWin = false
+  let awayWin = false
+  if (finished) {
+    if (match.penalty_winner) {
+      homeWin = match.penalty_winner === match.home_team
+      awayWin = match.penalty_winner === match.away_team
+    } else if (match.et_winner) {
+      homeWin = match.et_winner === match.home_team
+      awayWin = match.et_winner === match.away_team
+    } else if (h !== null && a !== null) {
+      homeWin = h > a
+      awayWin = a > h
+    }
+  }
 
   const homeTbd = match.home_team === 'TBD' || !match.home_team
   const awayTbd = match.away_team === 'TBD' || !match.away_team
@@ -155,9 +184,17 @@ export default function BracketMatchCard({
       shadow-sm shadow-black/[0.07] dark:shadow-black/30
       ${roundColor ?? 'bg-white/80 dark:bg-gray-800/75'}`}>
       <DateRow time={match.kickoff_time} finished={finished} />
-      <Row tla={effectiveHomeTla} name={homeName} score={finished ? h : null} winner={homeWin} loser={awayWin} unknown={false} />
+      <Row
+        tla={effectiveHomeTla} name={homeName}
+        score={finished ? h : null} penScore={finished && hasPen ? hp : null}
+        winner={homeWin} loser={awayWin} unknown={false}
+      />
       <div className="h-px bg-black/[0.05] dark:bg-white/[0.06]" />
-      <Row tla={effectiveAwayTla} name={awayName} score={finished ? a : null} winner={awayWin} loser={homeWin} unknown={false} />
+      <Row
+        tla={effectiveAwayTla} name={awayName}
+        score={finished ? a : null} penScore={finished && hasPen ? ap : null}
+        winner={awayWin} loser={homeWin} unknown={false}
+      />
     </div>
   )
 }
