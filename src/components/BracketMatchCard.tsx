@@ -148,7 +148,10 @@ export default function BracketMatchCard({
   const a = match.away_score_90
   const hp = match.home_score_pen ?? null
   const ap = match.away_score_pen ?? null
+  const he = match.home_score_et ?? null
+  const ae = match.away_score_et ?? null
   const hasPen = hp !== null && ap !== null
+  const hasET = !hasPen && he !== null && ae !== null
 
   // 真正的胜者：点球 > 加时 > 90分
   let homeWin = false
@@ -186,13 +189,15 @@ export default function BracketMatchCard({
       <DateRow time={match.kickoff_time} finished={finished} />
       <Row
         tla={effectiveHomeTla} name={homeName}
-        score={finished ? h : null} penScore={finished && hasPen ? hp : null}
+        score={finished ? h : null}
+        penScore={finished ? (hasPen ? hp : hasET && h !== null && he !== null ? h + he : null) : null}
         winner={homeWin} loser={awayWin} unknown={false}
       />
       <div className="h-px bg-black/[0.05] dark:bg-white/[0.06]" />
       <Row
         tla={effectiveAwayTla} name={awayName}
-        score={finished ? a : null} penScore={finished && hasPen ? ap : null}
+        score={finished ? a : null}
+        penScore={finished ? (hasPen ? ap : hasET && a !== null && ae !== null ? a + ae : null) : null}
         winner={awayWin} loser={homeWin} unknown={false}
       />
     </div>
