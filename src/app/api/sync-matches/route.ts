@@ -192,83 +192,71 @@ async function runSync() {
     }
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
-    // 双重保护：① scoredMatchIds（已算分预测）② DB 已有 finished + 比分（防 join 查询偶发失败）
+    // 已算分比赛（scoredMatchIds）：完全跳过 upsert，DB 数据不被任何 API 覆盖
+    // 注意：不能用 partial upsert（scorePayload={}），Supabase 会把缺失字段设为 NULL
+    // 正确做法：从 upsert 数组里整条移除
     const isScored = scoredMatchIds.has(String(match.id))
-      || (prev?.status === 'finished' && prev?.home_score_90 != null)
+
     let result90 = prev?.result_90 ?? null
     let etWinner = prev?.et_winner ?? null
     let penaltyWinner = prev?.penalty_winner ?? null
+    let home90: number | null = null
+    let away90: number | null = null
+    let homePen: number | null = null
+    let awayPen: number | null = null
+    let homeET: number | null = null
+    let awayET: number | null = null
 
-    // football-data.org: ET/点球赛时 fullTime 含所有进球（包括点球）
-    // 必须用 regularTime 取 90 分钟比分，用 penalties 取点球比分
-    let apiHome90: number | null = null
-    let apiAway90: number | null = null
-    let apiHomePen: number | null = null
-    let apiAwayPen: number | null = null
-    let apiHomeET: number | null = null
-    let apiAwayET: number | null = null
-
-    if (match.status === 'FINISHED' && !isScored) {
+    if (match.status === 'FINISHED') {
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
+      const regTimeHome = match.score.regularTime?.home
 
-      // 90分钟比分：优先用 regularTime（ET/点球赛时更准确），否则用 fullTime
-      const src90 = (hasET || hasPenalty) && match.score.regularTime?.home != null
-        ? match.score.regularTime
-        : match.score.fullTime
-      apiHome90 = src90.home
-      apiAway90 = src90.away
+      // API 偶尔不返回 regularTime（已知不稳定）：用 fullTime 会算错点球赛
+      // 如果 regularTime 缺失但 DB 已有比分，直接沿用 DB（比重算更可靠）
+      const apiIncomplete = (hasET || hasPenalty) && regTimeHome == null
 
-      if (apiHome90 != null && apiAway90 != null) {
-        if (apiHome90 > apiAway90) result90 = 'home_win'
-        else if (apiAway90 > apiHome90) result90 = 'away_win'
+      if (apiIncomplete && prev?.home_score_90 != null) {
+        // API 数据不完整，信任 DB 现有值
+        home90 = prev.home_score_90
+        away90 = prev.away_score_90
+        homePen = prev.home_score_pen ?? null
+        awayPen = prev.away_score_pen ?? null
+        homeET  = prev.home_score_et  ?? null
+        awayET  = prev.away_score_et  ?? null
+      } else {
+        // 正常计算
+        const src90 = (hasET || hasPenalty) && regTimeHome != null
+          ? match.score.regularTime
+          : match.score.fullTime
+        home90 = src90.home
+        away90 = src90.away
+
+        if (hasPenalty) {
+          const regHome = match.score.regularTime?.home ?? 0
+          const regAway = match.score.regularTime?.away ?? 0
+          const etHome = hasET ? (match.score.extraTime?.home ?? 0) : 0
+          const etAway = hasET ? (match.score.extraTime?.away ?? 0) : 0
+          // fullTime = regularTime + extraTime + penaltyKicks
+          homePen = match.score.fullTime.home - regHome - etHome
+          awayPen = match.score.fullTime.away - regAway - etAway
+          penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
+        } else if (hasET) {
+          homeET = match.score.extraTime.home
+          awayET = match.score.extraTime.away
+          etWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
+        }
+      }
+
+      if (home90 != null && away90 != null) {
+        if (home90 > away90) result90 = 'home_win'
+        else if (away90 > home90) result90 = 'away_win'
         else result90 = 'draw'
       }
-
-      if (hasPenalty) {
-        // score.penalties 是包含 regularTime 的累积值，且不含 sudden death
-        // 用 fullTime - regularTime(- extraTime) 才能得到完整点球阶段得分（含 sudden death）
-        const regHome = match.score.regularTime?.home ?? 0
-        const regAway = match.score.regularTime?.away ?? 0
-        const etHome = hasET ? (match.score.extraTime?.home ?? 0) : 0
-        const etAway = hasET ? (match.score.extraTime?.away ?? 0) : 0
-        // fullTime = regularTime + extraTime_incremental + penaltyKicks
-        // => penaltyKicks = fullTime - regularTime - extraTime
-        apiHomePen = match.score.fullTime.home - regHome - etHome
-        apiAwayPen = match.score.fullTime.away - regAway - etAway
-        penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
-      } else if (hasET) {
-        apiHomeET = match.score.extraTime.home
-        apiAwayET = match.score.extraTime.away
-        etWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
-      }
-    }
-
-    // 保护：已算分的比赛（scoredMatchIds）比分数据锁定，不被 API 覆盖
-    // 未算分的比赛：API 有值优先，API 无值保留 DB
-    const home90  = isScored ? (prev?.home_score_90  ?? apiHome90)  : (apiHome90  ?? prev?.home_score_90  ?? null)
-    const away90  = isScored ? (prev?.away_score_90  ?? apiAway90)  : (apiAway90  ?? prev?.away_score_90  ?? null)
-    const homePen = isScored ? (prev?.home_score_pen ?? apiHomePen) : (apiHomePen ?? prev?.home_score_pen ?? null)
-    const awayPen = isScored ? (prev?.away_score_pen ?? apiAwayPen) : (apiAwayPen ?? prev?.away_score_pen ?? null)
-    const homeET  = isScored ? (prev?.home_score_et  ?? apiHomeET)  : (apiHomeET  ?? prev?.home_score_et  ?? null)
-    const awayET  = isScored ? (prev?.away_score_et  ?? apiAwayET)  : (apiAwayET  ?? prev?.away_score_et  ?? null)
-
-    // scored 比赛：upsert 对象里完全不带比分字段
-    // Supabase upsert 只更新对象中存在的字段，缺失的字段 DB 原值保持不变
-    // 这样不论 prevMap 里的值是否过期，都绝对不会覆盖 DB 里已有的正确比分
-    const scorePayload = isScored ? {} : {
-      home_score_90: isFinished ? home90 : null,
-      away_score_90: isFinished ? away90 : null,
-      home_score_et: isFinished ? homeET : null,
-      away_score_et: isFinished ? awayET : null,
-      home_score_pen: isFinished ? homePen : null,
-      away_score_pen: isFinished ? awayPen : null,
-      result_90: result90,
-      et_winner: etWinner,
-      penalty_winner: penaltyWinner,
     }
 
     return {
+      _isScored: isScored,
       api_match_id: match.id,
       stage: STAGE_MAP[match.stage] || 'group',
       home_team: homeName,
@@ -278,14 +266,28 @@ async function runSync() {
       kickoff_time: match.utcDate,
       lock_time: lockTime.toISOString(),
       status: isFinished ? 'finished' : 'scheduled',
+      home_score_90:  isFinished ? (home90  ?? prev?.home_score_90  ?? null) : null,
+      away_score_90:  isFinished ? (away90  ?? prev?.away_score_90  ?? null) : null,
+      home_score_et:  isFinished ? (homeET  ?? prev?.home_score_et  ?? null) : null,
+      away_score_et:  isFinished ? (awayET  ?? prev?.away_score_et  ?? null) : null,
+      home_score_pen: isFinished ? (homePen ?? prev?.home_score_pen ?? null) : null,
+      away_score_pen: isFinished ? (awayPen ?? prev?.away_score_pen ?? null) : null,
+      result_90: result90,
+      et_winner: etWinner,
+      penalty_winner: penaltyWinner,
       group_name: match.group || null,
-      ...scorePayload,
     }
   })
 
+  // scored 比赛（predictions 已有 points_earned）整条跳过，DB 数据完全不动
+  // unscored 比赛：移除内部标记后完整 upsert
+  const toUpsert = transformed
+    .filter((m: any) => !m._isScored)
+    .map(({ _isScored, ...rest }: any) => rest)
+
   const { error } = await supabaseAdmin
     .from('matches')
-    .upsert(transformed, { onConflict: 'api_match_id' })
+    .upsert(toUpsert, { onConflict: 'api_match_id' })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
