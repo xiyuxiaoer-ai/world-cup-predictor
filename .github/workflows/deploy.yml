@@ -37,7 +37,7 @@ jobs:
             echo "=== /var/spool/cron/crontabs ==="
             sudo ls /var/spool/cron/crontabs/ 2>/dev/null && sudo grep -rl sync-matches /var/spool/cron/crontabs/ 2>/dev/null || echo "(empty or no access)"
             echo "=== pm2 show wcp ==="
-            pm2 show wcp 2>/dev/null | grep -E "script|cron|exec mode|pid"
+            pm2 show wcp 2>/dev/null | grep -E "script|cron|exec mode|pid|cwd|root|node"
             echo "=== crontab file contents ==="
             sudo cat /var/spool/cron/crontabs/* 2>/dev/null || echo "(no crontab files)"
             echo "=== running curl/sync processes ==="
