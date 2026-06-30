@@ -22,17 +22,21 @@ export async function GET(request: Request) {
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  return runSync()
+  const userAgent = request.headers.get('user-agent') ?? 'unknown'
+  const ip = request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for') ?? 'unknown'
+  return runSync({ triggeredBy: 'cron', userAgent, ip })
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  return runSync()
+  const userAgent = request.headers.get('user-agent') ?? 'unknown'
+  const ip = request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for') ?? 'unknown'
+  return runSync({ triggeredBy: user.email ?? user.id, userAgent, ip })
 }
 
-async function runSync() {
+async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string }) {
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -127,6 +131,9 @@ async function runSync() {
       r32Supplement.set(slot.feedsInto, { ...cur, awaySlot: { name: winnerName, tla: winnerTla } })
     }
   }
+
+  // 收集所有 API 返回 FINISHED 的比赛的原始比分数据，用于写入 sync_log
+  const apiFinishedLog: any[] = []
 
   const transformed = matches.map((match: any) => {
     const kickoffTime = new Date(match.utcDate)
@@ -225,6 +232,23 @@ async function runSync() {
       }
     }
 
+    // 记录 API 原始比分数据（仅 API 返回 FINISHED 的场次）
+    if (match.status === 'FINISHED') {
+      apiFinishedLog.push({
+        api_match_id: match.id,
+        home_team: homeName,
+        away_team: awayName,
+        api_duration: match.score.duration ?? null,
+        api_regular_time: match.score.regularTime ?? null,
+        api_full_time: match.score.fullTime ?? null,
+        api_extra_time: match.score.extraTime ?? null,
+        api_penalties: match.score.penalties ?? null,
+        wrote_home_90: home90,
+        wrote_away_90: away90,
+        skipped: isAlreadyFinished,
+      })
+    }
+
     return {
       _skip: isAlreadyFinished,
       api_match_id: match.id,
@@ -303,6 +327,19 @@ async function runSync() {
       }
     }
   }
+
+  // 写入 sync_log
+  await supabaseAdmin.from('sync_log').insert({
+    triggered_by: ctx.triggeredBy,
+    user_agent: ctx.userAgent,
+    ip: ctx.ip,
+    commit: process.env.BUILD_COMMIT ?? 'unknown',
+    matches_total: transformed.length,
+    skipped: skippedIds.length,
+    skipped_ids: skippedIds,
+    scored,
+    finished_matches: apiFinishedLog,
+  })
 
   return NextResponse.json({
     success: true,
