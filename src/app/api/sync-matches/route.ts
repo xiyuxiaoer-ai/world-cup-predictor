@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 import { calculatePoints, getMissPenalty } from '@/lib/scores'
 import { R32_SLOTS, LATER_SLOT_BY_ID } from '@/lib/bracketSlots'
 import type { Match, Prediction } from '@/types'
@@ -25,6 +26,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST() {
+  const supabase = await createServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const { data: profile } = await supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+  if (!profile?.is_admin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   return runSync()
 }
 
