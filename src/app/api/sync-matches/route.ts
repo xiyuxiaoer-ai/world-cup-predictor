@@ -229,11 +229,10 @@ async function runSync() {
         const regAway = match.score.regularTime?.away ?? 0
         const etHome = hasET ? (match.score.extraTime?.home ?? 0) : 0
         const etAway = hasET ? (match.score.extraTime?.away ?? 0) : 0
-        // fullTime = regularTime + cumulativeAfterET + penaltyKicks
-        // cumulativeAfterET = regularTime + extraTime.incremental
-        // => penaltyKicks = fullTime - 2*regularTime - extraTime
-        apiHomePen = match.score.fullTime.home - 2 * regHome - etHome
-        apiAwayPen = match.score.fullTime.away - 2 * regAway - etAway
+        // fullTime = regularTime + extraTime_incremental + penaltyKicks
+        // => penaltyKicks = fullTime - regularTime - extraTime
+        apiHomePen = match.score.fullTime.home - regHome - etHome
+        apiAwayPen = match.score.fullTime.away - regAway - etAway
         penaltyWinner = match.score.winner === 'HOME_TEAM' ? match.homeTeam.name : match.awayTeam.name
       } else if (hasET) {
         apiHomeET = match.score.extraTime.home
