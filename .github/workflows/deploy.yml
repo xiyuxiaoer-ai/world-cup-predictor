@@ -27,3 +27,8 @@ jobs:
             git checkout -- .
             git pull
             npm run build && pm2 restart wcp || echo "BUILD FAILED, keeping old version running"
+            echo "=== wcp-sync.log (last 20) ==="
+            tail -20 /var/log/wcp-sync.log 2>/dev/null || echo "(log not found)"
+            echo "=== current crontabs ==="
+            crontab -l 2>/dev/null || echo "(user crontab empty)"
+            sudo crontab -l 2>/dev/null || echo "(root crontab empty or no sudo)"
