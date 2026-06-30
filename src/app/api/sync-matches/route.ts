@@ -77,25 +77,8 @@ async function runSync() {
   const prevMap = new Map(
     (allExisting || []).map((m: any) => [String(m.api_match_id), m])
   )
-  // 额外：通过已有积分的预测反查 finished 状态（防止 status 被 API 重置后保护失效）
-  const { data: scoredPredictions } = await supabaseAdmin
-    .from('predictions')
-    .select('match_id, matches(api_match_id, home_score_90, away_score_90, home_score_et, away_score_et, home_score_pen, away_score_pen, result_90, et_winner, penalty_winner)')
-    .not('points_earned', 'is', null)
-  const scoredMatchIds = new Set<string>()
-  for (const p of scoredPredictions || []) {
-    const m = Array.isArray(p.matches) ? p.matches[0] : p.matches
-    if (m?.api_match_id == null) continue
-    const key = String(m.api_match_id)
-    scoredMatchIds.add(key)
-    // 若 prevMap 里该比赛比分丢失，从 scored prediction 补回
-    const prev = prevMap.get(key)
-    if (prev && prev.home_score_90 == null && m.home_score_90 != null) {
-      prevMap.set(key, { ...prev, ...m })
-    } else if (!prev) {
-      prevMap.set(key, m)
-    }
-  }
+  // prevMap 里 status='finished' 的比赛视为已锁定，sync 不再写比分
+  // 判断依据直接用 prevMap（简单 select，无 join），避免复杂查询失败导致保护失效
 
 
   // ── R32 胜者 → 补充 R16 队名（API 有时不及时传播，如 winner=null 的 bug）──
@@ -192,10 +175,9 @@ async function runSync() {
     }
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
-    // 已算分比赛（scoredMatchIds）：完全跳过 upsert，DB 数据不被任何 API 覆盖
-    // 注意：不能用 partial upsert（scorePayload={}），Supabase 会把缺失字段设为 NULL
-    // 正确做法：从 upsert 数组里整条移除
-    const isScored = scoredMatchIds.has(String(match.id))
+    // DB 里已是 finished 的比赛：整条跳过 upsert，比分永远不被 API 覆盖
+    // 只有首次从 scheduled→finished 时才写入比分（此后 prev.status='finished'，后续同步全部跳过）
+    const isAlreadyFinished = prev?.status === 'finished'
 
     let result90 = prev?.result_90 ?? null
     let etWinner = prev?.et_winner ?? null
@@ -207,7 +189,7 @@ async function runSync() {
     let homeET: number | null = null
     let awayET: number | null = null
 
-    if (match.status === 'FINISHED') {
+    if (match.status === 'FINISHED' && !isAlreadyFinished) {
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
       const regTimeHome = match.score.regularTime?.home
@@ -256,7 +238,7 @@ async function runSync() {
     }
 
     return {
-      _isScored: isScored,
+      _skip: isAlreadyFinished,
       api_match_id: match.id,
       stage: STAGE_MAP[match.stage] || 'group',
       home_team: homeName,
@@ -279,11 +261,10 @@ async function runSync() {
     }
   })
 
-  // scored 比赛（predictions 已有 points_earned）整条跳过，DB 数据完全不动
-  // unscored 比赛：移除内部标记后完整 upsert
+  // DB 里已是 finished 的比赛整条跳过，其余正常 upsert
   const toUpsert = transformed
-    .filter((m: any) => !m._isScored)
-    .map(({ _isScored, ...rest }: any) => rest)
+    .filter((m: any) => !m._skip)
+    .map(({ _skip, ...rest }: any) => rest)
 
   const { error } = await supabaseAdmin
     .from('matches')
