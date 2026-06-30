@@ -17,6 +17,7 @@ jobs:
           timeout: 300s
           command_timeout: 10m
           script: |
+            echo "=== crontab ===" && crontab -l 2>/dev/null || echo "(no crontab)"
             cd /var/www/world-cup-predictor
             git checkout -- .
             git pull
