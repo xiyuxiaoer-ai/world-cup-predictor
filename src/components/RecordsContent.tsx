@@ -43,8 +43,12 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
   const [editingPredId, setEditingPredId] = useState<string | null>(null)
   const [editHome, setEditHome] = useState('')
   const [editAway, setEditAway] = useState('')
+  const [editEtWinner, setEditEtWinner] = useState('')
+  const [editPenaltyWinner, setEditPenaltyWinner] = useState('')
   const [editSaving, setEditSaving] = useState(false)
   const [editMsg, setEditMsg] = useState('')
+
+  const KNOCKOUT_STAGES = ['round_of_32', 'round_of_16', 'quarter_final', 'semi_final', 'third_place', 'final']
 
   useEffect(() => {
     if (!selectedGameId) return
@@ -97,15 +101,26 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
     setEditingPredId(pred.id)
     setEditHome(String(pred.pred_home_score))
     setEditAway(String(pred.pred_away_score))
+    setEditEtWinner(pred.pred_et_winner ?? '')
+    setEditPenaltyWinner(pred.pred_penalty_winner ?? '')
     setEditMsg('')
   }
 
-  async function handleEditSave(predId: string) {
+  async function handleEditSave(predId: string, match: any) {
+    const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
+    const isDraw = editHome === editAway
+    const showEt = isKnockout && isDraw
+    const showPen = showEt && editEtWinner === 'draw'
     setEditSaving(true)
     const res = await fetch(`/api/predictions/${predId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pred_home_score: Number(editHome), pred_away_score: Number(editAway) }),
+      body: JSON.stringify({
+        pred_home_score: Number(editHome),
+        pred_away_score: Number(editAway),
+        pred_et_winner: showEt ? (editEtWinner || null) : null,
+        pred_penalty_winner: showPen ? (editPenaltyWinner || null) : null,
+      }),
     })
     const data = await res.json()
     if (res.ok) {
@@ -281,21 +296,52 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                 </div>
                               </td>
                               <td className="px-3 py-2.5 text-center text-gray-900 dark:text-gray-100">
-                                {isEditing ? (
-                                  <div className="flex items-center justify-center gap-1">
-                                    <input
-                                      type="number" min="0" max="99" value={editHome}
-                                      onChange={e => setEditHome(e.target.value)}
-                                      className="w-10 text-center bg-gray-100 dark:bg-gray-700 border border-amber-400 rounded px-1 py-0.5 text-sm font-mono focus:outline-none"
-                                    />
-                                    <span className="text-gray-400">–</span>
-                                    <input
-                                      type="number" min="0" max="99" value={editAway}
-                                      onChange={e => setEditAway(e.target.value)}
-                                      className="w-10 text-center bg-gray-100 dark:bg-gray-700 border border-amber-400 rounded px-1 py-0.5 text-sm font-mono focus:outline-none"
-                                    />
+                                {isEditing ? (() => {
+                                  const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
+                                  const isDraw = editHome !== '' && editAway !== '' && editHome === editAway
+                                  const showEt = isKnockout && isDraw
+                                  const showPen = showEt && editEtWinner === 'draw'
+                                  return (
+                                  <div className="flex flex-col items-center gap-1.5 py-0.5">
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number" min="0" max="99" value={editHome}
+                                        onChange={e => { setEditHome(e.target.value); setEditEtWinner(''); setEditPenaltyWinner('') }}
+                                        className="w-10 text-center bg-gray-100 dark:bg-gray-700 border border-amber-400 rounded px-1 py-0.5 text-sm font-mono focus:outline-none"
+                                      />
+                                      <span className="text-gray-400">–</span>
+                                      <input
+                                        type="number" min="0" max="99" value={editAway}
+                                        onChange={e => { setEditAway(e.target.value); setEditEtWinner(''); setEditPenaltyWinner('') }}
+                                        className="w-10 text-center bg-gray-100 dark:bg-gray-700 border border-amber-400 rounded px-1 py-0.5 text-sm font-mono focus:outline-none"
+                                      />
+                                    </div>
+                                    {showEt && (
+                                      <select
+                                        value={editEtWinner}
+                                        onChange={e => { setEditEtWinner(e.target.value); setEditPenaltyWinner('') }}
+                                        className="w-full text-xs border border-amber-400 rounded px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 focus:outline-none"
+                                      >
+                                        <option value="">加时结果...</option>
+                                        <option value={match.home_team}>{getTeamDisplay(match.home_tla, match.home_team)}</option>
+                                        <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
+                                        <option value="draw">平局→点球</option>
+                                      </select>
+                                    )}
+                                    {showPen && (
+                                      <select
+                                        value={editPenaltyWinner}
+                                        onChange={e => setEditPenaltyWinner(e.target.value)}
+                                        className="w-full text-xs border border-amber-400 rounded px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 focus:outline-none"
+                                      >
+                                        <option value="">点球胜者...</option>
+                                        <option value={match.home_team}>{getTeamDisplay(match.home_tla, match.home_team)}</option>
+                                        <option value={match.away_team}>{getTeamDisplay(match.away_tla, match.away_team)}</option>
+                                      </select>
+                                    )}
                                   </div>
-                                ) : (
+                                  )
+                                })() : (
                                   <div className="flex flex-col items-center gap-0.5">
                                     <span className="font-mono">{pred.pred_home_score}–{pred.pred_away_score}</span>
                                     {pred.pred_et_winner && pred.pred_et_winner !== 'draw' && (() => {
@@ -312,23 +358,35 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                 )}
                               </td>
                               <td className="px-4 py-2.5 text-right font-bold">
-                                {isEditing ? (
-                                  <div className="flex items-center justify-end gap-1">
-                                    <button
-                                      onClick={() => handleEditSave(pred.id)}
-                                      disabled={editSaving}
-                                      className="text-xs text-white bg-amber-500 hover:bg-amber-400 px-2 py-1 rounded transition-colors disabled:opacity-50"
-                                    >
-                                      {editSaving ? '…' : '保存'}
-                                    </button>
-                                    <button
-                                      onClick={() => { setEditingPredId(null); setEditMsg('') }}
-                                      className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 px-1.5 py-1 rounded transition-colors"
-                                    >
-                                      取消
-                                    </button>
-                                  </div>
-                                ) : points != null ? (
+                                {isEditing ? (() => {
+                                  const isKnockout = KNOCKOUT_STAGES.includes(match.stage)
+                                  const isDraw = editHome !== '' && editAway !== '' && editHome === editAway
+                                  const showEt = isKnockout && isDraw
+                                  const showPen = showEt && editEtWinner === 'draw'
+                                  const saveDisabled = editSaving
+                                    || (showEt && !editEtWinner)
+                                    || (showPen && !editPenaltyWinner)
+                                  return (
+                                    <div className="flex flex-col items-end gap-1">
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          onClick={() => handleEditSave(pred.id, match)}
+                                          disabled={saveDisabled}
+                                          className="text-xs text-white bg-amber-500 hover:bg-amber-400 px-2 py-1 rounded transition-colors disabled:opacity-50"
+                                        >
+                                          {editSaving ? '…' : '保存'}
+                                        </button>
+                                        <button
+                                          onClick={() => { setEditingPredId(null); setEditMsg('') }}
+                                          className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 px-1.5 py-1 rounded transition-colors"
+                                        >
+                                          取消
+                                        </button>
+                                      </div>
+                                      {editMsg && <p className="text-red-400 text-xs">{editMsg}</p>}
+                                    </div>
+                                  )
+                                })() : points != null ? (
                                   <span className={points > 0 ? 'text-amber-500' : points < 0 ? 'text-red-500' : 'text-gray-500'}>
                                     {points > 0 ? `+${points}` : points}
                                   </span>
@@ -345,9 +403,6 @@ export default function RecordsContent({ games }: { games: GameWithRole[] }) {
                                       </button>
                                     )}
                                   </div>
-                                )}
-                                {isEditing && editMsg && (
-                                  <p className="text-red-400 text-xs mt-1 text-right">{editMsg}</p>
                                 )}
                               </td>
                             </tr>

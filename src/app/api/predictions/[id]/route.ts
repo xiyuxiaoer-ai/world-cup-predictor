@@ -13,6 +13,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore) || homeScore < 0 || awayScore < 0) {
     return NextResponse.json({ error: '无效比分' }, { status: 400 })
   }
+  const etWinner: string | null = body.pred_et_winner ?? null
+  const penaltyWinner: string | null = body.pred_penalty_winner ?? null
 
   // Fetch the prediction
   const { data: pred } = await supabase
@@ -48,7 +50,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const { error } = await supabase
     .from('predictions')
-    .update({ pred_home_score: homeScore, pred_away_score: awayScore })
+    .update({
+      pred_home_score: homeScore,
+      pred_away_score: awayScore,
+      pred_et_winner: etWinner,
+      pred_penalty_winner: penaltyWinner,
+    })
     .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
