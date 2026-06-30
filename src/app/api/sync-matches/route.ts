@@ -128,7 +128,7 @@ async function runSync() {
     const kickoffTime = new Date(match.utcDate)
     const lockTime = new Date(kickoffTime.getTime() - 60 * 60 * 1000)
     const prev = prevMap.get(String(match.id))
-    const wasFinished = prev?.status === 'finished' || scoredMatchIds.has(String(match.id))
+    const wasFinished = prev?.status === 'finished'
     const isFinished = match.status === 'FINISHED' || wasFinished
 
     // ── 球队名：优先级 API > DB已有 > standings > TBD ──────────────────
