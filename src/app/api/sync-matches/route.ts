@@ -304,6 +304,6 @@ async function runSync() {
     scored,
     skipped: skippedIds.length,
     skipped_ids: skippedIds,
-    commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 8) ?? 'local',
+    commit: process.env.BUILD_COMMIT ?? 'unknown',
   })
 }
