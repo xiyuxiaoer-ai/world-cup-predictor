@@ -180,7 +180,7 @@ async function runSync() {
 
     // ── 比分 & 结果 ────────────────────────────────────────────────────
       // DB 里已是 finished 的比赛：整条跳过 upsert，比分永远不被 API 覆盖
-    const isAlreadyFinished = prev?.status === 'finished'
+    const isAlreadyFinished = prev?.status === 'finished' && prev?.home_score_90 != null
 
     let result90 = prev?.result_90 ?? null
     let etWinner = prev?.et_winner ?? null
