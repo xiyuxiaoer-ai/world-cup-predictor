@@ -203,13 +203,12 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
       const hasET = match.score.extraTime?.home != null
       const hasPenalty = match.score.penalties?.home != null
 
-      if (match.score.duration === 'REGULAR') {
-        home90 = match.score.fullTime?.home ?? null
-        away90 = match.score.fullTime?.away ?? null
-      } else {
-        // EXTRA_TIME or PENALTY_SHOOTOUT: fullTime includes ET/penalties, use regularTime
-        home90 = match.score.regularTime?.home ?? null
-        away90 = match.score.regularTime?.away ?? null
+      // home90 = fullTime - extraTime - penalties（null 按 0 处理）
+      // 统一公式，不依赖 regularTime（该字段 API 不稳定，会在赛后短期内变化）
+      const ft = match.score.fullTime
+      if (ft?.home != null) {
+        home90 = ft.home - (match.score.extraTime?.home ?? 0) - (match.score.penalties?.home ?? 0)
+        away90 = ft.away - (match.score.extraTime?.away ?? 0) - (match.score.penalties?.away ?? 0)
       }
 
       if (hasET) {
