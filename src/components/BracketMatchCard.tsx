@@ -190,14 +190,14 @@ export default function BracketMatchCard({
       <Row
         tla={effectiveHomeTla} name={homeName}
         score={finished ? h : null}
-        penScore={finished ? (hasPen ? hp : hasET && h !== null && he !== null ? h + he : null) : null}
+        penScore={finished ? (hasPen ? hp : hasET ? he : null) : null}
         winner={homeWin} loser={awayWin} unknown={false}
       />
       <div className="h-px bg-black/[0.05] dark:bg-white/[0.06]" />
       <Row
         tla={effectiveAwayTla} name={awayName}
         score={finished ? a : null}
-        penScore={finished ? (hasPen ? ap : hasET && a !== null && ae !== null ? a + ae : null) : null}
+        penScore={finished ? (hasPen ? ap : hasET ? ae : null) : null}
         winner={awayWin} loser={homeWin} unknown={false}
       />
     </div>
