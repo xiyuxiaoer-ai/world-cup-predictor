@@ -18,7 +18,7 @@ export const R32_SLOTS: Record<number, BracketSlot> = {
   537417: { homeLabel: 'A2', awayLabel: 'B2',                  half: 'upper', matchNum: 75, round: 'r32', posInRound: 3, feedsInto: 90 },
   537418: { homeLabel: 'F1', awayLabel: 'C2',                  half: 'upper', matchNum: 76, round: 'r32', posInRound: 4, feedsInto: 90 },
   537420: { homeLabel: 'K2', awayLabel: 'L2',                  half: 'upper', matchNum: 77, round: 'r32', posInRound: 5, feedsInto: 93 },
-  537430: { homeLabel: 'H1', awayLabel: 'J2',                  half: 'upper', matchNum: 78, round: 'r32', posInRound: 6, feedsInto: 93 },
+  537419: { homeLabel: 'H1', awayLabel: 'J2',                  half: 'upper', matchNum: 78, round: 'r32', posInRound: 6, feedsInto: 93 },
   537421: { homeLabel: 'D1', awayLabel: '最佳第三(B/E/F/I/J)', half: 'upper', matchNum: 79, round: 'r32', posInRound: 7, feedsInto: 94 },
   537422: { homeLabel: 'G1', awayLabel: '最佳第三(A/E/H/I/J)', half: 'upper', matchNum: 80, round: 'r32', posInRound: 8, feedsInto: 94 },
   // 下半区 — positions 1-8（与懂球帝对齐：BRA/CIV→R16-91, MEX/ENG→R16-92, ARG/AUS→R16-95, SUI/K1→R16-96）
@@ -29,7 +29,7 @@ export const R32_SLOTS: Record<number, BracketSlot> = {
   537427: { homeLabel: 'J1', awayLabel: 'H2',                  half: 'lower', matchNum: 85, round: 'r32', posInRound: 5, feedsInto: 95 },
   537428: { homeLabel: 'D2', awayLabel: 'G2',                  half: 'lower', matchNum: 86, round: 'r32', posInRound: 6, feedsInto: 95 },
   537429: { homeLabel: 'B1', awayLabel: '最佳第三(E/F/G/I/J)', half: 'lower', matchNum: 87, round: 'r32', posInRound: 7, feedsInto: 96 },
-  537419: { homeLabel: 'K1', awayLabel: '最佳第三(D/E/J/L)',   half: 'lower', matchNum: 88, round: 'r32', posInRound: 8, feedsInto: 96 },
+  537430: { homeLabel: 'K1', awayLabel: '最佳第三(D/E/J/L)',   half: 'lower', matchNum: 88, round: 'r32', posInRound: 8, feedsInto: 96 },
 }
 
 // ─────────────────────────────────────────────
