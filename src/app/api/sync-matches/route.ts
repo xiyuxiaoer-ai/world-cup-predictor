@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { calculatePoints, getMissPenalty } from '@/lib/scores'
-import { R32_SLOTS, LATER_SLOT_BY_ID } from '@/lib/bracketSlots'
+import { R32_SLOTS, LATER_SLOT_BY_ID, LATER_ROUNDS } from '@/lib/bracketSlots'
 import type { Match, Prediction } from '@/types'
 
 const STAGE_MAP: Record<string, string> = {
@@ -89,14 +89,30 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
   // 判断依据直接用 prevMap（简单 select，无 join），避免复杂查询失败导致保护失效
 
 
-  // ── R32 胜者 → 补充 R16 队名（API 有时不及时传播，如 winner=null 的 bug）──
-  // 奇数 posInRound 的 R32 胜者 → 该 R16 比赛的主队；偶数 → 客队
+  // ── 各轮胜者 → 补充下一轮队名（API 有时不及时传播）──
+  // 奇数 posInRound 的胜者 → 下一场主队槽位；偶数 → 客队槽位
+  // 覆盖 R32→R16、R16→QF、QF→SF、SF→Final 全部层级
   type TeamRef = { name: string; tla: string | null }
-  const r32Supplement = new Map<number, { homeSlot: TeamRef | null; awaySlot: TeamRef | null }>()
+  const winnerSupplement = new Map<number, { homeSlot: TeamRef | null; awaySlot: TeamRef | null }>()
   for (const m of matches) {
-    if (m.stage !== 'LAST_32' || m.status !== 'FINISHED') continue
-    const slot = R32_SLOTS[m.id as number]
-    if (!slot) continue
+    if (m.status !== 'FINISHED') continue
+
+    let feedsInto: number | undefined
+    let posInRound: number | undefined
+
+    if (m.stage === 'LAST_32') {
+      const slot = R32_SLOTS[m.id as number]
+      if (!slot) continue
+      feedsInto = slot.feedsInto
+      posInRound = slot.posInRound
+    } else {
+      const matchNum = LATER_SLOT_BY_ID[m.id as number]
+      if (matchNum === undefined) continue
+      const slot = LATER_ROUNDS[matchNum]
+      if (!slot || !slot.feedsInto) continue
+      feedsInto = slot.feedsInto
+      posInRound = slot.posInRound
+    }
 
     let winnerName: string | null = null
     let winnerTla: string | null = null
@@ -123,12 +139,11 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
     }
 
     if (!winnerName) continue
-    const cur = r32Supplement.get(slot.feedsInto) ?? { homeSlot: null, awaySlot: null }
-    // 奇数 posInRound → R16 主队槽位，偶数 → 客队槽位
-    if (slot.posInRound % 2 === 1) {
-      r32Supplement.set(slot.feedsInto, { ...cur, homeSlot: { name: winnerName, tla: winnerTla } })
+    const cur = winnerSupplement.get(feedsInto) ?? { homeSlot: null, awaySlot: null }
+    if (posInRound! % 2 === 1) {
+      winnerSupplement.set(feedsInto, { ...cur, homeSlot: { name: winnerName, tla: winnerTla } })
     } else {
-      r32Supplement.set(slot.feedsInto, { ...cur, awaySlot: { name: winnerName, tla: winnerTla } })
+      winnerSupplement.set(feedsInto, { ...cur, awaySlot: { name: winnerName, tla: winnerTla } })
     }
   }
 
@@ -167,11 +182,11 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
     }
 
 
-    // ── R16+ TBD 补充：从 R32 胜者推算（仅当 API 仍返回 TBD 时生效）──────
+    // ── R16+ TBD 补充：从上一轮胜者推算（仅当 API 仍返回 TBD 时生效）──────
     if (match.stage !== 'LAST_32') {
       const laterNum = LATER_SLOT_BY_ID[match.id as number]
       if (laterNum !== undefined) {
-        const supp = r32Supplement.get(laterNum)
+        const supp = winnerSupplement.get(laterNum)
         if (supp) {
           if ((homeName === 'TBD' || !homeName) && supp.homeSlot) {
             homeName = supp.homeSlot.name
