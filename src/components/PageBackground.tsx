@@ -44,7 +44,7 @@ const BG_ILLUSTRATIONS: Record<Variant, BackgroundConfig> = {
     desktop: {
       position: 'center center',
       size: 'cover',
-      opacity: 0.14,
+      opacity: 0.10,
     },
   },
 
@@ -57,8 +57,8 @@ const BG_ILLUSTRATIONS: Record<Variant, BackgroundConfig> = {
     },
     desktop: {
       position: 'right center',
-      size: '38% auto',
-      opacity: 0.18,
+      size: '36% auto',
+      opacity: 0.15,
     },
   },
 
@@ -71,8 +71,8 @@ const BG_ILLUSTRATIONS: Record<Variant, BackgroundConfig> = {
     },
     desktop: {
       position: 'right 58%',
-      size: '34% auto',
-      opacity: 0.20,
+      size: '32% auto',
+      opacity: 0.18,
     },
   },
 
@@ -85,8 +85,8 @@ const BG_ILLUSTRATIONS: Record<Variant, BackgroundConfig> = {
     },
     desktop: {
       position: 'right bottom',
-      size: '42% auto',
-      opacity: 0.18,
+      size: '40% auto',
+      opacity: 0.16,
     },
   },
 
@@ -99,8 +99,8 @@ const BG_ILLUSTRATIONS: Record<Variant, BackgroundConfig> = {
     },
     desktop: {
       position: 'right bottom',
-      size: '38% auto',
-      opacity: 0.18,
+      size: '36% auto',
+      opacity: 0.16,
     },
   },
 
@@ -114,7 +114,7 @@ const BG_ILLUSTRATIONS: Record<Variant, BackgroundConfig> = {
     desktop: {
       position: 'center center',
       size: 'cover',
-      opacity: 0.12,
+      opacity: 0.08,
     },
   },
 }

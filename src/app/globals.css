@@ -1,39 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F7F2E8;
-  --foreground: #132033;
+  --background: #FBFCF8;
+  --foreground: #0F172A;
 
-  --qf-bg-0: #F7F2E8;
-  --qf-bg-1: #EEF4EA;
-  --qf-bg-2: #EAF0F6;
+  --qf-bg-0: #FBFCF8;
+  --qf-bg-1: #F4FAF7;
+  --qf-bg-2: #F3F7FB;
 
-  --qf-text-strong: #10213A;
+  --qf-text-strong: #0F172A;
   --qf-text-muted: #475569;
   --qf-text-subtle: #64748B;
 
-  --qf-gold: #B8792C;
-  --qf-gold-bright: #D6A84F;
-  --qf-gold-soft: rgba(184, 121, 44, 0.16);
-  --qf-score-winner: #8A5A16;
+  --qf-gold: #C9922E;
+  --qf-gold-bright: #E6C76A;
+  --qf-gold-soft: rgba(201, 146, 46, 0.12);
+  --qf-score-winner: #8A5A12;
 
-  --qf-pitch: #0F766E;
-  --qf-stadium: #193B5D;
-  --qf-cyan: #38BDF8;
+  --qf-pitch: #0F8A72;
+  --qf-stadium: #1E4E6D;
+  --qf-cyan: #7DD3FC;
 
-  --glass-bg: rgba(255, 252, 244, 0.58);
-  --glass-bg-strong: rgba(255, 252, 244, 0.68);
-  --glass-bg-soft: rgba(255, 255, 255, 0.46);
-  --glass-border: rgba(255, 255, 255, 0.74);
-  --glass-highlight: rgba(255, 255, 255, 0.94);
-  --glass-shadow: rgba(41, 31, 16, 0.14);
+  --glass-bg: rgba(255, 255, 255, 0.62);
+  --glass-bg-strong: rgba(255, 255, 255, 0.74);
+  --glass-bg-soft: rgba(255, 255, 255, 0.48);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-highlight: rgba(255, 255, 255, 0.96);
+  --glass-shadow: rgba(15, 23, 42, 0.08);
 
-  --nav-pill-bg: rgba(184, 121, 44, 0.12);
-  --nav-pill-border: rgba(184, 121, 44, 0.30);
-  --nav-pill-glow: rgba(184, 121, 44, 0.18);
+  --nav-pill-bg: rgba(201, 146, 46, 0.10);
+  --nav-pill-border: rgba(201, 146, 46, 0.26);
+  --nav-pill-glow: rgba(201, 146, 46, 0.14);
 
-  --bracket-line: rgba(184, 121, 44, 0.42);
-  --bracket-line-glow: rgba(214, 168, 79, 0.34);
+  --bracket-line: rgba(201, 146, 46, 0.36);
+  --bracket-line-glow: rgba(230, 199, 106, 0.26);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -76,9 +76,10 @@
 
 body {
   background:
-    radial-gradient(circle at 18% 8%, rgba(214,168,79,0.24), transparent 34%),
-    radial-gradient(circle at 84% 12%, rgba(15,118,110,0.16), transparent 36%),
-    radial-gradient(circle at 50% 92%, rgba(25,59,93,0.10), transparent 42%),
+    radial-gradient(circle at 16% 6%, rgba(230,199,106,0.20), transparent 32%),
+    radial-gradient(circle at 86% 10%, rgba(125,211,252,0.12), transparent 34%),
+    radial-gradient(circle at 22% 86%, rgba(15,138,114,0.10), transparent 38%),
+    radial-gradient(circle at 70% 96%, rgba(255,255,255,0.58), transparent 42%),
     linear-gradient(150deg, var(--qf-bg-0) 0%, var(--qf-bg-1) 48%, var(--qf-bg-2) 100%);
   background-attachment: fixed;
   color: var(--foreground);
