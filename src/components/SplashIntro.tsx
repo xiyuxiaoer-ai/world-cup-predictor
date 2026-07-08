@@ -4,21 +4,30 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 const SESSION_KEY = 'wc_splash_seen'
 
-type Phase = 'entering' | 'visible' | 'leaving'
+// 时间线：黑场 -> 海报淡入+开始缓慢放大(呼吸感持续到停留结束) -> 停留 -> 退场(只做整体淡出)
+const BLACKOUT_MS = 170
+const ENTER_MS = 430
+const LEAVE_MS = 450
+const TOTAL_MS = 2800 // 黑场+淡入+停留+退场，控制在 2.9s 以内
+const HOLD_MS = TOTAL_MS - BLACKOUT_MS - ENTER_MS - LEAVE_MS
+
+const RM_BLACKOUT_MS = 100
+const RM_ENTER_MS = 150
+const RM_HOLD_MS = 500
+const RM_LEAVE_MS = 150
+
+type Phase = 'blackout' | 'reveal' | 'leaving'
 
 export default function SplashIntro() {
   const [shouldRender, setShouldRender] = useState(false)
-  const [phase, setPhase] = useState<Phase>('entering')
+  const [phase, setPhase] = useState<Phase>('blackout')
   const timersRef = useRef<number[]>([])
-  const rafRef = useRef<number[]>([])
   const doneRef = useRef(false)
   const reducedMotionRef = useRef(false)
 
   const clearAllTimers = useCallback(() => {
     timersRef.current.forEach(id => window.clearTimeout(id))
     timersRef.current = []
-    rafRef.current.forEach(id => cancelAnimationFrame(id))
-    rafRef.current = []
   }, [])
 
   const skip = useCallback(() => {
@@ -26,7 +35,7 @@ export default function SplashIntro() {
     doneRef.current = true
     clearAllTimers()
     setPhase('leaving')
-    const leaveMs = reducedMotionRef.current ? 150 : 450
+    const leaveMs = reducedMotionRef.current ? RM_LEAVE_MS : LEAVE_MS
     const id = window.setTimeout(() => setShouldRender(false), leaveMs)
     timersRef.current.push(id)
   }, [clearAllTimers])
@@ -45,19 +54,17 @@ export default function SplashIntro() {
     try { sessionStorage.setItem(SESSION_KEY, '1') } catch {}
 
     reducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const holdMs = reducedMotionRef.current ? 600 : 1800
+    const blackoutMs = reducedMotionRef.current ? RM_BLACKOUT_MS : BLACKOUT_MS
+    const enterMs = reducedMotionRef.current ? RM_ENTER_MS : ENTER_MS
+    const holdMs = reducedMotionRef.current ? RM_HOLD_MS : HOLD_MS
 
     setShouldRender(true)
 
-    // 双 rAF：先让浏览器画出 opacity:0 的初始帧，下一帧再切到 visible，
-    // 这样 CSS transition 才会真正播放淡入，而不是直接跳到最终状态
-    const raf1 = requestAnimationFrame(() => {
-      const raf2 = requestAnimationFrame(() => setPhase('visible'))
-      rafRef.current.push(raf2)
-    })
-    rafRef.current.push(raf1)
+    // 先纯黑场停留一小段时间，再让海报开始淡入 + 缓慢放大
+    const revealTimer = window.setTimeout(() => setPhase('reveal'), blackoutMs)
+    timersRef.current.push(revealTimer)
 
-    const holdTimer = window.setTimeout(skip, holdMs)
+    const holdTimer = window.setTimeout(skip, blackoutMs + enterMs + holdMs)
     timersRef.current.push(holdTimer)
 
     return () => clearAllTimers()
@@ -83,17 +90,28 @@ export default function SplashIntro() {
 
   if (!shouldRender) return null
 
-  const phaseClass =
-    phase === 'visible'
-      ? 'opacity-100 scale-100'
-      : phase === 'leaving'
-        ? 'opacity-0 scale-[1.02]'
-        : 'opacity-0 scale-[0.98]'
-  const durationClass = phase === 'leaving' ? 'duration-[450ms]' : 'duration-[250ms]'
+  const reduced = reducedMotionRef.current
+  const enterMs = reduced ? RM_ENTER_MS : ENTER_MS
+  const holdMs = reduced ? RM_HOLD_MS : HOLD_MS
+  const leaveMs = reduced ? RM_LEAVE_MS : LEAVE_MS
+
+  // 海报：opacity 只在黑场->显示时切一次（420~450ms），scale 从黑场结束那一刻
+  // 起步，用一个覆盖"淡入+停留"全程的过渡时长缓慢走到 1.02，退场阶段不再触发它变化
+  const posterOpacity = phase === 'blackout' ? 'opacity-0' : 'opacity-100'
+  const posterScale = reduced ? '' : phase === 'blackout' ? 'scale-100' : 'scale-[1.02]'
+  const posterTransition = reduced
+    ? `opacity ${enterMs}ms ease-out`
+    : `opacity ${enterMs}ms ease-out, transform ${enterMs + holdMs}ms ease-out`
+
+  const overlayOpacity = phase === 'leaving' ? 'opacity-0' : 'opacity-100'
+  // 用行内 style 控制 transition-duration：Tailwind 的 JIT 只能识别源码里字面出现的
+  // class 字符串，`duration-[${leaveMs}ms]` 这种插值拼出来的类名不会被生成对应 CSS。
+  const overlayTransition = phase === 'leaving' ? `opacity ${leaveMs}ms ease-out` : 'none'
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#050608] cursor-pointer select-none transition-[opacity,transform] ease-out ${durationClass} ${phaseClass}`}
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#050608] cursor-pointer select-none ${overlayOpacity}`}
+      style={{ transition: overlayTransition }}
       onClick={skip}
       role="presentation"
       aria-hidden="true"
@@ -102,13 +120,15 @@ export default function SplashIntro() {
         src="/splash/worldcup-flashback-desktop.png"
         alt=""
         draggable={false}
-        className="hidden sm:block max-w-full max-h-full object-contain"
+        style={{ transition: posterTransition }}
+        className={`hidden sm:block max-w-full max-h-full object-contain will-change-transform ${posterOpacity} ${posterScale}`}
       />
       <img
         src="/splash/worldcup-flashback-mobile.png"
         alt=""
         draggable={false}
-        className="block sm:hidden max-w-full max-h-full object-contain"
+        style={{ transition: posterTransition }}
+        className={`block sm:hidden max-w-full max-h-full object-contain will-change-transform ${posterOpacity} ${posterScale}`}
       />
       <span className="absolute bottom-4 right-4 text-white/50 text-[11px] tracking-wide pointer-events-none">
         点击跳过
