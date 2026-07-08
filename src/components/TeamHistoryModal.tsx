@@ -108,7 +108,7 @@ function PlayerCard({ player, index }: { player: any; index: number }) {
         <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
       </div>
 
-      <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200 text-center leading-tight line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+      <span className="text-[11px] font-medium text-gray-900 dark:text-gray-100 text-center leading-tight line-clamp-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
         {player.name}
       </span>
       {player.era && (
@@ -127,7 +127,7 @@ function ReadMoreText({ text, maxLen }: { text: string; maxLen: number }) {
   const shown = expanded || !needsMore ? text : text.slice(0, maxLen).replace(/[^一-鿿。！？，\w]+$/, '') + '……'
   return (
     <div>
-      <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+      <p className="text-[13px] sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-line">
         {shown}
       </p>
       {needsMore && (
@@ -148,7 +148,7 @@ function SectionBlock({ title, icon, children }: { title: string; icon?: React.R
     <div className="mt-0">
       <div className="px-4 sm:px-5 pt-4 pb-2 flex items-center gap-2">
         {icon && <span className="text-amber-500 dark:text-amber-400 shrink-0">{icon}</span>}
-        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</span>
+        <span className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">{title}</span>
         <div className="flex-1 h-px bg-gray-200/60 dark:bg-white/10" />
       </div>
       <div className="px-4 sm:px-5">{children}</div>
@@ -170,7 +170,7 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
 
       {worldCupRecord ? (
         <SectionBlock title="世界杯征程" icon={<svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M4 2h8v5a4 4 0 0 1-8 0V2Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/><path d="M3 2H2a1 1 0 0 0-1 1v1a3 3 0 0 0 2.5 2.96M13 2h1a1 1 0 0 1 1 1v1a3 3 0 0 1-2.5 2.96" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/><path d="M8 10v4M6 14h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>}>
-          <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{worldCupRecord}</p>
+          <p className="text-[13px] sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-line">{worldCupRecord}</p>
         </SectionBlock>
       ) : null}
 
@@ -194,7 +194,7 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
 
       {goal2026 ? (
         <SectionBlock title="2026世界杯目标" icon={<svg viewBox="0 0 16 16" width="13" height="13" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.3"/><circle cx="8" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.3"/><circle cx="8" cy="8" r="1" fill="currentColor"/></svg>}>
-          <p className="text-[13px] sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{goal2026}</p>
+          <p className="text-[13px] sm:text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{goal2026}</p>
         </SectionBlock>
       ) : null}
 
@@ -205,7 +205,7 @@ function FootballLegendTab({ data, teamName }: { data: any; teamName: string }) 
           rel="noopener noreferrer"
           className="group flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-[12px] font-medium text-gray-600 dark:text-gray-300 glass-sm hover:bg-white/50 dark:hover:bg-white/8 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" className="shrink-0 text-gray-500 dark:text-gray-400"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9z" stroke="currentColor" strokeWidth="1.3"/><path d="M5 2v12M5 6h5M5 9h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" className="shrink-0 text-gray-600 dark:text-gray-300"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9z" stroke="currentColor" strokeWidth="1.3"/><path d="M5 2v12M5 6h5M5 9h5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>
           <span>在百度百科查看完整历史</span>
           <span className="ml-auto text-gray-400 group-hover:translate-x-0.5 transition-transform"><svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 3H2v7h7V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
         </a>
@@ -341,7 +341,7 @@ export default function TeamHistoryModal({
                   flex-1 py-2.5 text-[11px] font-medium transition-all duration-200 relative tap-scale
                   ${tab === t
                     ? 'text-amber-500 dark:text-amber-400'
-                    : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}
                 `}
               >
                 {TAB_LABELS[t]}
@@ -385,7 +385,7 @@ export default function TeamHistoryModal({
                   ? (
                     <div className="flex flex-col items-center gap-3 p-10 text-center">
                       <svg viewBox="0 0 48 48" width="48" height="48" fill="none" className="text-gray-300 dark:text-gray-600"><circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2"/><ellipse cx="24" cy="24" rx="8" ry="20" stroke="currentColor" strokeWidth="2"/><path d="M4 24h40M24 4a28 28 0 0 1 0 40M24 4a28 28 0 0 0 0 40" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">暂无该球队的历史资料</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">暂无该球队的历史资料</p>
                       <button
                         onClick={() => setLegendError(false)}
                         className="mt-1 px-4 py-1.5 rounded-full text-[12px] font-medium text-amber-600 dark:text-amber-400 border border-amber-300/60 dark:border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-900/20 active:scale-95 transition-all"
@@ -438,10 +438,10 @@ function Section({ title, matches, tla, isWC }: { title: string; matches: any[];
   return (
     <div>
       <div className="px-5 py-2 border-b border-gray-200/60 dark:border-white/10">
-        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</span>
+        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">{title}</span>
       </div>
       {matches.length === 0
-        ? <div className="px-5 py-3 text-xs text-gray-400 dark:text-gray-500">暂无记录</div>
+        ? <div className="px-5 py-3 text-xs text-gray-500 dark:text-gray-400">暂无记录</div>
         : (
           <div className="divide-y divide-white/30 dark:divide-white/10">
             {matches.map((m: any, idx: number) => {
@@ -463,12 +463,12 @@ function Section({ title, matches, tla, isWC }: { title: string; matches: any[];
                   {resultTag(isHome, homeScore, awayScore)}
                   <div className="flex items-center gap-1.5 flex-1 min-w-0">
                     {opponentFlag && <img src={opponentFlag} alt="" className="w-5 h-3.5 object-cover rounded-sm shrink-0" />}
-                    <span className="text-sm text-gray-800 dark:text-gray-200 truncate">{opponent}</span>
+                    <span className="text-sm text-gray-900 dark:text-gray-100 truncate">{opponent}</span>
                   </div>
                   <span className="font-mono text-sm font-bold text-gray-900 dark:text-gray-100 shrink-0">{myScore}–{theirScore}</span>
                   <div className="text-right shrink-0 w-16">
-                    <div className="text-xs text-gray-400 dark:text-gray-500">{dateStr}</div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500 truncate">{stageLabel}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{dateStr}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{stageLabel}</div>
                   </div>
                 </div>
               )
@@ -505,9 +505,9 @@ function NewsList({ items }: { items: any[] }) {
           rel="noopener noreferrer"
           className="flex flex-col gap-1 px-5 py-3 hover:bg-white/20 dark:hover:bg-white/5 transition-colors tap-scale"
         >
-          <span className="text-sm text-gray-800 dark:text-gray-100 leading-snug line-clamp-2">{item.title}</span>
-          <div className="flex items-center gap-2 text-[11px] text-gray-400 dark:text-gray-500">
-            {item.source && <span className="font-medium text-gray-500 dark:text-gray-400 truncate max-w-[120px]">{item.source}</span>}
+          <span className="text-sm text-gray-900 dark:text-gray-100 leading-snug line-clamp-2">{item.title}</span>
+          <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+            {item.source && <span className="font-medium text-gray-600 dark:text-gray-300 truncate max-w-[120px]">{item.source}</span>}
             {item.source && item.pubDate && <span>·</span>}
             {item.pubDate && <span>{timeAgo(item.pubDate)}</span>}
             <span className="ml-auto shrink-0"><svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M7 1h4v4M11 1L5.5 6.5M5 3H2v7h7V7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg></span>
@@ -535,7 +535,7 @@ function PlayerAvatar({ photoUrl, name }: { photoUrl?: string | null; name: stri
   }
   return (
     <div className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 ring-1 ring-gray-200/60 dark:ring-white/10">
-      <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500">
+      <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400">
         {name?.[0]?.toUpperCase() ?? '?'}
       </span>
     </div>
@@ -557,7 +557,7 @@ function SquadList({ squad }: { squad: any[] }) {
       {sections.map(pos => (
         <div key={pos}>
           <div className="px-5 py-2 border-b border-gray-200/70 dark:border-white/10">
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
               {POSITION_LABELS[pos] || pos}
             </span>
           </div>
@@ -565,22 +565,22 @@ function SquadList({ squad }: { squad: any[] }) {
             {grouped[pos].map((p: any, idx: number) => (
               <div key={idx} className="flex items-center gap-3 px-4 py-2">
                 {p.shirt_number != null
-                  ? <span className="text-xs font-mono text-gray-400 dark:text-gray-500 w-5 text-right shrink-0">{p.shirt_number}</span>
+                  ? <span className="text-xs font-mono text-gray-500 dark:text-gray-400 w-5 text-right shrink-0">{p.shirt_number}</span>
                   : <span className="w-5 shrink-0" />}
                 {hasPhotos && (
                   <PlayerAvatar photoUrl={p.photo_url} name={p.player_name_zh || p.player_name} />
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-tight">
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-tight">
                     {p.player_name_zh || p.player_name}
                   </div>
                   {p.player_name_zh && p.player_name !== p.player_name_zh && (
-                    <div className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight">
+                    <div className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight">
                       {p.player_name}
                     </div>
                   )}
                   {p.club && (
-                    <div className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight truncate">
+                    <div className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight truncate">
                       {p.club}
                     </div>
                   )}
