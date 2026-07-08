@@ -14,6 +14,12 @@ const RM_ENTER_MS = 150
 const RM_HOLD_MS = 500
 const RM_LEAVE_MS = 150
 
+// 手机浏览器切到后台再切回来，很多时候是从 bfcache 恢复的，页面并没有真正
+// 重新加载、组件也不会重新挂载。用 pageshow(persisted) 单独捕捉这种"回来了"，
+// 但要有冷却时间，否则每次切一下 App 再切回来都会重播，很快就变得很烦。
+const LAST_SHOWN_KEY = 'wc_splash_last_shown'
+const REPLAY_COOLDOWN_MS = 15 * 60 * 1000
+
 type Phase = 'blackout' | 'reveal' | 'leaving'
 
 export default function SplashIntro() {
@@ -38,14 +44,17 @@ export default function SplashIntro() {
     timersRef.current.push(id)
   }, [clearAllTimers])
 
-  // 每次真正的页面加载（刷新/新开/直接输入网址）都重新播放一次；
-  // Next.js 客户端路由跳转不会重新挂载根 layout，所以站内点击链接不会重复触发
-  useEffect(() => {
+  const playIntro = useCallback(() => {
+    clearAllTimers()
+    doneRef.current = false
     reducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const blackoutMs = reducedMotionRef.current ? RM_BLACKOUT_MS : BLACKOUT_MS
     const enterMs = reducedMotionRef.current ? RM_ENTER_MS : ENTER_MS
     const holdMs = reducedMotionRef.current ? RM_HOLD_MS : HOLD_MS
 
+    try { localStorage.setItem(LAST_SHOWN_KEY, String(Date.now())) } catch {}
+
+    setPhase('blackout')
     setShouldRender(true)
 
     // 先纯黑场停留一小段时间，再让海报开始淡入 + 缓慢放大
@@ -54,10 +63,28 @@ export default function SplashIntro() {
 
     const holdTimer = window.setTimeout(skip, blackoutMs + enterMs + holdMs)
     timersRef.current.push(holdTimer)
+  }, [clearAllTimers, skip])
 
+  // 每次真正的页面加载（刷新/新开/直接输入网址）都重新播放一次；
+  // Next.js 客户端路由跳转不会重新挂载根 layout，所以站内点击链接不会重复触发
+  useEffect(() => {
+    playIntro()
     return () => clearAllTimers()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 从后台/bfcache 恢复时（比如切到别的 App 再切回来）单独判断是否该重播，
+  // 隔够 15 分钟才会再放一次，避免频繁切换 App 时反复弹
+  useEffect(() => {
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (!e.persisted) return
+      let lastShown = 0
+      try { lastShown = Number(localStorage.getItem(LAST_SHOWN_KEY)) || 0 } catch {}
+      if (Date.now() - lastShown >= REPLAY_COOLDOWN_MS) playIntro()
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [playIntro])
 
   // 展示期间锁定滚动 + 监听 ESC 跳过
   useEffect(() => {
