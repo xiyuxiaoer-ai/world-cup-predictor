@@ -130,8 +130,9 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <PageBackground variant="profile" />
       <Navbar username={username} avatarUrl={displayAvatarUrl} />
-      <main className="flex-1 max-w-md mx-auto w-full px-4 py-8 space-y-6">
+      <main className="relative z-10 flex-1 max-w-md mx-auto w-full px-4 py-8 space-y-6 animate-page-enter">
         <h1 className="text-xl font-bold">个人设置</h1>
 
         {/* Avatar */}

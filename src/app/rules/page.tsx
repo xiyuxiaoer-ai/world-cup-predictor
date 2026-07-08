@@ -134,9 +134,10 @@ export default async function RulesPage() {
   const { data: profile } = await supabase.from('profiles').select('username, avatar_url').eq('id', user.id).single()
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col">
+      <PageBackground variant="rules" />
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-8 space-y-4">
+      <main className="relative z-10 flex-1 max-w-2xl mx-auto w-full px-4 py-8 space-y-4 animate-page-enter">
         <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">积分规则</h1>
 
         {/* 彩蛋：猜冠军额外奖励 */}

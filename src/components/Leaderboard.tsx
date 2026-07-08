@@ -83,7 +83,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
   }
 
   if (loading) return (
-    <div className="glass rounded-xl overflow-hidden">
+    <div className="glass-strong rounded-xl overflow-hidden">
       {[...Array(5)].map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-black/[0.04] dark:border-white/[0.04] animate-stagger-in"
           style={{ animationDelay: `${i * 55}ms` }}>
@@ -108,7 +108,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
 
   return (
     <>
-      <div className="glass rounded-xl overflow-hidden animate-spring-in">
+      <div className="glass-strong rounded-xl overflow-hidden animate-spring-in">
         {sorted.length === 0 ? (
           <div className="p-4 text-gray-400 dark:text-gray-500 text-sm">暂无积分数据</div>
         ) : (
@@ -189,7 +189,7 @@ export default function Leaderboard({ gameId }: { gameId: string }) {
           onClick={() => setSelected(null)}
         >
           <div
-            className="w-full max-w-md glass rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col animate-spring-in"
+            className="w-full max-w-md glass-strong rounded-2xl shadow-2xl overflow-hidden max-h-[80vh] flex flex-col animate-spring-in"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
