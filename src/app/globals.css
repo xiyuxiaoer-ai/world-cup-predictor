@@ -257,10 +257,13 @@ button, a, [role="button"], select, input, textarea, label {
    iOS 毛玻璃 + 动效系统 (Glassmorphism Premium)
    ══════════════════════════════════════════════════════ */
 
-/* 标准毛玻璃卡片 */
+/* 标准毛玻璃卡片
+   注意：不强制 overflow:hidden —— .glass 上常挂下拉菜单/弹层等需要溢出显示的子元素，
+   全局裁切会把它们切掉。装饰光泽层用 border-radius:inherit 跟随圆角，不依赖裁切。
+   确实需要裁切内容（如卡片内嵌图片）时，额外叠加 .glass-clip。 */
 .glass {
   position: relative;
-  overflow: hidden;
+  isolation: isolate;
   background: var(--glass-bg);
   backdrop-filter: blur(34px) saturate(185%) contrast(105%);
   -webkit-backdrop-filter: blur(34px) saturate(185%) contrast(105%);
@@ -276,10 +279,16 @@ button, a, [role="button"], select, input, textarea, label {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  border-radius: inherit;
   background:
     linear-gradient(135deg, rgba(255,255,255,0.32), transparent 38%),
     radial-gradient(circle at 20% 0%, rgba(255,255,255,0.22), transparent 32%);
   opacity: 0.7;
+}
+
+/* 需要裁切内部内容时（如卡片内嵌图片、进度条）才叠加这个，不要依赖 .glass 本身裁切 */
+.glass-clip {
+  overflow: hidden;
 }
 
 /* 信息密集区域（排行榜/弹窗/选分器）：更不透明的玻璃，保证可读性 */
@@ -296,7 +305,7 @@ button, a, [role="button"], select, input, textarea, label {
 /* 较轻毛玻璃（次级面板） */
 .glass-sm {
   position: relative;
-  overflow: hidden;
+  isolation: isolate;
   background: var(--glass-bg-soft);
   backdrop-filter: blur(24px) saturate(175%);
   -webkit-backdrop-filter: blur(24px) saturate(175%);
