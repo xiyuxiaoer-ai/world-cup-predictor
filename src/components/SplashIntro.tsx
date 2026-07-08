@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-const SESSION_KEY = 'wc_splash_seen'
-
 // 时间线：黑场 -> 海报淡入+开始缓慢放大(呼吸感持续到停留结束) -> 停留 -> 退场(只做整体淡出)
 const BLACKOUT_MS = 170
 const ENTER_MS = 430
@@ -40,19 +38,9 @@ export default function SplashIntro() {
     timersRef.current.push(id)
   }, [clearAllTimers])
 
-  // 首次挂载：判断这个会话里是否已经看过 splash
+  // 每次真正的页面加载（刷新/新开/直接输入网址）都重新播放一次；
+  // Next.js 客户端路由跳转不会重新挂载根 layout，所以站内点击链接不会重复触发
   useEffect(() => {
-    let seen = true
-    try {
-      seen = sessionStorage.getItem(SESSION_KEY) === '1'
-    } catch {
-      // 隐私模式等场景 sessionStorage 不可用时，直接跳过 splash，不阻塞页面
-      seen = true
-    }
-    if (seen) return
-
-    try { sessionStorage.setItem(SESSION_KEY, '1') } catch {}
-
     reducedMotionRef.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const blackoutMs = reducedMotionRef.current ? RM_BLACKOUT_MS : BLACKOUT_MS
     const enterMs = reducedMotionRef.current ? RM_ENTER_MS : ENTER_MS
