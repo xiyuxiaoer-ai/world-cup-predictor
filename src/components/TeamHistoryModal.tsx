@@ -297,7 +297,7 @@ export default function TeamHistoryModal({
         <div
           className="
             relative w-full sm:max-w-xl
-            glass rounded-t-3xl sm:rounded-3xl
+            glass-strong rounded-t-3xl sm:rounded-3xl
             overflow-hidden
             min-h-[75vh] sm:min-h-0
             max-h-[92vh] sm:max-h-[88vh]

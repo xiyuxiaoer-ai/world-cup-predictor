@@ -136,8 +136,11 @@ export default function BracketContent() {
 
   useEffect(() => {
     if (!loading && scrollRef.current) {
-      const el = scrollRef.current
-      el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2
+      // 内层 `justify-center` 已经把赛程树对齐在和视口等宽的容器正中间——
+      // 无论内容溢出多少，溢出都是左右对称的，scrollLeft=0 看到的就是居中窗口。
+      // 用 scrollWidth 反推居中位置不对：浏览器不会把"左侧溢出"计入 scrollWidth，
+      // 内容越宽这个偏差越明显（32强/16强溢出少所以不明显，8强/半决赛就很明显）。
+      scrollRef.current.scrollLeft = 0
     }
   }, [loading, maxRound])
 
