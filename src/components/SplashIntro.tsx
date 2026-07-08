@@ -99,9 +99,11 @@ export default function SplashIntro() {
   // 起步，用一个覆盖"淡入+停留"全程的过渡时长缓慢走到 1.02，退场阶段不再触发它变化
   const posterOpacity = phase === 'blackout' ? 'opacity-0' : 'opacity-100'
   const posterScale = reduced ? '' : phase === 'blackout' ? 'scale-100' : 'scale-[1.02]'
+  // Tailwind v4 的 scale-[...] 工具类设置的是独立的 CSS `scale` 属性，不是旧版
+  // `transform: scaleX()/scaleY()` 那一套，所以过渡要监听 `scale` 而不是 `transform`
   const posterTransition = reduced
     ? `opacity ${enterMs}ms ease-out`
-    : `opacity ${enterMs}ms ease-out, transform ${enterMs + holdMs}ms ease-out`
+    : `opacity ${enterMs}ms ease-out, scale ${enterMs + holdMs}ms ease-out`
 
   const overlayOpacity = phase === 'leaving' ? 'opacity-0' : 'opacity-100'
   // 用行内 style 控制 transition-duration：Tailwind 的 JIT 只能识别源码里字面出现的
@@ -121,14 +123,14 @@ export default function SplashIntro() {
         alt=""
         draggable={false}
         style={{ transition: posterTransition }}
-        className={`hidden sm:block max-w-full max-h-full object-contain will-change-transform ${posterOpacity} ${posterScale}`}
+        className={`hidden sm:block max-w-full max-h-full object-contain will-change-[scale,opacity] ${posterOpacity} ${posterScale}`}
       />
       <img
         src="/splash/worldcup-flashback-mobile.png"
         alt=""
         draggable={false}
         style={{ transition: posterTransition }}
-        className={`block sm:hidden max-w-full max-h-full object-contain will-change-transform ${posterOpacity} ${posterScale}`}
+        className={`block sm:hidden max-w-full max-h-full object-contain will-change-[scale,opacity] ${posterOpacity} ${posterScale}`}
       />
       <span className="absolute bottom-4 right-4 text-white/50 text-[11px] tracking-wide pointer-events-none">
         点击跳过
