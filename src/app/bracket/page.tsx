@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import BracketContent from '@/components/BracketContent'
+import PageBackground from '@/components/PageBackground'
 
 export default async function BracketPage() {
   const supabase = await createClient()
@@ -13,8 +14,9 @@ export default async function BracketPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <PageBackground variant="bracket" />
       <Navbar username={profile?.username ?? ''} avatarUrl={profile?.avatar_url} />
-      <main className="flex-1 w-full px-4 sm:px-8 py-6 max-w-screen-2xl mx-auto">
+      <main className="relative z-10 flex-1 w-full px-4 sm:px-8 py-6 max-w-screen-2xl mx-auto animate-page-enter">
         <BracketContent />
       </main>
     </div>

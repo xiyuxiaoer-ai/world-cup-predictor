@@ -49,8 +49,8 @@ function Row({ tla, name, score, penScore, winner, loser, unknown }: {
   unknown: boolean
 }) {
   return (
-    <div className={`flex items-center gap-[5px] px-[6px] h-[22px] transition-colors ${
-      winner ? 'bg-amber-400/[0.13] dark:bg-amber-500/[0.12]' : ''
+    <div className={`bracket-team-row flex items-center gap-[5px] px-[6px] h-[22px] transition-colors ${
+      winner ? 'bracket-row-winner' : ''
     }`}>
       <Flag tla={tla} faded={loser} />
       <span className={`flex-1 text-[10px] truncate leading-none min-w-0 transition-colors ${
@@ -63,7 +63,7 @@ function Row({ tla, name, score, penScore, winner, loser, unknown }: {
       </span>
       {score !== null && (
         <div className={`flex items-baseline shrink-0 leading-none gap-[1px] ${
-          winner ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400/80 dark:text-gray-500'
+          winner ? 'text-[var(--qf-score-winner)]' : 'text-gray-400/80 dark:text-gray-500'
         }`}>
           <span className="text-[11px] font-bold tabular-nums">
             {score}
@@ -111,10 +111,10 @@ export default function BracketMatchCard({
     const homeKnown = !!homeTla
     const awayKnown = !!awayTla
     return (
-      <div className={`w-20 sm:w-24 rounded-lg overflow-hidden shrink-0
+      <div className={`bracket-match-card w-20 sm:w-24 rounded-lg overflow-hidden shrink-0
         border border-dashed border-black/[0.08] dark:border-white/[0.09]
-        backdrop-blur-[6px]
-        ${roundColor ?? 'bg-white/20 dark:bg-white/[0.03]'}`}>
+        backdrop-blur-[14px]
+        ${roundColor ?? ''}`}>
         <DateRow time={null} />
         <div className="flex items-center gap-[5px] px-[6px] h-[22px]">
           <Flag tla={homeTla} />
@@ -181,11 +181,9 @@ export default function BracketMatchCard({
   const effectiveAwayTla = awayTbd ? awayTla : match.away_tla
 
   return (
-    <div className={`w-20 sm:w-24 rounded-lg overflow-hidden shrink-0
-      border border-white/50 dark:border-white/[0.13]
-      backdrop-blur-[8px]
-      shadow-sm shadow-black/[0.07] dark:shadow-black/30
-      ${roundColor ?? 'bg-white/80 dark:bg-gray-800/75'}`}>
+    <div className={`bracket-match-card w-20 sm:w-24 rounded-lg overflow-hidden shrink-0
+      border backdrop-blur-[14px]
+      ${roundColor ?? ''}`}>
       <DateRow time={match.kickoff_time} finished={finished} />
       <Row
         tla={effectiveHomeTla} name={homeName}

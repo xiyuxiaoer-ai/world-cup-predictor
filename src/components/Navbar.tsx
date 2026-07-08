@@ -114,8 +114,11 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
       {navigating && (
         <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden">
           <div
-            className="h-full bg-amber-400 dark:bg-blue-400 rounded-full"
-            style={{ animation: 'nav-progress 1.2s cubic-bezier(0.1,0.6,0.5,1) forwards' }}
+            className="h-full rounded-full"
+            style={{
+              background: 'linear-gradient(90deg, var(--qf-gold), var(--qf-gold-bright))',
+              animation: 'nav-progress 1.2s cubic-bezier(0.1,0.6,0.5,1) forwards',
+            }}
           />
         </div>
       )}
@@ -138,9 +141,9 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
               style={{
                 left: pill.left,
                 width: pill.width,
-                background: 'rgba(59,130,246,0.09)',
-                border: '1.5px solid rgba(59,130,246,0.26)',
-                boxShadow: '0 0 14px rgba(59,130,246,0.10)',
+                background: 'var(--nav-pill-bg)',
+                border: '1.5px solid var(--nav-pill-border)',
+                boxShadow: '0 0 18px var(--nav-pill-glow), inset 0 1px 0 rgba(255,255,255,0.30)',
               }}
             />
           )}
@@ -153,7 +156,7 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
               onClick={() => { if (pathname !== link.href) { setNavigating(true); setNavTarget(link.href) } }}
               className={`relative z-10 px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap font-medium tap-scale transition-colors duration-200 ${
                 isActive(link.href)
-                  ? 'text-blue-600 dark:text-blue-300'
+                  ? 'text-amber-700 dark:text-amber-300'
                   : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
               }`}
             >
@@ -168,7 +171,7 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
             onClick={() => { if (pathname !== '/chat') { setNavigating(true); setNavTarget('/chat') } }}
             className={`relative z-10 p-1.5 rounded-lg transition-colors duration-200 tap-scale ${
               isActive('/chat')
-                ? 'text-blue-600 dark:text-blue-300'
+                ? 'text-amber-700 dark:text-amber-300'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
@@ -192,7 +195,7 @@ export default function Navbar({ username, avatarUrl }: { username: string; avat
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover border border-white/50 shadow-sm" />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 border border-blue-200/60 dark:border-blue-800/30 flex items-center justify-center text-blue-600 text-[10px] font-bold shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-amber-100/70 dark:bg-amber-900/20 border border-amber-200/70 dark:border-amber-700/30 flex items-center justify-center text-amber-700 dark:text-amber-300 text-[10px] font-bold shadow-sm">
                 {username?.[0]?.toUpperCase() ?? '?'}
               </div>
             )}

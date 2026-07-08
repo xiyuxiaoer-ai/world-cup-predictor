@@ -1,25 +1,85 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F9FAFB;
-  --foreground: #111827;
+  --background: #F7F2E8;
+  --foreground: #132033;
+
+  --qf-bg-0: #F7F2E8;
+  --qf-bg-1: #EEF4EA;
+  --qf-bg-2: #EAF0F6;
+
+  --qf-text-strong: #10213A;
+  --qf-text-muted: #475569;
+  --qf-text-subtle: #64748B;
+
+  --qf-gold: #B8792C;
+  --qf-gold-bright: #D6A84F;
+  --qf-gold-soft: rgba(184, 121, 44, 0.16);
+  --qf-score-winner: #8A5A16;
+
+  --qf-pitch: #0F766E;
+  --qf-stadium: #193B5D;
+  --qf-cyan: #38BDF8;
+
+  --glass-bg: rgba(255, 252, 244, 0.58);
+  --glass-bg-strong: rgba(255, 252, 244, 0.68);
+  --glass-bg-soft: rgba(255, 255, 255, 0.46);
+  --glass-border: rgba(255, 255, 255, 0.74);
+  --glass-highlight: rgba(255, 255, 255, 0.94);
+  --glass-shadow: rgba(41, 31, 16, 0.14);
+
+  --nav-pill-bg: rgba(184, 121, 44, 0.12);
+  --nav-pill-border: rgba(184, 121, 44, 0.30);
+  --nav-pill-glow: rgba(184, 121, 44, 0.18);
+
+  --bracket-line: rgba(184, 121, 44, 0.42);
+  --bracket-line-glow: rgba(214, 168, 79, 0.34);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #111827;
-    --foreground: #F9FAFB;
+    --background: #05070F;
+    --foreground: #F8FAFC;
+
+    --qf-bg-0: #05070F;
+    --qf-bg-1: #07111F;
+    --qf-bg-2: #0B1020;
+
+    --qf-text-strong: #F8FAFC;
+    --qf-text-muted: #CBD5E1;
+    --qf-text-subtle: #94A3B8;
+
+    --qf-gold: #D6A84F;
+    --qf-gold-bright: #F1C76B;
+    --qf-gold-soft: rgba(214, 168, 79, 0.18);
+    --qf-score-winner: #F1C76B;
+
+    --qf-pitch: #2DD4BF;
+    --qf-stadium: #38BDF8;
+    --qf-cyan: #38BDF8;
+
+    --glass-bg: rgba(8, 13, 28, 0.58);
+    --glass-bg-strong: rgba(8, 13, 28, 0.70);
+    --glass-bg-soft: rgba(15, 23, 42, 0.44);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-highlight: rgba(255, 255, 255, 0.18);
+    --glass-shadow: rgba(0, 0, 0, 0.55);
+
+    --nav-pill-bg: rgba(214, 168, 79, 0.13);
+    --nav-pill-border: rgba(214, 168, 79, 0.34);
+    --nav-pill-glow: rgba(214, 168, 79, 0.28);
+
+    --bracket-line: rgba(214, 168, 79, 0.52);
+    --bracket-line-glow: rgba(214, 168, 79, 0.42);
   }
 }
 
 body {
   background:
-    linear-gradient(155deg,
-      #F5F5F8 0%,
-      #F8F9FC 38%,
-      #F2F5FA 68%,
-      #F7F8FB 100%
-    );
+    radial-gradient(circle at 18% 8%, rgba(214,168,79,0.24), transparent 34%),
+    radial-gradient(circle at 84% 12%, rgba(15,118,110,0.16), transparent 36%),
+    radial-gradient(circle at 50% 92%, rgba(25,59,93,0.10), transparent 42%),
+    linear-gradient(150deg, var(--qf-bg-0) 0%, var(--qf-bg-1) 48%, var(--qf-bg-2) 100%);
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, sans-serif;
@@ -28,9 +88,11 @@ body {
 @media (prefers-color-scheme: dark) {
   body {
     background:
-      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(30, 50, 100, 0.18) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 90%, rgba(20, 40, 90, 0.14) 0%, transparent 55%),
-      linear-gradient(160deg, #060810 0%, #0a0f1e 45%, #0d1420 100%);
+      radial-gradient(circle at 50% -10%, rgba(255,255,255,0.16), transparent 28%),
+      radial-gradient(circle at 18% 18%, rgba(56,189,248,0.20), transparent 34%),
+      radial-gradient(circle at 86% 12%, rgba(214,168,79,0.18), transparent 32%),
+      radial-gradient(circle at 50% 100%, rgba(15,118,110,0.18), transparent 44%),
+      linear-gradient(160deg, var(--qf-bg-0) 0%, var(--qf-bg-1) 48%, var(--qf-bg-2) 100%);
     background-attachment: fixed;
   }
 }
@@ -197,69 +259,69 @@ button, a, [role="button"], select, input, textarea, label {
 
 /* 标准毛玻璃卡片 */
 .glass {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.75);
+  position: relative;
+  overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(34px) saturate(185%) contrast(105%);
+  -webkit-backdrop-filter: blur(34px) saturate(185%) contrast(105%);
+  border: 1px solid var(--glass-border);
   box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.10),
-    0 4px 16px rgba(0, 0, 0, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    0 18px 56px var(--glass-shadow),
+    0 6px 18px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
 }
-@media (prefers-color-scheme: dark) {
-  .glass {
-    background: rgba(16, 18, 30, 0.84);
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow:
-      0 16px 48px rgba(0, 0, 0, 0.60),
-      0 4px 16px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.10),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.20),
-      0 0 0 0.5px rgba(100, 130, 255, 0.08);
-  }
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.32), transparent 38%),
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,0.22), transparent 32%);
+  opacity: 0.7;
+}
+
+/* 信息密集区域（排行榜/弹窗/选分器）：更不透明的玻璃，保证可读性 */
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 20px 60px var(--glass-shadow),
+    inset 0 1px 0 var(--glass-highlight);
 }
 
 /* 较轻毛玻璃（次级面板） */
 .glass-sm {
-  background: rgba(255, 255, 255, 0.80);
-  backdrop-filter: blur(20px) saturate(190%);
-  -webkit-backdrop-filter: blur(20px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.65);
+  position: relative;
+  overflow: hidden;
+  background: var(--glass-bg-soft);
+  backdrop-filter: blur(24px) saturate(175%);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  border: 1px solid color-mix(in srgb, var(--glass-border) 78%, transparent);
   box-shadow:
-    0 6px 24px rgba(0, 0, 0, 0.09),
-    0 2px 8px rgba(0, 0, 0, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.90);
-}
-@media (prefers-color-scheme: dark) {
-  .glass-sm {
-    background: rgba(28, 30, 46, 0.82);
-    border-color: rgba(255, 255, 255, 0.11);
-    box-shadow:
-      0 6px 24px rgba(0, 0, 0, 0.45),
-      0 2px 8px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  }
+    0 8px 28px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 var(--glass-highlight);
 }
 
 /* 导航栏专用强毛玻璃 */
 .glass-nav {
-  background: rgba(250, 251, 253, 0.90);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.07);
+  background: color-mix(in srgb, var(--glass-bg-strong) 86%, transparent);
+  backdrop-filter: blur(30px) saturate(185%);
+  -webkit-backdrop-filter: blur(30px) saturate(185%);
+  border-bottom: 0.5px solid var(--glass-border);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.80),
-    0 4px 24px rgba(0, 0, 0, 0.06);
+    0 1px 0 rgba(255,255,255,0.55),
+    0 10px 34px rgba(0,0,0,0.08);
 }
 @media (prefers-color-scheme: dark) {
   .glass-nav {
-    background: rgba(7, 9, 18, 0.92);
-    border-bottom-color: rgba(255, 255, 255, 0.07);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.04),
-      0 4px 24px rgba(0, 0, 0, 0.50),
-      inset 0 -1px 0 rgba(100, 130, 255, 0.06);
+      0 1px 0 rgba(255,255,255,0.05),
+      0 12px 38px rgba(0,0,0,0.58),
+      inset 0 -1px 0 rgba(56,189,248,0.07);
   }
 }
 
@@ -332,69 +394,64 @@ button, a, [role="button"], select, input, textarea, label {
   transition: transform 0.06s cubic-bezier(0.4, 0, 1, 1);
 }
 
-/* ── 主按钮：亮色=淡蓝填充+边框，暗色=实心蓝 ── */
+/* ── 主按钮：真正的 trophy gold 系统 ── */
 .btn-gold-primary {
-  background: rgba(59, 130, 246, 0.08);
-  border: 1.5px solid rgba(59, 130, 246, 0.38);
-  box-shadow: none;
-  color: #2563EB;
-  transition: background 0.14s ease, border-color 0.14s ease,
-              transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  background:
+    linear-gradient(135deg, rgba(214,168,79,0.22), rgba(184,121,44,0.12));
+  border: 1.5px solid rgba(184,121,44,0.38);
+  box-shadow:
+    0 8px 22px rgba(184,121,44,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.50);
+  color: var(--qf-gold);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-gold-primary:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.14);
-  border-color: rgba(59, 130, 246, 0.60);
+  background:
+    linear-gradient(135deg, rgba(214,168,79,0.30), rgba(184,121,44,0.18));
+  border-color: rgba(184,121,44,0.56);
+  box-shadow:
+    0 10px 28px rgba(184,121,44,0.22),
+    0 0 18px rgba(214,168,79,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.60);
   transform: translateY(-1px);
 }
 .btn-gold-primary:active:not(:disabled) {
-  background: rgba(59, 130, 246, 0.20);
+  background:
+    linear-gradient(135deg, rgba(214,168,79,0.36), rgba(184,121,44,0.22));
   transform: translateY(0) scale(0.99);
 }
 .btn-gold-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
 @media (prefers-color-scheme: dark) {
   .btn-gold-primary {
-    background: rgba(59, 130, 246, 0.10);
-    border: 1.5px solid rgba(96, 165, 250, 0.38);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(96,165,250,0.08);
-    color: rgba(147, 197, 253, 0.92);
+    color: var(--qf-gold-bright);
+    box-shadow:
+      0 8px 22px rgba(0,0,0,0.35),
+      inset 0 1px 0 rgba(255,255,255,0.08);
   }
   .btn-gold-primary:hover:not(:disabled) {
-    background: rgba(59, 130, 246, 0.18);
-    border-color: rgba(96, 165, 250, 0.60);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 12px rgba(96,165,250,0.20);
-    color: rgba(191, 219, 254, 0.96);
-    transform: translateY(-1px);
-  }
-  .btn-gold-primary:active:not(:disabled) {
-    background: rgba(59, 130, 246, 0.24);
-    border-color: rgba(96, 165, 250, 0.50);
-    transform: translateY(0) scale(0.99);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow:
+      0 10px 28px rgba(0,0,0,0.42),
+      0 0 16px rgba(214,168,79,0.22),
+      inset 0 1px 0 rgba(255,255,255,0.10);
   }
 }
 
-/* ── 蓝色辉光（主要按钮，全模式通用） ── */
+/* ── 金色辉光（主要按钮，全模式通用） ── */
 .glow-amber {
-  transition: box-shadow 0.3s ease, transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: box-shadow 0.28s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glow-amber:hover {
-  box-shadow: 0 0 24px rgba(59, 130, 246, 0.40), 0 4px 16px rgba(59, 130, 246, 0.22);
+  box-shadow:
+    0 0 24px rgba(214,168,79,0.36),
+    0 4px 16px rgba(184,121,44,0.18);
   transform: translateY(-1px);
 }
 .glow-amber:active { transform: scale(0.97) translateY(0); }
-
-/* ── 全模式：所有 bg-amber-500 交互按钮统一切换到蓝色 ── */
-:is(button, a, [type="submit"]).bg-amber-500 {
-  background-color: #3B82F6;
-}
-:is(button, a, [type="submit"]).hover\:bg-amber-400:hover,
-:is(button, a, [type="submit"]).hover\:bg-amber-600:hover {
-  background-color: #2563EB;
-}
-:is(button, a, [type="submit"]).active\:bg-amber-600:active {
-  background-color: #1D4ED8;
-}
 
 /* ── 导航进度条 ── */
 @keyframes nav-progress {
@@ -414,13 +471,13 @@ button, a, [role="button"], select, input, textarea, label {
   animation: shimmer 1.6s ease-in-out infinite;
 }
 
-/* ── 页面进入：translate + 淡入，结束于 transform:none 避免成为 fixed 子元素的 containing block ── */
+/* ── 页面进入：translate + 模糊淡入，结束于 transform:none 避免成为 fixed 子元素的 containing block ── */
 @keyframes page-enter {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(8px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
 }
 .animate-page-enter {
-  animation: page-enter 0.40s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: page-enter 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ── iOS 底部 sheet 入场：移动端从底部滑上，桌面端弹入 ── */
@@ -449,27 +506,53 @@ button, a, [role="button"], select, input, textarea, label {
    淘汰赛赛程表专用动效
    ══════════════════════════════════════════════════════ */
 
-/* 轮次列从左侧弹入 */
+/* 轮次列从左侧弹入（模糊滑入，更高级的 glide） */
 @keyframes bracket-col-left {
-  0%   { opacity: 0; transform: translateX(-20px); }
-  55%  { opacity: 1; transform: translateX(2px); }
-  100% { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateX(-28px) scale(0.985);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
 }
 /* 轮次列从右侧弹入 */
 @keyframes bracket-col-right {
-  0%   { opacity: 0; transform: translateX(20px); }
-  55%  { opacity: 1; transform: translateX(-2px); }
-  100% { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateX(28px) scale(0.985);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
 }
 .animate-bracket-left {
-  animation: bracket-col-left 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+  animation: bracket-col-left 0.56s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .animate-bracket-right {
-  animation: bracket-col-right 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+  animation: bracket-col-right 0.56s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-/* SF+决赛区弹入（从中心放大） */
+/* SF+决赛区弹入（中心模糊聚焦） */
+@keyframes knockout-center-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.972);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
 .animate-bracket-center {
-  animation: spring-in 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: knockout-center-enter 0.66s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* 展开按钮呼吸光环 */
@@ -555,77 +638,186 @@ button, a, [role="button"], select, input, textarea, label {
   }
 }
 
-/* ── 轮次卡片彩色玻璃内光（覆盖 Tailwind shadow-sm） ── */
-/* 轮次卡片彩色玻璃内光（覆盖 Tailwind shadow-sm） */
-.bracket-card-r32 {
+/* ── 淘汰赛卡片：统一玻璃底 + 各轮次不同边缘光（八强以后视觉升级） ── */
+.bracket-match-card {
+  position: relative;
+  color: var(--qf-text-strong);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.50), rgba(255,255,255,0.24));
+  border-color: rgba(255,255,255,0.58);
   box-shadow:
-    0 0 0 1px rgba(96,165,250,0.22),
-    0 2px 8px rgba(96,165,250,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.72),
-    inset 0 -1px 0 rgba(96,165,250,0.08);
+    0 8px 24px rgba(41,31,16,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.70);
 }
+
+.bracket-card-r32,
 .bracket-card-r16 {
   box-shadow:
-    0 0 0 1px rgba(45,212,191,0.22),
-    0 2px 8px rgba(45,212,191,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.72),
-    inset 0 -1px 0 rgba(45,212,191,0.08);
+    0 0 0 1px rgba(25,59,93,0.10),
+    0 6px 20px rgba(25,59,93,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.70);
 }
+
 .bracket-card-qf {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.52), rgba(255,255,255,0.24)),
+    radial-gradient(circle at 0% 0%, rgba(214,168,79,0.20), transparent 42%);
+  border-color: rgba(214,168,79,0.34);
   box-shadow:
-    0 0 0 1px rgba(251,146,60,0.22),
-    0 2px 8px rgba(251,146,60,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.72),
-    inset 0 -1px 0 rgba(251,146,60,0.08);
+    0 12px 36px rgba(184,121,44,0.16),
+    0 0 0 1px rgba(214,168,79,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.74);
 }
+
 .bracket-card-sf {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.52), rgba(255,255,255,0.22)),
+    radial-gradient(circle at 100% 0%, rgba(25,59,93,0.14), transparent 42%);
+  border-color: rgba(25,59,93,0.20);
   box-shadow:
-    0 0 0 1px rgba(167,139,250,0.22),
-    0 2px 8px rgba(167,139,250,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.72),
-    inset 0 -1px 0 rgba(167,139,250,0.08);
+    0 12px 34px rgba(25,59,93,0.14),
+    0 0 0 1px rgba(214,168,79,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.70);
 }
+
 .bracket-card-fin {
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.64), rgba(255,255,255,0.30)),
+    radial-gradient(circle at 50% 0%, rgba(214,168,79,0.28), transparent 48%);
+  border-color: rgba(214,168,79,0.48);
   box-shadow:
-    0 0 0 1px rgba(251,191,36,0.35),
-    0 2px 12px rgba(251,191,36,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.82),
-    inset 0 -1px 0 rgba(251,191,36,0.12);
+    0 0 0 1px rgba(214,168,79,0.30),
+    0 16px 42px rgba(184,121,44,0.22),
+    0 0 26px rgba(214,168,79,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.84);
 }
+
 @media (prefers-color-scheme: dark) {
-  .bracket-card-r32 {
+  .bracket-match-card {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.65);
+    background:
+      linear-gradient(145deg, rgba(14,25,48,0.68), rgba(7,11,24,0.52));
+    border-color: rgba(255,255,255,0.12);
     box-shadow:
-      0 0 0 1px rgba(96,165,250,0.38),
-      0 3px 14px rgba(96,165,250,0.28),
-      inset 0 1px 0 rgba(255,255,255,0.13),
-      inset 0 -1px 0 rgba(96,165,250,0.16);
+      0 12px 34px rgba(0,0,0,0.42),
+      inset 0 1px 0 rgba(255,255,255,0.12);
   }
+
+  .bracket-card-r32,
   .bracket-card-r16 {
     box-shadow:
-      0 0 0 1px rgba(45,212,191,0.38),
-      0 3px 14px rgba(45,212,191,0.28),
-      inset 0 1px 0 rgba(255,255,255,0.13),
-      inset 0 -1px 0 rgba(45,212,191,0.16);
+      0 0 0 1px rgba(56,189,248,0.18),
+      0 8px 28px rgba(0,0,0,0.36),
+      inset 0 1px 0 rgba(255,255,255,0.12);
   }
+
   .bracket-card-qf {
+    background:
+      linear-gradient(145deg, rgba(14,25,48,0.72), rgba(7,11,24,0.54)),
+      radial-gradient(circle at 0% 0%, rgba(214,168,79,0.18), transparent 44%);
+    border-color: rgba(214,168,79,0.30);
     box-shadow:
-      0 0 0 1px rgba(251,146,60,0.38),
-      0 3px 14px rgba(251,146,60,0.28),
-      inset 0 1px 0 rgba(255,255,255,0.13),
-      inset 0 -1px 0 rgba(251,146,60,0.16);
+      0 14px 42px rgba(0,0,0,0.46),
+      0 0 24px rgba(214,168,79,0.10),
+      0 0 0 1px rgba(214,168,79,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.12);
   }
+
   .bracket-card-sf {
+    background:
+      linear-gradient(145deg, rgba(14,25,48,0.74), rgba(7,11,24,0.56)),
+      radial-gradient(circle at 100% 0%, rgba(56,189,248,0.16), transparent 44%);
+    border-color: rgba(56,189,248,0.18);
     box-shadow:
-      0 0 0 1px rgba(167,139,250,0.38),
-      0 3px 14px rgba(167,139,250,0.28),
-      inset 0 1px 0 rgba(255,255,255,0.13),
-      inset 0 -1px 0 rgba(167,139,250,0.16);
+      0 14px 42px rgba(0,0,0,0.48),
+      0 0 20px rgba(56,189,248,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.12);
   }
+
   .bracket-card-fin {
+    background:
+      linear-gradient(145deg, rgba(18,25,42,0.82), rgba(6,10,22,0.64)),
+      radial-gradient(circle at 50% 0%, rgba(214,168,79,0.24), transparent 48%);
+    border-color: rgba(214,168,79,0.42);
     box-shadow:
-      0 0 0 1px rgba(251,191,36,0.48),
-      0 3px 20px rgba(251,191,36,0.38),
-      inset 0 1px 0 rgba(255,255,255,0.15),
-      inset 0 -1px 0 rgba(251,191,36,0.22);
+      0 0 0 1px rgba(214,168,79,0.30),
+      0 18px 48px rgba(0,0,0,0.54),
+      0 0 34px rgba(214,168,79,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.15);
   }
+}
+
+/* 胜者行：左侧金线代替大面积色块 */
+.bracket-row-winner {
+  position: relative;
+  background:
+    linear-gradient(90deg, rgba(214,168,79,0.18), transparent 72%);
+}
+.bracket-row-winner::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--qf-gold-bright);
+  box-shadow: 0 0 10px rgba(214,168,79,0.58);
+}
+
+/* 队名行局部底色，避免文字直接压在复杂背景上 */
+.bracket-team-row {
+  background: rgba(255,255,255,0.20);
+}
+@media (prefers-color-scheme: dark) {
+  .bracket-team-row {
+    background: rgba(2,6,23,0.22);
+  }
+}
+
+/* 对阵连接线：金色高级线条 */
+.bracket-connector-line {
+  border-color: var(--bracket-line) !important;
+  filter: drop-shadow(0 0 5px var(--bracket-line-glow));
+}
+
+/* 轮次 tab 激活态 */
+.round-tab-active {
+  color: var(--qf-stadium);
+  background: rgba(25,59,93,0.08);
+  border-color: rgba(25,59,93,0.20);
+  box-shadow: 0 4px 14px rgba(25,59,93,0.10);
+}
+.round-tab-active-qf,
+.round-tab-active-final {
+  color: var(--qf-gold);
+  background: var(--qf-gold-soft);
+  border-color: rgba(214,168,79,0.36);
+  box-shadow:
+    0 4px 16px rgba(184,121,44,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.36);
+}
+@media (prefers-color-scheme: dark) {
+  .round-tab-active {
+    color: rgba(186,230,253,0.94);
+    background: rgba(56,189,248,0.10);
+    border-color: rgba(56,189,248,0.22);
+  }
+  .round-tab-active-qf,
+  .round-tab-active-final {
+    color: rgba(241,199,107,0.96);
+    background: rgba(214,168,79,0.12);
+    border-color: rgba(214,168,79,0.34);
+    box-shadow:
+      0 0 18px rgba(214,168,79,0.18),
+      inset 0 1px 0 rgba(255,255,255,0.10);
+  }
+}
+
+/* 决赛卡片外层聚焦光框 */
+.final-focus-frame {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(214,168,79,0.14), transparent 58%);
+  border: 1px solid rgba(214,168,79,0.18);
 }

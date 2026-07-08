@@ -19,23 +19,18 @@ const PAIR_GAP: Record<string, number> = {
 }
 
 // 每轮卡片颜色 = 背景色 + 彩色内光CSS类
-const R32_COLOR   = 'bg-blue-100/50 dark:bg-blue-900/25 bracket-card-r32'
-const R16_COLOR   = 'bg-teal-100/50 dark:bg-teal-900/25 bracket-card-r16'
-const QF_COLOR    = 'bg-orange-100/45 dark:bg-orange-900/20 bracket-card-qf'
-const SF_COLOR    = 'bg-violet-100/50 dark:bg-violet-900/25 bracket-card-sf'
-const FINAL_COLOR = 'bg-amber-50/70 dark:bg-amber-900/30 bracket-card-fin'
+const R32_COLOR   = 'bracket-card-r32'
+const R16_COLOR   = 'bracket-card-r16'
+const QF_COLOR    = 'bracket-card-qf'
+const SF_COLOR    = 'bracket-card-sf'
+const FINAL_COLOR = 'bracket-card-fin'
 
 const ROUND_TABS = [
-  { level: 0, label: '32强',
-    activeTab: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-400/40 dark:border-blue-400/30 shadow-sm shadow-blue-400/25 dark:shadow-blue-400/15' },
-  { level: 1, label: '16强',
-    activeTab: 'bg-teal-500/10 text-teal-600 dark:text-teal-300 border-teal-400/40 dark:border-teal-400/30 shadow-sm shadow-teal-400/25 dark:shadow-teal-400/15' },
-  { level: 2, label: '8强',
-    activeTab: 'bg-orange-500/10 text-orange-600 dark:text-orange-300 border-orange-400/40 dark:border-orange-400/30 shadow-sm shadow-orange-400/25 dark:shadow-orange-400/15' },
-  { level: 3, label: '半决赛',
-    activeTab: 'bg-violet-500/10 text-violet-600 dark:text-violet-300 border-violet-400/40 dark:border-violet-400/30 shadow-sm shadow-violet-400/25 dark:shadow-violet-400/15' },
-  { level: 3, label: '决赛',
-    activeTab: 'bg-amber-400/10 text-amber-700 dark:text-amber-300 border-amber-400/40 dark:border-amber-400/30 shadow-sm shadow-amber-400/30 dark:shadow-amber-400/20' },
+  { level: 0, label: '32强', activeTab: 'round-tab-active' },
+  { level: 1, label: '16强', activeTab: 'round-tab-active' },
+  { level: 2, label: '8强', activeTab: 'round-tab-active-qf' },
+  { level: 3, label: '半决赛', activeTab: 'round-tab-active-qf' },
+  { level: 3, label: '决赛', activeTab: 'round-tab-active-final' },
 ]
 
 function indexByMatchNum(matches: BracketMatchData[]): Map<number, BracketMatchData> {
@@ -255,7 +250,7 @@ export default function BracketContent() {
               </div>
 
               {/* Final — 金色辉光包裹 */}
-              <div className="flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl animate-final-glow">
+              <div className="final-focus-frame flex flex-col items-center gap-1.5 px-1 py-2 rounded-2xl animate-final-glow">
                 <div className="flex flex-col items-center gap-0">
                   <svg viewBox="0 0 20 20" width="18" height="18" fill="none" className="text-amber-400 drop-shadow-sm">
                     <path d="M10 2l1.2 3.6h3.8l-3.1 2.2 1.2 3.6L10 9.2l-3.1 2.2 1.2-3.6L5 5.6h3.8z" fill="currentColor"/>

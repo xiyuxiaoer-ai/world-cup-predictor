@@ -1,4 +1,4 @@
-type Variant = 'auth' | 'home' | 'records' | 'members' | 'rules' | 'profile'
+type Variant = 'auth' | 'home' | 'records' | 'members' | 'rules' | 'profile' | 'bracket'
 
 function AuthBg() {
   return (
@@ -111,26 +111,54 @@ function ProfileBg() {
   )
 }
 
+function BracketBg() {
+  return (
+    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1200 800" fill="none" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="qfPitchLine" x1="0" y1="0" x2="1200" y2="800">
+          <stop stopColor="currentColor" stopOpacity="0.55" />
+          <stop offset="1" stopColor="currentColor" stopOpacity="0.12" />
+        </linearGradient>
+      </defs>
+
+      <rect x="90" y="120" width="1020" height="560" rx="28" stroke="url(#qfPitchLine)" strokeWidth="1.4" />
+      <line x1="600" y1="120" x2="600" y2="680" stroke="url(#qfPitchLine)" strokeWidth="1.2" />
+      <circle cx="600" cy="400" r="116" stroke="url(#qfPitchLine)" strokeWidth="1.2" />
+      <circle cx="600" cy="400" r="5" fill="currentColor" opacity="0.28" />
+
+      <rect x="90" y="270" width="160" height="260" rx="18" stroke="url(#qfPitchLine)" strokeWidth="1.1" />
+      <rect x="950" y="270" width="160" height="260" rx="18" stroke="url(#qfPitchLine)" strokeWidth="1.1" />
+
+      <path d="M250 320 C320 350 320 450 250 480" stroke="url(#qfPitchLine)" strokeWidth="1" strokeDasharray="8 8" />
+      <path d="M950 320 C880 350 880 450 950 480" stroke="url(#qfPitchLine)" strokeWidth="1" strokeDasharray="8 8" />
+
+      <path d="M160 170 L300 230 L160 290" stroke="currentColor" strokeOpacity="0.18" strokeWidth="1" />
+      <path d="M1040 170 L900 230 L1040 290" stroke="currentColor" strokeOpacity="0.18" strokeWidth="1" />
+    </svg>
+  )
+}
+
 export default function PageBackground({ variant }: { variant: Variant }) {
   return (
     <>
       {/* 环境光晕色斑（为毛玻璃提供背景色彩层次） */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden>
         <div className="absolute -top-1/4 -right-1/5 w-[80vw] h-[80vw] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.22) 0%, rgba(251,191,36,0.08) 45%, transparent 70%)' }} />
+          style={{ background: 'radial-gradient(circle, rgba(214,168,79,0.24) 0%, rgba(214,168,79,0.08) 45%, transparent 70%)' }} />
         <div className="absolute -bottom-1/4 -left-1/5 w-[70vw] h-[70vw] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.16) 0%, rgba(139,92,246,0.06) 45%, transparent 70%)' }} />
-        <div className="absolute top-[30%] left-[15%] w-[45vw] h-[45vw] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.07) 0%, transparent 65%)' }} />
+          style={{ background: 'radial-gradient(circle, rgba(15,118,110,0.18) 0%, rgba(56,189,248,0.07) 45%, transparent 70%)' }} />
+        <div className="absolute top-[24%] left-[12%] w-[48vw] h-[48vw] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 64%)' }} />
       </div>
       {/* 足球场 SVG 纹理 */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.09]">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0 opacity-[0.08] text-slate-900 dark:text-white">
         {variant === 'auth'    && <AuthBg />}
         {variant === 'home'    && <HomeBg />}
         {variant === 'records' && <RecordsBg />}
         {variant === 'members' && <MembersBg />}
         {variant === 'rules'   && <RulesBg />}
         {variant === 'profile' && <ProfileBg />}
+        {variant === 'bracket' && <BracketBg />}
       </div>
     </>
   )
