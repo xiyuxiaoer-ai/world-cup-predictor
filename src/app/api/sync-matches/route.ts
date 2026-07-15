@@ -90,14 +90,15 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
 
 
   // ── 各轮胜者 → 补充下一轮队名（API 有时不及时传播）──
-  // 奇数 posInRound 的胜者 → 下一场主队槽位；偶数 → 客队槽位
-  // 覆盖 R32→R16、R16→QF、QF→SF、SF→Final 全部层级
+  // 奇数 posInRound 的队伍 → 下一场主队槽位；偶数 → 客队槽位
+  // 覆盖 R32→R16、R16→QF、QF→SF、SF→Final 全部层级；SF 的负者额外补充进季军赛（loserFeedsInto）
   type TeamRef = { name: string; tla: string | null }
   const winnerSupplement = new Map<number, { homeSlot: TeamRef | null; awaySlot: TeamRef | null }>()
   for (const m of matches) {
     if (m.status !== 'FINISHED') continue
 
     let feedsInto: number | undefined
+    let loserFeedsInto: number | undefined
     let posInRound: number | undefined
 
     if (m.stage === 'LAST_32') {
@@ -109,20 +110,27 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
       const matchNum = LATER_SLOT_BY_ID[m.id as number]
       if (matchNum === undefined) continue
       const slot = LATER_ROUNDS[matchNum]
-      if (!slot || !slot.feedsInto) continue
-      feedsInto = slot.feedsInto
+      if (!slot || (!slot.feedsInto && !slot.loserFeedsInto)) continue
+      feedsInto = slot.feedsInto ?? undefined
+      loserFeedsInto = slot.loserFeedsInto ?? undefined
       posInRound = slot.posInRound
     }
 
     let winnerName: string | null = null
     let winnerTla: string | null = null
+    let loserName: string | null = null
+    let loserTla: string | null = null
 
     if (m.score.winner === 'HOME_TEAM') {
       winnerName = m.homeTeam.name || m.homeTeam.shortName || null
       winnerTla = m.homeTeam.tla || null
+      loserName = m.awayTeam.name || m.awayTeam.shortName || null
+      loserTla = m.awayTeam.tla || null
     } else if (m.score.winner === 'AWAY_TEAM') {
       winnerName = m.awayTeam.name || m.awayTeam.shortName || null
       winnerTla = m.awayTeam.tla || null
+      loserName = m.homeTeam.name || m.homeTeam.shortName || null
+      loserTla = m.homeTeam.tla || null
     } else {
       // API winner=null（已知 bug），回退到 DB 存储的点球/加时胜者
       const prev = prevMap.get(String(m.id))
@@ -132,18 +140,30 @@ async function runSync(ctx: { triggeredBy: string; userAgent: string; ip: string
         const awayApiName = m.awayTeam.name || m.awayTeam.shortName || ''
         if (stored === homeApiName) {
           winnerName = homeApiName; winnerTla = m.homeTeam.tla || null
+          loserName = awayApiName; loserTla = m.awayTeam.tla || null
         } else {
           winnerName = awayApiName; winnerTla = m.awayTeam.tla || null
+          loserName = homeApiName; loserTla = m.homeTeam.tla || null
         }
       }
     }
 
-    if (!winnerName) continue
-    const cur = winnerSupplement.get(feedsInto) ?? { homeSlot: null, awaySlot: null }
-    if (posInRound! % 2 === 1) {
-      winnerSupplement.set(feedsInto, { ...cur, homeSlot: { name: winnerName, tla: winnerTla } })
-    } else {
-      winnerSupplement.set(feedsInto, { ...cur, awaySlot: { name: winnerName, tla: winnerTla } })
+    if (winnerName && feedsInto !== undefined) {
+      const cur = winnerSupplement.get(feedsInto) ?? { homeSlot: null, awaySlot: null }
+      if (posInRound! % 2 === 1) {
+        winnerSupplement.set(feedsInto, { ...cur, homeSlot: { name: winnerName, tla: winnerTla } })
+      } else {
+        winnerSupplement.set(feedsInto, { ...cur, awaySlot: { name: winnerName, tla: winnerTla } })
+      }
+    }
+
+    if (loserName && loserFeedsInto !== undefined) {
+      const cur = winnerSupplement.get(loserFeedsInto) ?? { homeSlot: null, awaySlot: null }
+      if (posInRound! % 2 === 1) {
+        winnerSupplement.set(loserFeedsInto, { ...cur, homeSlot: { name: loserName, tla: loserTla } })
+      } else {
+        winnerSupplement.set(loserFeedsInto, { ...cur, awaySlot: { name: loserName, tla: loserTla } })
+      }
     }
   }
 

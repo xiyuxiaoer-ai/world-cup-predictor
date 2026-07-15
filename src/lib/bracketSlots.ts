@@ -58,7 +58,8 @@ export const LATER_SLOT_BY_ID: Record<number, number> = {
   // SF
   537387: 101,  // 07/14 19:00 UTC → upper
   537388: 102,  // 07/15 19:00 UTC → lower
-  // Final
+  // Third place & Final
+  537389: 103,  // 07/18 UTC 季军赛
   537390: 104,  // 07/19 19:00 UTC
 }
 
@@ -68,10 +69,11 @@ export const LATER_SLOT_BY_ID: Record<number, number> = {
 // ─────────────────────────────────────────────
 export type LaterRoundSlot = {
   half: 'upper' | 'lower' | 'final'
-  round: 'r16' | 'qf' | 'sf' | 'final'
+  round: 'r16' | 'qf' | 'sf' | 'final' | 'third_place'
   stage: string
   posInRound: number
-  feedsInto: number | null
+  feedsInto: number | null       // 胜者进下一轮的 matchNum
+  loserFeedsInto?: number | null // 负者进季军赛的 matchNum（仅 SF 有）
 }
 
 export const LATER_ROUNDS: Record<number, LaterRoundSlot> = {
@@ -91,9 +93,11 @@ export const LATER_ROUNDS: Record<number, LaterRoundSlot> = {
   // QF — 下半区
   99: { half: 'lower', round: 'qf', stage: 'quarter_final', posInRound: 1, feedsInto: 102 },
   100: { half: 'lower', round: 'qf', stage: 'quarter_final', posInRound: 2, feedsInto: 102 },
-  // SF
-  101: { half: 'upper', round: 'sf', stage: 'semi_final', posInRound: 1, feedsInto: 104 },
-  102: { half: 'lower', round: 'sf', stage: 'semi_final', posInRound: 1, feedsInto: 104 },
+  // SF（posInRound 1/2 分别对应 Final 与季军赛的主/客场槽位）
+  101: { half: 'upper', round: 'sf', stage: 'semi_final', posInRound: 1, feedsInto: 104, loserFeedsInto: 103 },
+  102: { half: 'lower', round: 'sf', stage: 'semi_final', posInRound: 2, feedsInto: 104, loserFeedsInto: 103 },
+  // 季军赛
+  103: { half: 'final', round: 'third_place', stage: 'third_place', posInRound: 1, feedsInto: null },
   // Final
   104: { half: 'final', round: 'final', stage: 'final', posInRound: 1, feedsInto: null },
 }
